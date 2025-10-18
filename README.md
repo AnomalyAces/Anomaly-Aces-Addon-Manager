@@ -1,1 +1,1 @@
-# Anomaly-Aces-Plugin-Manager
+# Anomaly-Aces-Addon-Manager
