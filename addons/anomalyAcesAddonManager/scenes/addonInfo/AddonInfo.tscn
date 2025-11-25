@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmps3vhsgsals"]
+
+[ext_resource type="Script" uid="uid://chgck0ejmuk25" path="res://addons/anomalyAcesAddonManager/scenes/addonInfo/addon_info.gd" id="1_dttx4"]
+
+[node name="AddonInfo" type="HBoxContainer"]
+alignment = 1
+script = ExtResource("1_dttx4")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Test"
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 2
+text = "Test2"
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 2
+text = "Test3"

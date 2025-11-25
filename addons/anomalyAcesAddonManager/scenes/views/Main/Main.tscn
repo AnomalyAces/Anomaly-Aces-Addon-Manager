@@ -1,0 +1,57 @@
+[gd_scene load_steps=9 format=3 uid="uid://jg4xi14xt04h"]
+
+[ext_resource type="Script" uid="uid://bbdorbbnvdkof" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/ace_plugin_main_view.gd" id="1_0542m"]
+[ext_resource type="Script" uid="uid://sx1wgfw6xjis" path="res://addons/anomalyAcesTable/Scripts/ace_table_properties.gd" id="2_0542m"]
+[ext_resource type="Theme" uid="uid://bx1fly6adbouv" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/Main-HeaderTheme.tres" id="3_l7mma"]
+[ext_resource type="Theme" uid="uid://dvm3ul1pd018w" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/Main-HeaderCellTheme.tres" id="4_0542m"]
+[ext_resource type="Theme" uid="uid://wgkqeg5mojsr" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/Main-RowTheme.tres" id="4_t5kl5"]
+[ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/Main-RowCellTheme.tres" id="5_y0qvv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0542m"]
+bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
+
+[sub_resource type="Theme" id="Theme_l7mma"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_0542m")
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_0542m")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_l7mma")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Ace Addon Manager"
+horizontal_alignment = 1
+
+[node name="AceTable" type="Control" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+script = ExtResource("2_0542m")
+header_theme = ExtResource("3_l7mma")
+header_cell_theme = ExtResource("4_0542m")
+row_theme = ExtResource("4_t5kl5")
+row_cell_theme = ExtResource("5_y0qvv")
+cell_separation = 0
+metadata/_custom_type_script = "uid://sx1wgfw6xjis"

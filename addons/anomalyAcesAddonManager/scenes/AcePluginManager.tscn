@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://c4d8ha0malyi4"]
+
+[ext_resource type="Script" uid="uid://cr5efgs3bsx2w" path="res://addons/anomalyAcesAddonManager/scenes/ace_plugin_manager.gd" id="1_ihacs"]
+[ext_resource type="PackedScene" uid="uid://jg4xi14xt04h" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/Main.tscn" id="2_grbuy"]
+
+[node name="AcePluginManager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ihacs")
+
+[node name="Main" parent="." instance=ExtResource("2_grbuy")]
+layout_mode = 1
