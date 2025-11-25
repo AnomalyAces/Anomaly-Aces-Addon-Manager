@@ -12,7 +12,21 @@
         "isRelease": true,
         "version": "1.0",
         "branch": "master"
-      }
+      },
+	  {
+		"owner": "anomalyaces",
+		"repo": "Anomaly-Aces-Log-Plugin",
+		"isRelease": true,
+		"version": "1.0",
+		"branch": "master"
+	  },
+	  {
+		"owner": "anomalyaces",
+		"repo": "Anomaly-Aces-Table-Plugin",
+		"isRelease": true,
+		"version": "1.0",
+		"branch": "master"
+	  }
     ]
   }
 ]
