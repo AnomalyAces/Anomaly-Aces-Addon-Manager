@@ -17,12 +17,12 @@ var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
 }
 
 var settings: AceSettings
+var parent_node: Node
 
-var http: HTTPRequest
 
 
-func _init(req:HTTPRequest) -> void:
-	http = req
+func _init(parent: Node) -> void:
+	parent_node = parent
 	settings = AceSettings.new()
 	settings.initialize_settings(SETTINGS_CONFIGURATION, SETTINGS_ROOT)
 	settings.prepare()
@@ -66,7 +66,7 @@ func _getAddonFiles() -> Array[RemoteRepoObject]:
 			var addonResp:AceDeserializeResult = AceSerialize.deserialize(content, RemoteRepoObject)
 
 			if addonResp.error == Error.OK:
-				AceLog.printLog(["Successfully deserialized addon file", addonResp.data])
+				AceLog.printLog(["Successfully deserialized addon file: " , file_path])
 				var rro_sub_arr: Array[RemoteRepoObject] = []
 				rro_sub_arr.assign(addonResp.data)
 				rroList.append_array(rro_sub_arr)

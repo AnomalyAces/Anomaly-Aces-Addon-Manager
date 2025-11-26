@@ -1,7 +1,6 @@
 @tool
 class_name AcePluginMainView extends Control
 
-@onready var http: HTTPRequest = $HTTPRequest
 # @onready var container: VBoxContainer = $VBoxContainer
 
 @onready var tablePlugin: AceTable = $PanelContainer/VBoxContainer/AceTable
@@ -9,7 +8,7 @@ class_name AcePluginMainView extends Control
 var rrm: RemoteRepoManager
 
 func _ready() -> void:
-	rrm = GitHubManager.new(http)
+	rrm = GitHubManager.new(self)
 	_createTable()
 	# for i in randi_range(1,3):
 	# 	_add_addonInfo()
