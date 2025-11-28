@@ -6,15 +6,14 @@ var repo: String
 var isRelease: bool
 var version: String
 var branch: String
-var branch_last_commit: String
-var dependencies: Array[RemoteRepoObject]
-var dict: Dictionary[String, RemoteRepoObject]
+var metadata: RemoteRepoMetadata = RemoteRepoMetadata.new()
+var dependencies: Array[RemoteRepoObject] = []
 
 
 
 func _to_string() -> String:
-    return "RemoteRepoObject[owner: %s, repo: %s, isRelease: %s, version: %s, branch: %s, branch_last_commit: %s, dependencies: %s"  \
-        % [owner, repo, isRelease, version, branch, branch_last_commit, str(dependencies)]
+    return "RemoteRepoObject[owner: %s, repo: %s, isRelease: %s, version: %s, branch: %s, metadata: %s, dependencies: %s"  \
+        % [owner, repo, isRelease, version, branch, metadata._to_string(), str(dependencies)]
 
 
 

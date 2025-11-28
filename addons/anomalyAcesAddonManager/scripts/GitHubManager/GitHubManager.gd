@@ -10,6 +10,8 @@ const GITHUB_BRANCH_API_URL: String = "https://api.github.com/repos/%s/%s/branch
 
 const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipball/%s"
 
+const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github/"
+
 signal addons_processed
 
 var _addons: Array[RemoteRepoObject] = []
@@ -41,7 +43,7 @@ func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 
 	var http: HTTPRequest = HTTPRequest.new()
 	parent_node.add_child(http)
-	_setHTTPSignals(http, addon)
+	_setHTTPAddonInfoSignal(http, addon)
 	AceLog.printLog(["Found Addon Config: %s Version: %s" % [addon.repo, addon.version]])
 	var github_url: String = GITHUB_RELEASES_API_URL % [addon.owner, addon.repo, addon.version] if addon.isRelease else GITHUB_BRANCH_API_URL % [addon.owner, addon.repo, addon.branch]
 
@@ -58,14 +60,14 @@ func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 		addons_processed.emit()
 
 
-func _setHTTPSignals(http: HTTPRequest, addon: RemoteRepoObject) -> void:
-	if http.request_completed.is_connected(_http_request_completed):
-		http.request_completed.disconnect(_http_request_completed)
+func _setHTTPAddonInfoSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void:
+	if http.request_completed.is_connected(_http_addon_info_request_completed):
+		http.request_completed.disconnect(_http_addon_info_request_completed)
 	
-	http.request_completed.connect(_http_request_completed.bind(addon, http))
+	http.request_completed.connect(_http_addon_info_request_completed.bind(addon, http))
 
 
-func _http_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
+func _http_addon_info_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
 
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["HTTP Request Failed with result: %d, response code: %d" % [result, response_code]], AceLog.LOG_LEVEL.ERROR)
@@ -75,7 +77,7 @@ func _http_request_completed(result: int, response_code: int, headers: PackedStr
 			var body_str: String = body.get_string_from_utf8()
 			var json_data = JSON.parse_string(body_str)
 			AceLog.printLog(["Error response from GitHub API for addon: %s - Response Code: %d - Error Message: %s." % [addon.repo, response_code, json_data["message"]]], AceLog.LOG_LEVEL.ERROR)
-			_printAddonErrorMessage(addon)
+			_printAddonInfoErrorMessage(addon)
 			return
 		else:
 			var body_str: String = body.get_string_from_utf8()
@@ -85,20 +87,27 @@ func _http_request_completed(result: int, response_code: int, headers: PackedStr
 			# Process the json_data
 			if addon.isRelease:
 				if json_data.has("zipball_url"):
-					addon.download_url = json_data["zipball_url"]
+					addon.metadata.download_url = json_data["zipball_url"]
 					# TODO: Call the content download API here
 			else:
 				if json_data.has("commit") && json_data["commit"].has("commit"):
-					addon.branch_last_commit = json_data["commit"]["commit"]["author"]["date"]
-					AceLog.printLog(["Addon: %s - Branch Last Commit Date: %s" % [addon.repo, addon.branch_last_commit]])
+					addon.metadata.branch_last_commit = json_data["commit"]["commit"]["author"]["date"]
+					AceLog.printLog(["Addon: %s - Branch Last Commit Date: %s" % [addon.repo, addon.metadata.branch_last_commit]])
+					addon.metadata.download_url = GITHUB_BRANCH_ZIP_URL % [addon.owner, addon.repo, addon.branch]
 					# TODO: Call the content download API here
 			
+			if addon.metadata.download_url == null || addon.metadata.download_url.is_empty():
+				AceLog.printLog(["Download URL not found for addon: %s" % addon.repo], AceLog.LOG_LEVEL.ERROR)
+				return
+			else:
+				_downloadAddonFromRemoteRepo(addon)
+
 			parent_node.remove_child(http)
 			http.queue_free()
 
 	
 
-func _printAddonErrorMessage(addon: RemoteRepoObject) -> void:
+func _printAddonInfoErrorMessage(addon: RemoteRepoObject) -> void:
 	var github_url: String = GITHUB_RELEASES_API_URL % [addon.owner, addon.repo, addon.version] if addon.isRelease else GITHUB_BRANCH_API_URL % [addon.owner, addon.repo, addon.branch]
 	if addon.isRelease:
 		AceLog.printLog(
@@ -108,5 +117,65 @@ func _printAddonErrorMessage(addon: RemoteRepoObject) -> void:
 	else:
 		AceLog.printLog(
 			["Branch %s of addon %s is not available. Check that the branch exists or try a release version instead by setting isRelease to true in the addons.json file. Url: %s" % [addon.branch, addon.repo, github_url]],
+			AceLog.LOG_LEVEL.ERROR
+		)
+
+func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
+	var http: HTTPRequest = HTTPRequest.new()
+	parent_node.add_child(http)
+	_setHTTPAddonDownloadSignal(http, addon)
+	AceLog.printLog(["Starting download for Addon: %s" % [addon.repo]])
+	var github_url: String = addon.metadata.download_url
+
+	# Create temp directory if it doesn't exist
+	if !DirAccess.dir_exists_absolute(GITHUB_TEMP_DOWNLOAD_PATH):
+		DirAccess.make_dir_recursive_absolute(GITHUB_TEMP_DOWNLOAD_PATH)
+
+	#Set Download File Path
+	http.download_file = GITHUB_TEMP_DOWNLOAD_PATH + "%s.zip" % addon.repo
+
+	var resp = http.request(github_url, GITHUB_API_HEADERS)
+	AceLog.printLog(["Wating for GitHub API download request %s" % github_url] )
+	await http.request_completed
+	if resp != OK:
+		AceLog.printLog(["Failed to make HTTP download request for addon: %s" % addon.repo], AceLog.LOG_LEVEL.ERROR)
+	
+	AceLog.printLog(["Download request completed for Addon: %s" % [addon.repo]])
+
+
+func _setHTTPAddonDownloadSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void: 
+	if http.request_completed.is_connected(_http_addon_download_request_completed):
+		http.request_completed.disconnect(_http_addon_download_request_completed)
+	http.request_completed.connect(_http_addon_download_request_completed.bind(addon, http))
+
+func _http_addon_download_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS:
+		AceLog.printLog(["HTTP Download Request Failed with result: %d, response code: %d" % [result, response_code]], AceLog.LOG_LEVEL.ERROR)
+		return
+	else :
+		if response_code >= 400:
+			var body_str: String = body.get_string_from_utf8()
+			var json_data = JSON.parse_string(body_str)
+			AceLog.printLog(["Error response from GitHub API for addon download: %s - Response Code: %d - Error Message: %s." % [addon.repo, response_code, json_data["message"]]], AceLog.LOG_LEVEL.ERROR)
+			_printAddonDownloadErrorMessage(addon)
+			return
+		else:
+			if FileAccess.file_exists(http.download_file):
+				AceLog.printLog(["Successfully downloaded addon: %s to path: %s" % [addon.repo, http.download_file]])
+			else:
+				AceLog.printLog(["Failed to download addon: %s to path: %s" % [addon.repo, http.download_file]], AceLog.LOG_LEVEL.ERROR)
+			
+			parent_node.remove_child(http)
+			http.queue_free()
+
+func _printAddonDownloadErrorMessage(addon: RemoteRepoObject) -> void:
+	if addon.isRelease:
+		AceLog.printLog(
+			["Failed to download release version %s of addon %s. Try a different release version or branch by changing the isRelease value to false in the addons.json file." % [addon.version, addon.repo]],
+			AceLog.LOG_LEVEL.ERROR
+		)
+	else:
+		AceLog.printLog(
+			["Failed to download branch %s of addon %s. Check that the branch exists or try a release version instead by setting isRelease to true in the addons.json file." % [addon.branch, addon.repo]],
 			AceLog.LOG_LEVEL.ERROR
 		)

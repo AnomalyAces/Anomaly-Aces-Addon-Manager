@@ -3,6 +3,9 @@ class_name RemoteRepoManager extends Object
 
 ##Settings root
 const SETTINGS_ROOT: String = "aceAddonManager"
+
+## If true this plugin will automatically download addons from remote repos when Godot starts
+const AUTO_DOWNLOAD_ADDONS: String = "settings/auto_download_addons"
 ## Check for updates. If true this plugin will check for updates and notify the user when they are available
 const CHECK_FOR_UPDATES: String = "settings/check_for_updates"
 
@@ -13,6 +16,7 @@ const ADDON_FILE: String = "addons.json"
 const ADDON_DIR: String = "res://addons"
 
 var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
+	AUTO_DOWNLOAD_ADDONS: AceSettingConfig.new(AUTO_DOWNLOAD_ADDONS, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
 	CHECK_FOR_UPDATES: AceSettingConfig.new(CHECK_FOR_UPDATES, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE)
 }
 
@@ -31,11 +35,10 @@ func _parseAddonFiles() -> Array[RemoteRepoObject]:
 	AceLog.printLog(["Parsing Addon Files...."])
 	var rroList: Array[RemoteRepoObject] = []
 
-	if settings.get_setting(CHECK_FOR_UPDATES, false):
+	if settings.get_setting(AUTO_DOWNLOAD_ADDONS, false):
 		rroList = _getAddonFiles()
 	else:
-		AceLog.printLog(["Ace Addon Manager Setting: %s is not enabled in the project settings. Parsing addon files skipped" % CHECK_FOR_UPDATES], AceLog.LOG_LEVEL.WARN)
-
+		AceLog.printLog(["Ace Addon Manager Setting: %s is not enabled in the project settings. Auto Download of addons has been disabled." % AUTO_DOWNLOAD_ADDONS], AceLog.LOG_LEVEL.WARN)
 
 	return rroList
 
