@@ -13,10 +13,13 @@ const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipbal
 const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github/"
 
 signal addons_processed
+signal addons_downloaded
 
 var _addons: Array[RemoteRepoObject] = []
 var _num_requests: int = 0
 var _requests_completed: int = 0
+var _num_download_requests: int = 0
+var _download_requests_completed: int = 0
 
 func getAddonsFromRemoteRepo():
 	_addons = _parseAddonFiles()
@@ -27,6 +30,8 @@ func getAddonsFromRemoteRepo():
 
 	await addons_processed
 	AceLog.printLog(["Addons Processed from Remote Repo: ", _addons])
+
+	
 	return _addons
 
 func _get_num_requests(addons: Array[RemoteRepoObject]) -> int:
