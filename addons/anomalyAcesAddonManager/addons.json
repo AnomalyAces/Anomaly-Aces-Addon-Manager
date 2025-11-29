@@ -1,32 +1,36 @@
 [
-  {
-	"owner": "anomalyaces",
-	"repo": "Anomaly-Aces-Addon-Manager",
-	"isRelease": false,
-	"version": "1.0",
-	"branch": "master",
-	"dependencies": [
-	  {
+	{
 		"owner": "anomalyaces",
-		"repo": "Anomaly-Aces-Util-Plugin",
-		"isRelease": true,
+		"repo": "Anomaly-Aces-Addon-Manager",
+		"isRelease": false,
 		"version": "1.0",
-		"branch": "master"
-	  },
-	  {
-		"owner": "anomalyaces",
-		"repo": "Anomaly-Aces-Log-Plugin",
-		"isRelease": true,
-		"version": "1.0",
-		"branch": "master"
-	  },
-	  {
-		"owner": "anomalyaces",
-		"repo": "Anomaly-Aces-Table-Plugin",
-		"isRelease": true,
-		"version": "1.0",
-		"branch": "master"
-	  }
-	]
-  }
+		"branch": "master",
+		"subfolder": "addons/anomalyAcesAddonManager/",
+		"dependencies": [
+			{
+				"owner": "anomalyaces",
+				"repo": "Anomaly-Aces-Util-Plugin",
+				"isRelease": true,
+				"version": "1.0",
+				"branch": "master",
+				"subfolder": "addons/anomalyAcesUtil/"
+			},
+			{
+				"owner": "anomalyaces",
+				"repo": "Anomaly-Aces-Log-Plugin",
+				"isRelease": true,
+				"version": "1.0",
+				"branch": "master",
+				"subfolder": "addons/anomalyAcesLog/"
+			},
+			{
+				"owner": "anomalyaces",
+				"repo": "Anomaly-Aces-Table-Plugin",
+				"isRelease": true,
+				"version": "1.0",
+				"branch": "master",
+				"subfolder": "addons/anomalyAcesTable/"
+			}
+		]
+	}
 ]

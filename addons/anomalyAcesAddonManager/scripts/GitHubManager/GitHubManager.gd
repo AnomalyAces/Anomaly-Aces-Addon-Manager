@@ -67,7 +67,7 @@ func _setHTTPAddonInfoSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void
 	http.request_completed.connect(_http_addon_info_request_completed.bind(addon, http))
 
 
-func _http_addon_info_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
+func _http_addon_info_request_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
 
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["HTTP Request Failed with result: %d, response code: %d" % [result, response_code]], AceLog.LOG_LEVEL.ERROR)
@@ -88,13 +88,12 @@ func _http_addon_info_request_completed(result: int, response_code: int, headers
 			if addon.isRelease:
 				if json_data.has("zipball_url"):
 					addon.metadata.download_url = json_data["zipball_url"]
-					# TODO: Call the content download API here
 			else:
 				if json_data.has("commit") && json_data["commit"].has("commit"):
 					addon.metadata.branch_last_commit = json_data["commit"]["commit"]["author"]["date"]
 					AceLog.printLog(["Addon: %s - Branch Last Commit Date: %s" % [addon.repo, addon.metadata.branch_last_commit]])
 					addon.metadata.download_url = GITHUB_BRANCH_ZIP_URL % [addon.owner, addon.repo, addon.branch]
-					# TODO: Call the content download API here
+
 			
 			if addon.metadata.download_url == null || addon.metadata.download_url.is_empty():
 				AceLog.printLog(["Download URL not found for addon: %s" % addon.repo], AceLog.LOG_LEVEL.ERROR)
@@ -148,7 +147,7 @@ func _setHTTPAddonDownloadSignal(http: HTTPRequest, addon: RemoteRepoObject) -> 
 		http.request_completed.disconnect(_http_addon_download_request_completed)
 	http.request_completed.connect(_http_addon_download_request_completed.bind(addon, http))
 
-func _http_addon_download_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
+func _http_addon_download_request_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["HTTP Download Request Failed with result: %d, response code: %d" % [result, response_code]], AceLog.LOG_LEVEL.ERROR)
 		return
@@ -162,6 +161,7 @@ func _http_addon_download_request_completed(result: int, response_code: int, hea
 		else:
 			if FileAccess.file_exists(http.download_file):
 				AceLog.printLog(["Successfully downloaded addon: %s to path: %s" % [addon.repo, http.download_file]])
+				AceFileUtil.Zip.extract_all_from_zip(http.download_file, http.download_file.get_base_dir(), addon.subfolder)
 			else:
 				AceLog.printLog(["Failed to download addon: %s to path: %s" % [addon.repo, http.download_file]], AceLog.LOG_LEVEL.ERROR)
 			
