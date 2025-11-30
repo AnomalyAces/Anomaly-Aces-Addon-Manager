@@ -5,14 +5,16 @@ class_name AcePluginMainView extends Control
 
 @onready var tablePlugin: AceTable = $PanelContainer/VBoxContainer/AceTable
 
-var rrm: RemoteRepoManager
+var rrm: GitHubManager
 
 func _ready() -> void:
 	rrm = GitHubManager.new(self)
 	_createTable()
 	# for i in randi_range(1,3):
 	# 	_add_addonInfo()
-	rrm.getAddonsFromRemoteRepo()
+	# rrm.getAddonsFromRemoteRepo()
+	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
+
 
 	
 
@@ -20,10 +22,9 @@ func getAddons() -> void:
 	rrm.getAddonsFromRemoteRepo()
 
 
-func _add_addonInfo():
-	var addonInfoScene: PackedScene = load("res://addons/anomalyAcesAddonManager/scenes/addonInfo/AddonInfo.tscn")
-	var addonInfoSceneInstance: HBoxContainer = addonInfoScene.instantiate()
-	# container.add_child(addonInfoSceneInstance)
+func _on_addon_downloads_completed() -> void:
+	AceLog.printLog(["All Addons Downloaded from Remote Repo"], AceLog.LOG_LEVEL.INFO)
+
 
 func _createTable():
 	

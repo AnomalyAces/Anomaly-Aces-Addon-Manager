@@ -31,15 +31,17 @@ func _init(parent: Node) -> void:
 	settings.initialize_settings(SETTINGS_CONFIGURATION, SETTINGS_ROOT)
 	settings.prepare()
 
+
+func isAutoDownloadEnabled() -> bool:
+	return settings.get_setting(AUTO_DOWNLOAD_ADDONS, false)
+
+func isCheckForUpdatesEnabled() -> bool:
+	return settings.get_setting(CHECK_FOR_UPDATES, false)
+
 func _parseAddonFiles() -> Array[RemoteRepoObject]:
 	AceLog.printLog(["Parsing Addon Files...."])
 	var rroList: Array[RemoteRepoObject] = []
-
-	if settings.get_setting(AUTO_DOWNLOAD_ADDONS, false):
-		rroList = _getAddonFiles()
-	else:
-		AceLog.printLog(["Ace Addon Manager Setting: %s is not enabled in the project settings. Auto Download of addons has been disabled." % AUTO_DOWNLOAD_ADDONS], AceLog.LOG_LEVEL.WARN)
-
+	rroList = _getAddonFiles()
 	return rroList
 
 

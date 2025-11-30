@@ -23,15 +23,29 @@ var _download_requests_completed: int = 0
 
 func getAddonsFromRemoteRepo():
 	_addons = _parseAddonFiles()
+	#Intialize counters
 	_num_requests = _get_num_requests(_addons)
+	_num_download_requests = 0
 	_requests_completed = 0
+	_download_requests_completed = 0
+	
 	for addon in _addons:
 		_getAddonFromRemoteRepo(addon)
 
 	await addons_processed
-	AceLog.printLog(["Addons Processed from Remote Repo: ", _addons])
+	AceLog.printLog(["Addons Processed from Remote Repo "])
 
+	_num_download_requests = _get_num_download_requests(_addons, _num_download_requests)
+
+	AceLog.printLog(["Total Download Requests to complete: %d" % _num_download_requests])
+
+	for addon in _addons:
+		_downloadAddonFromRemoteRepo(addon)
 	
+	await addons_downloaded
+
+	AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons])
+
 	return _addons
 
 func _get_num_requests(addons: Array[RemoteRepoObject]) -> int:
@@ -40,11 +54,22 @@ func _get_num_requests(addons: Array[RemoteRepoObject]) -> int:
 		_num_requests += addon.dependencies.size() + 1
 	return _num_requests
 
+func _get_num_download_requests(addons: Array[RemoteRepoObject], num_download_req: int ) -> int:
+
+	for addon in addons:
+		if addon.metadata.download_url != null && !addon.metadata.download_url.is_empty():
+			AceLog.printLog(["Download URL found for addon: %s download url: %s" % [addon.repo, addon.metadata.download_url]])
+			num_download_req += 1
+		if addon.dependencies.size() > 0:
+			num_download_req = _get_num_download_requests(addon.dependencies, num_download_req)
+	return num_download_req
+
 
 func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	if addon.dependencies.size() > 0:
 		for dependency in addon.dependencies:
 			_getAddonFromRemoteRepo(dependency)
+			
 
 	var http: HTTPRequest = HTTPRequest.new()
 	parent_node.add_child(http)
@@ -75,7 +100,7 @@ func _setHTTPAddonInfoSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void
 func _http_addon_info_request_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, addon: RemoteRepoObject, http: HTTPRequest) -> void:
 
 	if result != HTTPRequest.RESULT_SUCCESS:
-		AceLog.printLog(["HTTP Request Failed with result: %d, response code: %d" % [result, response_code]], AceLog.LOG_LEVEL.ERROR)
+		AceLog.printLog(["HTTP Request Failed (url: %s) with result: %d, response code: %d" % [addon.metadata.download_url, result, response_code]], AceLog.LOG_LEVEL.ERROR)
 		return
 	else :
 		if response_code >= 400:
@@ -103,8 +128,6 @@ func _http_addon_info_request_completed(result: int, response_code: int, _header
 			if addon.metadata.download_url == null || addon.metadata.download_url.is_empty():
 				AceLog.printLog(["Download URL not found for addon: %s" % addon.repo], AceLog.LOG_LEVEL.ERROR)
 				return
-			else:
-				_downloadAddonFromRemoteRepo(addon)
 
 			parent_node.remove_child(http)
 			http.queue_free()
@@ -125,6 +148,14 @@ func _printAddonInfoErrorMessage(addon: RemoteRepoObject) -> void:
 		)
 
 func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
+	if addon.dependencies.size() > 0:
+		for dependency in addon.dependencies:
+			_downloadAddonFromRemoteRepo(dependency)
+
+	if addon.metadata.download_url == null || addon.metadata.download_url.is_empty():
+		AceLog.printLog(["No download URL for addon: %s, skipping download." % addon.repo], AceLog.LOG_LEVEL.WARN)
+		return
+	
 	var http: HTTPRequest = HTTPRequest.new()
 	parent_node.add_child(http)
 	_setHTTPAddonDownloadSignal(http, addon)
@@ -145,7 +176,10 @@ func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 		AceLog.printLog(["Failed to make HTTP download request for addon: %s" % addon.repo], AceLog.LOG_LEVEL.ERROR)
 	
 	AceLog.printLog(["Download request completed for Addon: %s" % [addon.repo]])
-
+	_download_requests_completed += 1
+	AceLog.printLog(["Download Requests Completed: %d / %d" % [_download_requests_completed, _num_download_requests]])
+	if _download_requests_completed >= _num_download_requests:
+		addons_downloaded.emit()
 
 func _setHTTPAddonDownloadSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void: 
 	if http.request_completed.is_connected(_http_addon_download_request_completed):
