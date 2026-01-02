@@ -88,4 +88,4 @@ func _createTable():
 	
 
 func button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
-	AceLog.printLog(["data from Button: %s" % [dt]])
+	AceLog.printLog(["data from Button: %s" % [dt]], AceLog.LOG_LEVEL.INFO)
