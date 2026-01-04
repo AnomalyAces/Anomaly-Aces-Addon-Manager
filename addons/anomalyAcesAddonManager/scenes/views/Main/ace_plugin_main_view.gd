@@ -7,6 +7,8 @@ class_name AcePluginMainView extends Control
 
 var rrm: GitHubManager
 
+var _table: _AceTable
+
 func _ready() -> void:
 	rrm = GitHubManager.new(self)
 	_createTable()
@@ -33,6 +35,12 @@ func _createTable():
 	textRect.size_flags_horizontal = SIZE_EXPAND_FILL
 	textRect.set_texture(load("res://icon.svg"))
 
+	var selectColDef: AceTableColumnDef = AceTableColumnDef.new()
+	selectColDef.columnId = "selected"
+	selectColDef.columnName = ""
+	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
+	selectColDef.columnAlign = AceTableConstants.Align.CENTER
+
 	var fooColDef: AceTableColumnDef = AceTableColumnDef.new()
 	fooColDef.columnId = "foo"
 	fooColDef.columnName = "Foo"
@@ -48,7 +56,7 @@ func _createTable():
 	barColDef.columnAlign = AceTableConstants.Align.CENTER
 	barColDef.columnImage = "res://icon.svg"
 	barColDef.columnImageSize = Vector2i(64,64)
-	barColDef.columnCallable = button_pressed
+	barColDef.columnCallable = _button_pressed
 
 	var foobarColDef: AceTableColumnDef = AceTableColumnDef.new()
 	foobarColDef.columnId = "foobar"
@@ -57,25 +65,29 @@ func _createTable():
 	foobarColDef.columnAlign = AceTableConstants.Align.CENTER
 	foobarColDef.columnNode = textRect
 
-	var colDefs: Array[AceTableColumnDef] = [fooColDef, barColDef, foobarColDef]
+	var colDefs: Array[AceTableColumnDef] = [selectColDef, fooColDef, barColDef, foobarColDef]
 	
 	var data: Array[Dictionary] = [
 		{
+			"selected":false,
 			"foo":"12",
 			"bar":"Press Me",
 			"foobar": "res://icon.svg"
 		},
 		{
+			"selected":false,
 			"foo":"15",
 			"bar":"Old Me",
 			"foobar": "res://icon.svg"
 		},
 		{
+			"selected":false,
 			"foo":"10",
 			"bar":"Press Me",
 			"foobar": "res://icon.svg"
 		},
 		{
+			"selected":false,
 			"foo":"17",
 			"bar":"New Me",
 			"foobar": "res://icon.svg"
@@ -83,9 +95,9 @@ func _createTable():
 	]
 	AceLog.printLog(["Loading Table data via AceTableManager"])
 	tablePlugin.printConfig()
-	AceTableManager.createTable(tablePlugin, colDefs, data)
+	_table = AceTableManager.createTable(tablePlugin, colDefs, data)
 	AceLog.printLog(["Done Loading  Table data via AceTableManager"])
 	
 
-func button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
-	AceLog.printLog(["data from Button: %s" % [dt]], AceLog.LOG_LEVEL.INFO)
+func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
+	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)
