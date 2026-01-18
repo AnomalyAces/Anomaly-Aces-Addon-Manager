@@ -40,6 +40,7 @@ func _createTable():
 	selectColDef.columnName = ""
 	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
 	selectColDef.columnAlign = AceTableConstants.Align.CENTER
+	selectColDef.columnImageSize = Vector2i(64,64)
 
 	var fooColDef: AceTableColumnDef = AceTableColumnDef.new()
 	fooColDef.columnId = "foo"
@@ -64,7 +65,8 @@ func _createTable():
 	foobarColDef.columnName = "FooBar"
 	foobarColDef.columnType = AceTableConstants.ColumnType.TEXTURE_RECT
 	foobarColDef.columnAlign = AceTableConstants.Align.CENTER
-	foobarColDef.columnNode = textRect
+	foobarColDef.columnImageSize = Vector2i(64,64)
+	# foobarColDef.columnNode = textRect
 
 	var colDefs: Array[AceTableColumnDef] = [selectColDef, fooColDef, barColDef, foobarColDef]
 	
