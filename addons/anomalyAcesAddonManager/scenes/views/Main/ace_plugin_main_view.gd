@@ -57,6 +57,7 @@ func _createTable():
 	barColDef.columnAlign = AceTableConstants.Align.CENTER
 	barColDef.columnImage = "res://icon.svg"
 	barColDef.columnImageAlign = AceTableConstants.ImageAlign.LEFT
+	barColDef.columnButtonIconUpdateWithState = false
 	barColDef.columnImageSize = Vector2i(64,64)
 	barColDef.columnCallable = _button_pressed
 

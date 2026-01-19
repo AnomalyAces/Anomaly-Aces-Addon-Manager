@@ -4,7 +4,7 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yr6qx"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nmtgr"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_u8pwk"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hy7am"]
 
@@ -30,7 +30,7 @@ Button/font_sizes/font_size = 32
 Button/fonts/font = ExtResource("1_u8pwk")
 Button/styles/disabled = null
 Button/styles/focus = SubResource("StyleBoxEmpty_yr6qx")
-Button/styles/hover = SubResource("StyleBoxEmpty_nmtgr")
+Button/styles/hover = SubResource("StyleBoxEmpty_u8pwk")
 Button/styles/normal = SubResource("StyleBoxEmpty_hy7am")
 Button/styles/pressed = SubResource("StyleBoxEmpty_3b1h6")
 Label/colors/font_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
