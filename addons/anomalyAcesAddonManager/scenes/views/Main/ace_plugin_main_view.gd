@@ -41,6 +41,7 @@ func _createTable():
 	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
 	selectColDef.columnAlign = AceTableConstants.Align.CENTER
 	selectColDef.columnImageSize = Vector2i(64,64)
+	selectColDef.columnHasSelectAll = true
 
 	var fooColDef: AceTableColumnDef = AceTableColumnDef.new()
 	fooColDef.columnId = "foo"
