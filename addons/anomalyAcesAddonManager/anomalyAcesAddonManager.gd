@@ -1,7 +1,7 @@
 @tool
 extends EditorPlugin
 
-const MainView = preload("./scenes/AcePluginManager.tscn")
+const PluginManagerScene = preload("./scenes/AcePluginManager.tscn")
 
 var window: Window
 var plugin_manager: AcePluginManager
@@ -10,7 +10,7 @@ var plugin_manager: AcePluginManager
 
 func _enter_tree() -> void:
 	if Engine.is_editor_hint():
-		plugin_manager = MainView.instantiate()
+		plugin_manager = PluginManagerScene.instantiate()
 
 		add_tool_menu_item("Ace Addon Manager", _on_addon_manager_clicked)
 		window = Window.new()
@@ -67,10 +67,14 @@ func _exit_tree() -> void:
 # 			print("Option 2 selected!")
 # 			# Implement functionality for Option 2
 func _on_addon_manager_clicked():
-
-	AceLog.printLog(["Open Addon Window Please"])
-	EditorInterface.popup_dialog_centered(window, Vector2i(1280, 720))
+	if window.get_parent():
+		AceLog.printLog(["Show Addon Window Please"])
+		window.mode = Window.MODE_WINDOWED
+	else:
+		AceLog.printLog(["Open Addon Window Please"])
+		EditorInterface.popup_dialog_centered(window, Vector2i(1280, 720))
 	pass
 
 func _on_about_to_popup():
+	# pass
 	plugin_manager.main_view.getAddons()
