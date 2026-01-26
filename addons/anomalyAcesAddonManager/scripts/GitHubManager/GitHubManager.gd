@@ -13,7 +13,7 @@ const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipbal
 const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github/"
 
 signal addons_processed
-signal addons_downloaded
+signal addons_downloaded(addons: Array[RemoteRepoObject])
 
 var _addons: Array[RemoteRepoObject] = []
 var _num_requests: int = 0
@@ -23,6 +23,14 @@ var _download_requests_completed: int = 0
 
 func getAddonsFromRemoteRepo():
 	_addons = _parseAddonFiles()
+
+	#Check for conflicts
+	var conflicting_addons: Array[String] = _checkForConflicts(_addons)
+	if conflicting_addons.size() > 0:
+		AceLog.printLog(["Conflicts found in addons from remote repos."], AceLog.LOG_LEVEL.ERROR)
+		conflicts_found.emit(conflicting_addons)
+		return
+
 	#Intialize counters
 	_num_requests = _get_num_requests(_addons)
 	_num_download_requests = 0
@@ -39,14 +47,17 @@ func getAddonsFromRemoteRepo():
 
 	AceLog.printLog(["Total Download Requests to complete: %d" % _num_download_requests])
 
-	for addon in _addons:
-		_downloadAddonFromRemoteRepo(addon)
+	if isAutoDownloadEnabled():
+		for addon in _addons:
+			_downloadAddonFromRemoteRepo(addon)
+	else:
+		AceLog.printLog(["Auto Download Addons is disabled. Skipping addon downloads. Should draw attention to download button", AceLog.LOG_LEVEL.INFO])
 	
 	await addons_downloaded
 
-	AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons])
+	# AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons ])
 
-	return _addons
+	# return _addons
 
 func _get_num_requests(addons: Array[RemoteRepoObject]) -> int:
 	_num_requests = 0
@@ -77,7 +88,7 @@ func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	AceLog.printLog(["Found Addon Config: %s Version: %s" % [addon.repo, addon.version]])
 	var github_url: String = GITHUB_RELEASES_API_URL % [addon.owner, addon.repo, addon.version] if addon.isRelease else GITHUB_BRANCH_API_URL % [addon.owner, addon.repo, addon.branch]
 
-	var resp = http.request(github_url, GITHUB_API_HEADERS)
+	var resp = http.request(github_url, _get_headers())
 	AceLog.printLog(["Wating for GitHub API request %s" % github_url] )
 	await http.request_completed
 	if resp != OK:
@@ -169,7 +180,7 @@ func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	#Set Download File Path
 	http.download_file = GITHUB_TEMP_DOWNLOAD_PATH + "%s.zip" % addon.repo
 
-	var resp = http.request(github_url, GITHUB_API_HEADERS)
+	var resp = http.request(github_url, _get_headers())
 	AceLog.printLog(["Wating for GitHub API download request %s" % github_url] )
 	await http.request_completed
 	if resp != OK:
@@ -179,7 +190,7 @@ func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	_download_requests_completed += 1
 	AceLog.printLog(["Download Requests Completed: %d / %d" % [_download_requests_completed, _num_download_requests]])
 	if _download_requests_completed >= _num_download_requests:
-		addons_downloaded.emit()
+		addons_downloaded.emit(_addons)
 
 func _setHTTPAddonDownloadSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void: 
 	if http.request_completed.is_connected(_http_addon_download_request_completed):
@@ -218,3 +229,12 @@ func _printAddonDownloadErrorMessage(addon: RemoteRepoObject) -> void:
 			["Failed to download branch %s of addon %s. Check that the branch exists or try a release version instead by setting isRelease to true in the addons.json file." % [addon.branch, addon.repo]],
 			AceLog.LOG_LEVEL.ERROR
 		)
+
+
+func _get_headers() -> PackedStringArray:
+	var headers: PackedStringArray = GITHUB_API_HEADERS.duplicate()
+	var token: String = getGithubPersonalAccessToken()
+	if token != null && !token.is_empty():
+		headers.append("Authorization: Bearer %s" % token)
+		AceLog.printLog(["Using GitHub Personal Access Token for API requests."], AceLog.LOG_LEVEL.INFO)
+	return headers

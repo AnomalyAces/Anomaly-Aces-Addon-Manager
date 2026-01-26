@@ -24,8 +24,8 @@ func getAddons() -> void:
 	rrm.getAddonsFromRemoteRepo()
 
 
-func _on_addon_downloads_completed() -> void:
-	AceLog.printLog(["All Addons Downloaded from Remote Repo"], AceLog.LOG_LEVEL.INFO)
+func _on_addon_downloads_completed(addons: Array[RemoteRepoObject]) -> void:
+	AceLog.printLog(["All Addons Downloaded from Remote Repo", AceSerialize.serialize_array(addons)], AceLog.LOG_LEVEL.INFO)
 
 
 func _createTable():

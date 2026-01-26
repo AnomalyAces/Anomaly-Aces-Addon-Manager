@@ -8,6 +8,8 @@ const SETTINGS_ROOT: String = "aceAddonManager"
 const AUTO_DOWNLOAD_ADDONS: String = "settings/auto_download_addons"
 ## Check for updates. If true this plugin will check for updates and notify the user when they are available
 const CHECK_FOR_UPDATES: String = "settings/check_for_updates"
+## Github Personal Access Token for increasing rate 
+const GITHUB_PERSONAL_ACCESS_TOKEN: String = "settings/github_personal_access_token"
 
 ## Addons json file
 const ADDON_FILE: String = "addons.json"
@@ -15,9 +17,14 @@ const ADDON_FILE: String = "addons.json"
 ## Addons directory. should be res://addons
 const ADDON_DIR: String = "res://addons"
 
+
+#Signals
+signal conflicts_found(conflicting_addons: Array[String])
+
 var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
 	AUTO_DOWNLOAD_ADDONS: AceSettingConfig.new(AUTO_DOWNLOAD_ADDONS, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
-	CHECK_FOR_UPDATES: AceSettingConfig.new(CHECK_FOR_UPDATES, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE)
+	CHECK_FOR_UPDATES: AceSettingConfig.new(CHECK_FOR_UPDATES, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
+	GITHUB_PERSONAL_ACCESS_TOKEN: AceSettingConfig.new(GITHUB_PERSONAL_ACCESS_TOKEN, TYPE_STRING, "", PROPERTY_HINT_PASSWORD)
 }
 
 var settings: AceSettings
@@ -38,10 +45,14 @@ func isAutoDownloadEnabled() -> bool:
 func isCheckForUpdatesEnabled() -> bool:
 	return settings.get_setting(CHECK_FOR_UPDATES, false)
 
+func getGithubPersonalAccessToken() -> String:
+	return settings.get_setting(GITHUB_PERSONAL_ACCESS_TOKEN, "")
+
 func _parseAddonFiles() -> Array[RemoteRepoObject]:
 	AceLog.printLog(["Parsing Addon Files...."])
 	var rroList: Array[RemoteRepoObject] = []
 	rroList = _getAddonFiles()
+	
 	return rroList
 
 
@@ -74,6 +85,7 @@ func _getAddonFiles() -> Array[RemoteRepoObject]:
 				AceLog.printLog(["Successfully deserialized addon file: " , file_path])
 				var rro_sub_arr: Array[RemoteRepoObject] = []
 				rro_sub_arr.assign(addonResp.data)
+				_assign_addon_files(rro_sub_arr, file_path)
 				rroList.append_array(rro_sub_arr)
 			else:
 				AceLog.printLog(["Error deserializing addon file at %s. Error Code: %s" % [file_path, addonResp.error]], AceLog.LOG_LEVEL.ERROR)
@@ -82,6 +94,65 @@ func _getAddonFiles() -> Array[RemoteRepoObject]:
 
 
 
+func _assign_addon_files(addons: Array[RemoteRepoObject], addon_file: String) -> void:
+	for addon in addons:
+		addon.metadata.addon_file = addon_file
+		for dependency in addon.dependencies:
+			dependency.metadata.addon_file = addon_file
 
+func _checkForConflicts(addons: Array[RemoteRepoObject]) -> Array[String]:
+	var unique_addons: Dictionary[String, RemoteRepoObject] = {}
+	var conflicting_addons: Array[RemoteRepoObject] = []
+	var conflict_strings: Array[String] = []
+	
+	for addon in addons:
+		#Check addon itself
+		if unique_addons.has(addon.repo):
+			if _is_conflicting(unique_addons[addon.repo], addon):
+				AceLog.printLog(["Conflict detected for addon repo: %s" % addon.repo], AceLog.LOG_LEVEL.WARN)
+				addon.metadata.conflicts.append(_create_conflict_string(unique_addons[addon.repo], addon))
+				conflicting_addons.append(addon)
+		else:
+			unique_addons[addon.repo] = addon
+		
+		#check dependencies
+		if addon.dependencies.size() > 0:
+			for dependency in addon.dependencies:
+				if unique_addons.has(dependency.repo):
+					if _is_conflicting(unique_addons[dependency.repo], dependency):
+						AceLog.printLog(["Conflict detected for addon dependency: %s required by addon: %s" % [dependency, addon.repo]], AceLog.LOG_LEVEL.WARN)
+						dependency.metadata.conflicts.append(_create_conflict_string(unique_addons[dependency.repo], dependency, addon))
+						conflicting_addons.append(dependency)
+				else:
+					unique_addons[dependency.repo] = dependency
+	
+	
+	if conflicting_addons.size() > 0:
+		for conflict in conflicting_addons:
+			conflict_strings.append_array(conflict.metadata.conflicts)
+
+		AceLog.printLog(["Conflicting addons found:", conflict_strings], AceLog.LOG_LEVEL.WARN)
+
+	return conflict_strings
+
+func _is_conflicting(target: RemoteRepoObject, source:RemoteRepoObject) -> bool:
+
+	if target.isRelease != source.isRelease:
+		return true
+	else:
+		return target.version == source.version if target.isRelease else target.branch == source.branch
+
+func _repo_desc(repo_obj: RemoteRepoObject) -> String:
+	return "Repo %s(addonFile: %s, isRelease: %s, version: %s, branch: %s)" % [repo_obj.repo, repo_obj.metadata.addon_file, repo_obj.isRelease, repo_obj.version, repo_obj.branch]
+
+
+func _create_conflict_string(conflict_addon: RemoteRepoObject, addon: RemoteRepoObject, parent_addon: RemoteRepoObject = null) -> String:
+	var addon_desc: String = _repo_desc(addon)
+	var conflict_desc: String = _repo_desc(conflict_addon)
+	if parent_addon != null:
+		var parent_desc: String = _repo_desc(parent_addon)
+		return "%s -> Dependent %s conflicts with %s" % [parent_desc, addon_desc, conflict_desc]
+	else:
+		return "%s conflicts with %s" % [addon_desc, conflict_desc]
 
 @abstract func getAddonsFromRemoteRepo()
