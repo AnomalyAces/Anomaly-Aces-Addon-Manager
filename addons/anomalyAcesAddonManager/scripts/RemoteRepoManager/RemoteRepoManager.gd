@@ -19,7 +19,7 @@ const ADDON_DIR: String = "res://addons"
 
 
 #Signals
-signal conflicts_found(conflicting_addons: Array[String])
+signal conflicts_found(conflicting_addons: Array[RemoteRepoConflict])
 
 var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
 	AUTO_DOWNLOAD_ADDONS: AceSettingConfig.new(AUTO_DOWNLOAD_ADDONS, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
@@ -100,18 +100,18 @@ func _assign_addon_files(addons: Array[RemoteRepoObject], addon_file: String) ->
 		for dependency in addon.dependencies:
 			dependency.metadata.addon_file = addon_file
 
-func _checkForConflicts(addons: Array[RemoteRepoObject]) -> Array[String]:
+func _checkForConflicts(addons: Array[RemoteRepoObject]) -> Array[RemoteRepoConflict]:
 	var unique_addons: Dictionary[String, RemoteRepoObject] = {}
-	var conflicting_addons: Array[RemoteRepoObject] = []
-	var conflict_strings: Array[String] = []
+	var conflicts: Array[RemoteRepoConflict] = []
 	
 	for addon in addons:
 		#Check addon itself
 		if unique_addons.has(addon.repo):
-			if _is_conflicting(unique_addons[addon.repo], addon):
+			var addon_conflict: RemoteRepoConflict = RemoteRepoConflict.new()
+			addon_conflict.initializeConflict(addon, unique_addons[addon.repo])
+			if addon_conflict.isConflicting():
 				AceLog.printLog(["Conflict detected for addon repo: %s" % addon.repo], AceLog.LOG_LEVEL.WARN)
-				addon.metadata.conflicts.append(_create_conflict_string(unique_addons[addon.repo], addon))
-				conflicting_addons.append(addon)
+				conflicts.append(addon_conflict)
 		else:
 			unique_addons[addon.repo] = addon
 		
@@ -119,40 +119,16 @@ func _checkForConflicts(addons: Array[RemoteRepoObject]) -> Array[String]:
 		if addon.dependencies.size() > 0:
 			for dependency in addon.dependencies:
 				if unique_addons.has(dependency.repo):
-					if _is_conflicting(unique_addons[dependency.repo], dependency):
+					var dependency_conflict: RemoteRepoConflict = RemoteRepoConflict.new()
+					dependency_conflict.initializeConflict(dependency, unique_addons[dependency.repo], addon)
+					if dependency_conflict.isConflicting():
 						AceLog.printLog(["Conflict detected for addon dependency: %s required by addon: %s" % [dependency, addon.repo]], AceLog.LOG_LEVEL.WARN)
-						dependency.metadata.conflicts.append(_create_conflict_string(unique_addons[dependency.repo], dependency, addon))
-						conflicting_addons.append(dependency)
+						conflicts.append(dependency_conflict)
 				else:
 					unique_addons[dependency.repo] = dependency
 	
-	
-	if conflicting_addons.size() > 0:
-		for conflict in conflicting_addons:
-			conflict_strings.append_array(conflict.metadata.conflicts)
 
-		AceLog.printLog(["Conflicting addons found:", conflict_strings], AceLog.LOG_LEVEL.WARN)
+	return conflicts
 
-	return conflict_strings
-
-func _is_conflicting(target: RemoteRepoObject, source:RemoteRepoObject) -> bool:
-
-	if target.isRelease != source.isRelease:
-		return true
-	else:
-		return target.version == source.version if target.isRelease else target.branch == source.branch
-
-func _repo_desc(repo_obj: RemoteRepoObject) -> String:
-	return "Repo %s(addonFile: %s, isRelease: %s, version: %s, branch: %s)" % [repo_obj.repo, repo_obj.metadata.addon_file, repo_obj.isRelease, repo_obj.version, repo_obj.branch]
-
-
-func _create_conflict_string(conflict_addon: RemoteRepoObject, addon: RemoteRepoObject, parent_addon: RemoteRepoObject = null) -> String:
-	var addon_desc: String = _repo_desc(addon)
-	var conflict_desc: String = _repo_desc(conflict_addon)
-	if parent_addon != null:
-		var parent_desc: String = _repo_desc(parent_addon)
-		return "%s -> Dependent %s conflicts with %s" % [parent_desc, addon_desc, conflict_desc]
-	else:
-		return "%s conflicts with %s" % [addon_desc, conflict_desc]
 
 @abstract func getAddonsFromRemoteRepo()

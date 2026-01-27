@@ -25,7 +25,7 @@ func getAddonsFromRemoteRepo():
 	_addons = _parseAddonFiles()
 
 	#Check for conflicts
-	var conflicting_addons: Array[String] = _checkForConflicts(_addons)
+	var conflicting_addons: Array[RemoteRepoConflict] = _checkForConflicts(_addons)
 	if conflicting_addons.size() > 0:
 		AceLog.printLog(["Conflicts found in addons from remote repos."], AceLog.LOG_LEVEL.ERROR)
 		conflicts_found.emit(conflicting_addons)

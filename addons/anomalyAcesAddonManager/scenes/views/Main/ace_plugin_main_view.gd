@@ -16,6 +16,7 @@ func _ready() -> void:
 	# 	_add_addonInfo()
 	# rrm.getAddonsFromRemoteRepo()
 	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
+	rrm.conflicts_found.connect(_on_conflicts_found)
 
 
 	
@@ -23,12 +24,20 @@ func _ready() -> void:
 func getAddons() -> void:
 	rrm.getAddonsFromRemoteRepo()
 
-
+##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject]) -> void:
-	AceLog.printLog(["All Addons Downloaded from Remote Repo", AceSerialize.serialize_array(addons)], AceLog.LOG_LEVEL.INFO)
+	AceLog.printLog(["All Addons Downloaded from Remote Repo", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
 
+func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
+	AceLog.printLog(["Conflicting addons found:", JSON.parse_string(AceSerialize.serialize_array(conflicting_addons))], AceLog.LOG_LEVEL.INFO)
+
+#############################
 
 func _createTable():
+
+	# 
+	# columns: name, version/branch, dependencies, status, updates
+	#
 	
 	var textRect = TextureRect.new()
 	textRect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
