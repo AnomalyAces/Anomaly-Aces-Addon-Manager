@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cf6oocf6kg0ss"
-path="res://.godot/imported/ChakraPetch-SemiBoldItalic.ttf-3062f981bc7f09abd2601873580ecfdd.fontdata"
+path="res://.godot/imported/ChakraPetch-SemiBoldItalic.ttf-f71711fa3bd8cafaab0a424382756d5f.fontdata"
 
 [deps]
 
-source_file="res://addons/anomalyAcesAddonManager/fonts/Chakra_Petch/ChakraPetch-SemiBoldItalic.ttf"
-dest_files=["res://.godot/imported/ChakraPetch-SemiBoldItalic.ttf-3062f981bc7f09abd2601873580ecfdd.fontdata"]
+source_file="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-SemiBoldItalic.ttf"
+dest_files=["res://.godot/imported/ChakraPetch-SemiBoldItalic.ttf-f71711fa3bd8cafaab0a424382756d5f.fontdata"]
 
 [params]
 

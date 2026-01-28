@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://c4d8ha0malyi4"]
+[gd_scene format=3 uid="uid://c4d8ha0malyi4"]
 
-[ext_resource type="Script" path="res://addons/anomalyAcesAddonManager/scenes/ace_plugin_manager.gd" id="1_ihacs"]
-[ext_resource type="PackedScene" uid="uid://jg4xi14xt04h" path="res://addons/anomalyAcesAddonManager/scenes/views/Main/Main.tscn" id="2_grbuy"]
+[ext_resource type="Script" uid="uid://cr5efgs3bsx2w" path="res://addons/anomalyAcesAddonManager/Scenes/ace_plugin_manager.gd" id="1_ihacs"]
+[ext_resource type="PackedScene" uid="uid://jg4xi14xt04h" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main.tscn" id="2_grbuy"]
 
 [node name="AcePluginManager" type="Control"]
 layout_mode = 3

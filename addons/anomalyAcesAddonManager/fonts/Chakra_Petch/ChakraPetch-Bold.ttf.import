@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://b6wpj0fxh68th"
-path="res://.godot/imported/ChakraPetch-Bold.ttf-c38abcd8a2e5ecadfd2a00a169439113.fontdata"
+path="res://.godot/imported/ChakraPetch-Bold.ttf-a0aad3b309c7e755d8589e0baf0c9970.fontdata"
 
 [deps]
 
-source_file="res://addons/anomalyAcesAddonManager/fonts/Chakra_Petch/ChakraPetch-Bold.ttf"
-dest_files=["res://.godot/imported/ChakraPetch-Bold.ttf-c38abcd8a2e5ecadfd2a00a169439113.fontdata"]
+source_file="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Bold.ttf"
+dest_files=["res://.godot/imported/ChakraPetch-Bold.ttf-a0aad3b309c7e755d8589e0baf0c9970.fontdata"]
 
 [params]
 

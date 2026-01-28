@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cvgrfj6s4idn3"
-path="res://.godot/imported/Teko-VariableFont_wght.ttf-1b077e779807ebd18359235f28e186d8.fontdata"
+path="res://.godot/imported/Teko-VariableFont_wght.ttf-28cc838e4b8a425ec017a953e70d532a.fontdata"
 
 [deps]
 
-source_file="res://addons/anomalyAcesAddonManager/fonts/Teko/Teko-VariableFont_wght.ttf"
-dest_files=["res://.godot/imported/Teko-VariableFont_wght.ttf-1b077e779807ebd18359235f28e186d8.fontdata"]
+source_file="res://addons/anomalyAcesAddonManager/Fonts/Teko/Teko-VariableFont_wght.ttf"
+dest_files=["res://.godot/imported/Teko-VariableFont_wght.ttf-28cc838e4b8a425ec017a953e70d532a.fontdata"]
 
 [params]
 

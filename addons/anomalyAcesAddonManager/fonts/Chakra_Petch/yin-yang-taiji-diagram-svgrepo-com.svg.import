@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dy3eutksf6c1e"
-path="res://.godot/imported/yin-yang-taiji-diagram-svgrepo-com.svg-bf946c3ea066cea1b72789af5721ca9c.ctex"
+path="res://.godot/imported/yin-yang-taiji-diagram-svgrepo-com.svg-5b8f6f8bd349702f5a8e670211d9aa07.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/anomalyAcesAddonManager/fonts/Chakra_Petch/yin-yang-taiji-diagram-svgrepo-com.svg"
-dest_files=["res://.godot/imported/yin-yang-taiji-diagram-svgrepo-com.svg-bf946c3ea066cea1b72789af5721ca9c.ctex"]
+source_file="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/yin-yang-taiji-diagram-svgrepo-com.svg"
+dest_files=["res://.godot/imported/yin-yang-taiji-diagram-svgrepo-com.svg-5b8f6f8bd349702f5a8e670211d9aa07.ctex"]
 
 [params]
 

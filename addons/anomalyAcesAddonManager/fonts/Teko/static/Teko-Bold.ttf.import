@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://8fg43hrjcn2j"
-path="res://.godot/imported/Teko-Bold.ttf-f690ca4c74ad4a1dac03e87324146f53.fontdata"
+path="res://.godot/imported/Teko-Bold.ttf-620ff796be58355f2f5a56fca3307e48.fontdata"
 
 [deps]
 
-source_file="res://addons/anomalyAcesAddonManager/fonts/Teko/static/Teko-Bold.ttf"
-dest_files=["res://.godot/imported/Teko-Bold.ttf-f690ca4c74ad4a1dac03e87324146f53.fontdata"]
+source_file="res://addons/anomalyAcesAddonManager/Fonts/Teko/static/Teko-Bold.ttf"
+dest_files=["res://.godot/imported/Teko-Bold.ttf-620ff796be58355f2f5a56fca3307e48.fontdata"]
 
 [params]
 

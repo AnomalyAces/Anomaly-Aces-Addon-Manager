@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dmps3vhsgsals"]
+[gd_scene format=3 uid="uid://dmps3vhsgsals"]
 
-[ext_resource type="Script" uid="uid://chgck0ejmuk25" path="res://addons/anomalyAcesAddonManager/scenes/addonInfo/addon_info.gd" id="1_dttx4"]
+[ext_resource type="Script" uid="uid://chgck0ejmuk25" path="res://addons/anomalyAcesAddonManager/Scenes/addonInfo/addon_info.gd" id="1_dttx4"]
+
 
 [node name="AddonInfo" type="HBoxContainer"]
 alignment = 1
