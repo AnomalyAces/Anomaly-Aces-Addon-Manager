@@ -72,7 +72,7 @@ func _on_addon_manager_clicked():
 		window.mode = Window.MODE_WINDOWED
 	else:
 		AceLog.printLog(["Open Addon Window Please"])
-		EditorInterface.popup_dialog_centered(window, Vector2i(1280, 720))
+		EditorInterface.popup_dialog_centered(window, Vector2i(1920,1080))
 	pass
 
 func _on_about_to_popup():
