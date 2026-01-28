@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://jg4xi14xt04h"]
 
-[ext_resource type="Script" uid="uid://bbdorbbnvdkof" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/ace_plugin_main_view.gd" id="1_0542m"]
+[ext_resource type="Script" uid="uid://cvfreqqu30n7m" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/ace_plugin_main_view.gd" id="1_0542m"]
+[ext_resource type="Texture2D" uid="uid://bkhb07x0xif35" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonUpdate.svg" id="2_1tjh4"]
 [ext_resource type="Script" uid="uid://sx1wgfw6xjis" path="res://addons/anomalyAcesTable/Scripts/ace_table_properties.gd" id="2_0542m"]
 [ext_resource type="Texture2D" uid="uid://gjq4h06k3g86" path="res://icon.svg" id="2_l7mma"]
 [ext_resource type="Theme" uid="uid://bx1fly6adbouv" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderTheme.tres" id="3_l7mma"]
@@ -59,7 +60,7 @@ size_flags_horizontal = 3
 theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 28
 text = "Check For Updates"
-icon = ExtResource("2_l7mma")
+icon = ExtResource("2_1tjh4")
 autowrap_mode = 2
 autowrap_trim_flags = 0
 

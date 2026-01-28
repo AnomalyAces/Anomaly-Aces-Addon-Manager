@@ -1,6 +1,6 @@
 [gd_resource type="Theme" format=3 uid="uid://dvm3ul1pd018w"]
 
-[ext_resource type="FontFile" uid="uid://cqfvl3wh354pb" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Regular.ttf" id="1_nmtgr"]
+[ext_resource type="FontFile" uid="uid://c7aukbcnpi3gy" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Regular.ttf" id="1_nmtgr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8unve"]
 
