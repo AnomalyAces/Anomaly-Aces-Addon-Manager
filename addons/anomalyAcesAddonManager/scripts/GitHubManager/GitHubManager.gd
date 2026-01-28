@@ -12,6 +12,7 @@ const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipbal
 
 const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github/"
 
+## Signals ##
 signal addons_processed
 signal addons_downloaded(addons: Array[RemoteRepoObject])
 
