@@ -3,9 +3,11 @@
 [ext_resource type="Script" uid="uid://cvfreqqu30n7m" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/ace_plugin_main_view.gd" id="1_0542m"]
 [ext_resource type="Texture2D" uid="uid://bkhb07x0xif35" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonUpdate.svg" id="2_1tjh4"]
 [ext_resource type="Script" uid="uid://sx1wgfw6xjis" path="res://addons/anomalyAcesTable/Scripts/ace_table_properties.gd" id="2_0542m"]
-[ext_resource type="Texture2D" uid="uid://gjq4h06k3g86" path="res://icon.svg" id="2_l7mma"]
 [ext_resource type="Theme" uid="uid://bx1fly6adbouv" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderTheme.tres" id="3_l7mma"]
+[ext_resource type="Texture2D" uid="uid://dheudj0jp7p0o" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonInstall.svg" id="3_sg5kk"]
+[ext_resource type="Texture2D" uid="uid://ctr7t17kfgcmy" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonReload.svg" id="3_uimyb"]
 [ext_resource type="Theme" uid="uid://dvm3ul1pd018w" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderCellTheme.tres" id="4_0542m"]
+[ext_resource type="Texture2D" uid="uid://b33bc0yfbkjw" path="res://addons/anomalyAcesAddonManager/Icons/Github.svg" id="4_sg5kk"]
 [ext_resource type="Theme" uid="uid://wgkqeg5mojsr" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowTheme.tres" id="4_t5kl5"]
 [ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowCellTheme.tres" id="5_y0qvv"]
 
@@ -53,40 +55,89 @@ layout_mode = 2
 [node name="Control" type="Control" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1658669640]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
 
-[node name="Updates" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1311066716]
+[node name="Reload" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1311066716]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("5_y0qvv")
+theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 64
-theme_override_font_sizes/font_size = 28
+theme_override_constants/align_to_largest_stylebox = 0
+theme_override_font_sizes/font_size = 32
+text = "Reload Addons"
+icon = ExtResource("3_uimyb")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
+[node name="Update" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=766363093]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_y0qvv")
+theme_override_constants/icon_max_width = 64
+theme_override_font_sizes/font_size = 32
 text = "Check For Updates"
 icon = ExtResource("2_1tjh4")
+flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
 
 [node name="Install" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1549816277]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("5_y0qvv")
 theme_override_constants/icon_max_width = 64
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 32
 text = "Install Selected Addons"
-icon = ExtResource("2_l7mma")
+icon = ExtResource("3_sg5kk")
+flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
+
+[node name="Control3" type="Control" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1652446808]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.1
+
+[node name="VSeparator" type="ColorRect" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=153835816]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+
+[node name="Control4" type="Control" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1599724157]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.1
 
 [node name="GithubPAT" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=257857659]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("5_y0qvv")
 theme_override_constants/icon_max_width = 64
-theme_override_font_sizes/font_size = 28
+theme_override_constants/align_to_largest_stylebox = 0
+theme_override_font_sizes/font_size = 32
 text = "Github Personal Access Token"
-icon = ExtResource("2_l7mma")
+icon = ExtResource("4_sg5kk")
+flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
 
 [node name="Control2" type="Control" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1761411447]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+
+[node name="Control" type="Control" parent="PanelContainer/VBoxContainer" unique_id=157346333]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+
+[node name="HSeparator" type="ColorRect" parent="PanelContainer/VBoxContainer" unique_id=1384112148]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+
+[node name="Control2" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1541599914]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
 
 [node name="AceTable" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]
 layout_mode = 2
