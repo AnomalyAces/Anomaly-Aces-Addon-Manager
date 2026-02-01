@@ -1,6 +1,9 @@
 [gd_resource type="Theme" format=3 uid="uid://dvm3ul1pd018w"]
 
 [ext_resource type="FontFile" uid="uid://c7aukbcnpi3gy" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Regular.ttf" id="1_nmtgr"]
+[ext_resource type="FontFile" uid="uid://dnoh4wya6wrde" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Bold.ttf" id="2_lnwpu"]
+[ext_resource type="FontFile" uid="uid://b3rarh40dh71o" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-BoldItalic.ttf" id="3_4x8po"]
+[ext_resource type="FontFile" uid="uid://csknraugtg53m" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Italic.ttf" id="4_0vro1"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8unve"]
 
@@ -14,6 +17,10 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uhayg"]
 bg_color = Color(0.32156864, 0.32156864, 0.32156864, 0)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lnwpu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4x8po"]
 
 [resource]
 Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
@@ -43,3 +50,16 @@ MarginContainer/constants/margin_left = 8
 MarginContainer/constants/margin_right = 8
 MarginContainer/constants/margin_top = 8
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_uhayg")
+RichTextLabel/colors/default_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+RichTextLabel/font_sizes/bold_font_size = 48
+RichTextLabel/font_sizes/bold_italics_font_size = 48
+RichTextLabel/font_sizes/italics_font_size = 48
+RichTextLabel/font_sizes/mono_font_size = 48
+RichTextLabel/font_sizes/normal_font_size = 48
+RichTextLabel/fonts/bold_font = ExtResource("2_lnwpu")
+RichTextLabel/fonts/bold_italics_font = ExtResource("3_4x8po")
+RichTextLabel/fonts/italics_font = ExtResource("4_0vro1")
+RichTextLabel/fonts/mono_font = ExtResource("1_nmtgr")
+RichTextLabel/fonts/normal_font = ExtResource("1_nmtgr")
+RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_lnwpu")
+RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_4x8po")

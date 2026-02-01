@@ -7,10 +7,10 @@
 [ext_resource type="Theme" uid="uid://bx1fly6adbouv" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderTheme.tres" id="3_l7mma"]
 [ext_resource type="Texture2D" uid="uid://dheudj0jp7p0o" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonInstall.svg" id="3_sg5kk"]
 [ext_resource type="Texture2D" uid="uid://ctr7t17kfgcmy" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonReload.svg" id="3_uimyb"]
-[ext_resource type="Theme" uid="uid://dvm3ul1pd018w" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderCellTheme.tres" id="4_0542m"]
 [ext_resource type="Texture2D" uid="uid://b33bc0yfbkjw" path="res://addons/anomalyAcesAddonManager/Icons/Github.svg" id="4_sg5kk"]
 [ext_resource type="Theme" uid="uid://wgkqeg5mojsr" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowTheme.tres" id="4_t5kl5"]
 [ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowCellTheme.tres" id="5_y0qvv"]
+[ext_resource type="Theme" uid="uid://dvm3ul1pd018w" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderCellTheme.tres" id="10_q1a5h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0542m"]
 bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
@@ -164,7 +164,7 @@ size_flags_vertical = 3
 mouse_filter = 1
 script = ExtResource("2_0542m")
 header_theme = ExtResource("3_l7mma")
-header_cell_theme = ExtResource("4_0542m")
+header_cell_theme = ExtResource("10_q1a5h")
 row_theme = ExtResource("4_t5kl5")
 row_cell_theme = ExtResource("5_y0qvv")
 cell_separation = 0

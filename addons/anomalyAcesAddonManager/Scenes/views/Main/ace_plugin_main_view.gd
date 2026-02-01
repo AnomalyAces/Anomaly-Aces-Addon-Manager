@@ -72,6 +72,12 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	conflictTypeColDef.columnImageSize = Vector2i(64,64)
 	conflictTypeColDef.columnTextType = AceTableConstants.TextType.TEXT
 
+	var addonFileColDef: AceTableColumnDef = AceTableColumnDef.new()
+	addonFileColDef.columnId = "addon_file"
+	addonFileColDef.columnName = "Add-on File"
+	addonFileColDef.columnType = AceTableConstants.ColumnType.LABEL
+	addonFileColDef.columnSort = false
+
 
 	pass
 
@@ -83,8 +89,10 @@ func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dict
 			"addon": conflict.addon.repo,
 			"conflict_addon": conflict.conflicting_addon.repo,
 			"conflict_type": "Release Conflict" if conflict.releaseConflict else ("Version Conflict" if conflict.versionConflict else ("Branch Conflict" if conflict.branchConflict else "N/A")),
-			"addon_file": conflict.addon.metadata.addon_file,
-			"conflicting_file": conflict.conflicting_addon.metadata.addon_file
+			# Is data for a text link. Needs to be an object with "text" and "link" keys
+			"addon_file": _createTextLinkObject(conflict.addon.metadata.addon_file),
+			# Is data for a text link. Needs to be an object with "text" and "link" keys
+			"conflicting_file": _createTextLinkObject(conflict.conflicting_addon.metadata.addon_file)
 		}
 		data.append(conflict_dict)
 	return data
@@ -181,3 +189,13 @@ func _createTable():
 
 func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
 	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)
+
+func _createTextLinkObject(filePath: String) -> Dictionary:
+
+	var file_name: String = filePath.get_file()
+	var parent_dir: String = filePath.get_base_dir().get_file()
+
+	return {
+		"text": "%s/%s" % [parent_dir, file_name],
+		"link": filePath
+	}
