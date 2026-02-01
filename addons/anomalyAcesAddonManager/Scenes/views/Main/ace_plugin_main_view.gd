@@ -33,11 +33,77 @@ func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
 
 #############################
 
-func _createTable():
-
+func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	# 
-	# columns: name, version/branch, dependencies, status, updates
+	# columns: Addon, Conflict Addon, Conflict Type, Addon File, Conflict File
 	#
+	var selectColDef: AceTableColumnDef = AceTableColumnDef.new()
+	selectColDef.columnId = "selected"
+	selectColDef.columnName = ""
+	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
+	selectColDef.columnAlign = AceTableConstants.Align.CENTER
+	selectColDef.columnImageSize = Vector2i(64,64)
+	selectColDef.columnHasSelectAll = true
+
+	var addonColDef: AceTableColumnDef = AceTableColumnDef.new()
+	addonColDef.columnId = "addon"
+	addonColDef.columnName = "Add-on"
+	addonColDef.columnType = AceTableConstants.ColumnType.LABEL
+	addonColDef.columnSort = true
+	addonColDef.columnAlign = AceTableConstants.Align.CENTER
+	addonColDef.columnImageSize = Vector2i(64,64)
+	addonColDef.columnTextType = AceTableConstants.TextType.COMBO
+
+	var conflictAddonColDef: AceTableColumnDef = AceTableColumnDef.new()
+	conflictAddonColDef.columnId = "conflict_addon"
+	conflictAddonColDef.columnName = "Conflict Add-on"
+	conflictAddonColDef.columnType = AceTableConstants.ColumnType.LABEL
+	conflictAddonColDef.columnSort = true
+	conflictAddonColDef.columnAlign = AceTableConstants.Align.CENTER
+	conflictAddonColDef.columnImageSize = Vector2i(64,64)
+	conflictAddonColDef.columnTextType = AceTableConstants.TextType.COMBO
+
+	var conflictTypeColDef: AceTableColumnDef = AceTableColumnDef.new()
+	conflictTypeColDef.columnId = "conflict_type"
+	conflictTypeColDef.columnName = "Conflict Type"
+	conflictTypeColDef.columnType = AceTableConstants.ColumnType.LABEL
+	conflictTypeColDef.columnSort = true
+	conflictTypeColDef.columnAlign = AceTableConstants.Align.CENTER
+	conflictTypeColDef.columnImageSize = Vector2i(64,64)
+	conflictTypeColDef.columnTextType = AceTableConstants.TextType.TEXT
+
+
+	pass
+
+func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dictionary]:
+	var data: Array[Dictionary] = []
+	for conflict in conflics:
+		var conflict_dict: Dictionary = {
+			"selected": false,
+			"addon": conflict.addon.repo,
+			"conflict_addon": conflict.conflicting_addon.repo,
+			"conflict_type": "Release Conflict" if conflict.releaseConflict else ("Version Conflict" if conflict.versionConflict else ("Branch Conflict" if conflict.branchConflict else "N/A")),
+			"addon_file": conflict.addon.metadata.addon_file,
+			"conflicting_file": conflict.conflicting_addon.metadata.addon_file
+		}
+		data.append(conflict_dict)
+	return data
+
+
+func _createAddonTable() -> void:
+	# 
+	# columns: selected, name, version/branch, dependencies, status, updates
+	#
+	var selectColDef: AceTableColumnDef = AceTableColumnDef.new()
+	selectColDef.columnId = "selected"
+	selectColDef.columnName = ""
+	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
+	selectColDef.columnAlign = AceTableConstants.Align.CENTER
+	selectColDef.columnImageSize = Vector2i(64,64)
+	selectColDef.columnHasSelectAll = true
+	pass
+
+func _createTable():
 	
 	var textRect = TextureRect.new()
 	textRect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

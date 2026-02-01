@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cvfreqqu30n7m" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/ace_plugin_main_view.gd" id="1_0542m"]
 [ext_resource type="Texture2D" uid="uid://bkhb07x0xif35" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonUpdate.svg" id="2_1tjh4"]
 [ext_resource type="Script" uid="uid://sx1wgfw6xjis" path="res://addons/anomalyAcesTable/Scripts/ace_table_properties.gd" id="2_0542m"]
+[ext_resource type="FontFile" uid="uid://cpb0xvgcv3wdl" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Medium.ttf" id="2_q1a5h"]
 [ext_resource type="Theme" uid="uid://bx1fly6adbouv" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderTheme.tres" id="3_l7mma"]
 [ext_resource type="Texture2D" uid="uid://dheudj0jp7p0o" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonInstall.svg" id="3_sg5kk"]
 [ext_resource type="Texture2D" uid="uid://ctr7t17kfgcmy" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonReload.svg" id="3_uimyb"]
@@ -43,11 +44,17 @@ theme = SubResource("Theme_l7mma")
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1623449591]
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1623449591]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "Ace Addon Manager"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_q1a5h")
+theme_override_font_sizes/font_size = 64
+text = "Ace Add-On Manager"
 horizontal_alignment = 1
+
+[node name="Control3" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1475605842]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
 
 [node name="ActionButtons" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1649454893]
 layout_mode = 2
@@ -61,11 +68,12 @@ size_flags_stretch_ratio = 0.5
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 64
 theme_override_constants/align_to_largest_stylebox = 0
 theme_override_font_sizes/font_size = 32
-text = "Reload Addons"
+text = "Reload Add-ons"
 icon = ExtResource("3_uimyb")
 flat = true
 autowrap_mode = 2
@@ -75,6 +83,7 @@ autowrap_trim_flags = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 32
 text = "Check For Updates"
@@ -87,9 +96,10 @@ autowrap_trim_flags = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 32
-text = "Install Selected Addons"
+text = "Install Selected Add-ons"
 icon = ExtResource("3_sg5kk")
 flat = true
 autowrap_mode = 2
@@ -113,6 +123,7 @@ size_flags_stretch_ratio = 0.1
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/icon_max_width = 64
 theme_override_constants/align_to_largest_stylebox = 0
 theme_override_font_sizes/font_size = 32
@@ -138,6 +149,14 @@ layout_mode = 2
 [node name="Control2" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1541599914]
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
+
+[node name="Title2" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1521063001]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_q1a5h")
+theme_override_font_sizes/font_size = 54
+text = "<Table Title>"
+horizontal_alignment = 1
 
 [node name="AceTable" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]
 layout_mode = 2

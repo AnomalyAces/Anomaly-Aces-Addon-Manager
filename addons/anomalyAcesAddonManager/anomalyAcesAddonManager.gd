@@ -12,9 +12,9 @@ func _enter_tree() -> void:
 	if Engine.is_editor_hint():
 		plugin_manager = PluginManagerScene.instantiate()
 
-		add_tool_menu_item("Ace Addon Manager", _on_addon_manager_clicked)
+		add_tool_menu_item("Ace Add-On Manager", _on_addon_manager_clicked)
 		window = Window.new()
-		window.title = "Ace Addon Manager"
+		window.title = "Ace Add-On Manager"
 		window.add_child(plugin_manager)
 		window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 		window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
@@ -33,7 +33,7 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
 	# remove_control_from_bottom_panel(plugin_manager)
-	remove_tool_menu_item("Ace Addon Manager")
+	remove_tool_menu_item("Ace Add-On Manager")
 	window.queue_free()
 
 	if is_instance_valid(plugin_manager):
