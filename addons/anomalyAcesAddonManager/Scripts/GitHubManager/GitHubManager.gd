@@ -15,6 +15,7 @@ const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/
 ## Signals ##
 signal addons_processed
 signal addons_downloaded(addons: Array[RemoteRepoObject])
+signal conflicts_found(conflicting_addons: Array[RemoteRepoConflict])
 
 var _addons: Array[RemoteRepoObject] = []
 var _num_requests: int = 0
@@ -28,8 +29,8 @@ func getAddonsFromRemoteRepo():
 	#Check for conflicts
 	var conflicting_addons: Array[RemoteRepoConflict] = _checkForConflicts(_addons)
 	if conflicting_addons.size() > 0:
-		AceLog.printLog(["Conflicts found in addons from remote repos."], AceLog.LOG_LEVEL.ERROR)
 		conflicts_found.emit(conflicting_addons)
+		AceLog.printLog(["Conflicts found in addons from remote repos."], AceLog.LOG_LEVEL.ERROR)
 		return
 
 	#Intialize counters

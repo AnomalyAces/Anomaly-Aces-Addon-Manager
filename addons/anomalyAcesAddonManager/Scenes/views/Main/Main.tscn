@@ -150,15 +150,17 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 
-[node name="Title2" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1521063001]
+[node name="TableTitle" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1521063001]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_q1a5h")
 theme_override_font_sizes/font_size = 54
-text = "<Table Title>"
+text = "Conflicts"
 horizontal_alignment = 1
 
 [node name="AceTable" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1

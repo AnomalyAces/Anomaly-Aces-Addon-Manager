@@ -18,9 +18,6 @@ const ADDON_FILE: String = "addons.json"
 const ADDON_DIR: String = "res://addons"
 
 
-#Signals
-signal conflicts_found(conflicting_addons: Array[RemoteRepoConflict])
-
 var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
 	AUTO_DOWNLOAD_ADDONS: AceSettingConfig.new(AUTO_DOWNLOAD_ADDONS, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
 	CHECK_FOR_UPDATES: AceSettingConfig.new(CHECK_FOR_UPDATES, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),

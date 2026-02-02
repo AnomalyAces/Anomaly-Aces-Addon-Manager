@@ -3,7 +3,8 @@ class_name AcePluginMainView extends Control
 
 # @onready var container: VBoxContainer = $VBoxContainer
 
-@onready var tablePlugin: AceTable = $PanelContainer/VBoxContainer/AceTable
+@onready var tablePlugin: AceTable = %AceTable
+@onready var tableTtile: Label = %TableTitle
 
 var rrm: GitHubManager
 
@@ -11,12 +12,13 @@ var _table: _AceTable
 
 func _ready() -> void:
 	rrm = GitHubManager.new(self)
-	_createTable()
+	# _createTable()
 	# for i in randi_range(1,3):
 	# 	_add_addonInfo()
-	# rrm.getAddonsFromRemoteRepo()
 	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
 	rrm.conflicts_found.connect(_on_conflicts_found)
+
+	rrm.getAddonsFromRemoteRepo()
 
 
 	
@@ -30,6 +32,7 @@ func _on_addon_downloads_completed(addons: Array[RemoteRepoObject]) -> void:
 
 func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
 	AceLog.printLog(["Conflicting addons found:", JSON.parse_string(AceSerialize.serialize_array(conflicting_addons))], AceLog.LOG_LEVEL.INFO)
+	_createConflictTable(conflicting_addons)
 
 #############################
 
@@ -52,6 +55,7 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	addonColDef.columnSort = true
 	addonColDef.columnAlign = AceTableConstants.Align.CENTER
 	addonColDef.columnImageSize = Vector2i(64,64)
+	addonColDef.columnImage = "res://addons/anomalyAcesAddonManager/Icons/Package.svg"
 	addonColDef.columnTextType = AceTableConstants.TextType.COMBO
 
 	var conflictAddonColDef: AceTableColumnDef = AceTableColumnDef.new()
@@ -61,6 +65,7 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	conflictAddonColDef.columnSort = true
 	conflictAddonColDef.columnAlign = AceTableConstants.Align.CENTER
 	conflictAddonColDef.columnImageSize = Vector2i(64,64)
+	conflictAddonColDef.columnImage = "res://addons/anomalyAcesAddonManager/Icons/Package.svg"
 	conflictAddonColDef.columnTextType = AceTableConstants.TextType.COMBO
 
 	var conflictTypeColDef: AceTableColumnDef = AceTableColumnDef.new()
@@ -69,17 +74,35 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	conflictTypeColDef.columnType = AceTableConstants.ColumnType.LABEL
 	conflictTypeColDef.columnSort = true
 	conflictTypeColDef.columnAlign = AceTableConstants.Align.CENTER
-	conflictTypeColDef.columnImageSize = Vector2i(64,64)
 	conflictTypeColDef.columnTextType = AceTableConstants.TextType.TEXT
 
 	var addonFileColDef: AceTableColumnDef = AceTableColumnDef.new()
 	addonFileColDef.columnId = "addon_file"
 	addonFileColDef.columnName = "Add-on File"
 	addonFileColDef.columnType = AceTableConstants.ColumnType.LABEL
-	addonFileColDef.columnSort = false
+	addonFileColDef.columnSort = true
+	addonFileColDef.columnAlign = AceTableConstants.Align.CENTER
+	addonFileColDef.columnTextType = AceTableConstants.TextType.LINK
+	addonFileColDef.columnCallable = _text_link_pressed
 
+	var conflictFileColDef: AceTableColumnDef = AceTableColumnDef.new()
+	conflictFileColDef.columnId = "conflicting_file"
+	conflictFileColDef.columnName = "Conflict File"
+	conflictFileColDef.columnType = AceTableConstants.ColumnType.LABEL
+	conflictFileColDef.columnSort = true
+	conflictFileColDef.columnAlign = AceTableConstants.Align.CENTER
+	conflictFileColDef.columnTextType = AceTableConstants.TextType.LINK
+	conflictFileColDef.columnCallable = _text_link_pressed
 
-	pass
+	var tableData: Array[Dictionary] = _createConflictTableData(conflics)
+	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, conflictAddonColDef, conflictTypeColDef, addonFileColDef, conflictFileColDef]
+
+	tableTtile.text = "Conflicts"
+
+	AceLog.printLog(["Loading Conflict Table data via AceTableManager"])
+	tablePlugin.printConfig()
+	_table = AceTableManager.createTable(tablePlugin, colDefs, tableData)
+	AceLog.printLog(["Done Loading Conflict Table data via AceTableManager"])
 
 func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dictionary]:
 	var data: Array[Dictionary] = []
@@ -187,9 +210,6 @@ func _createTable():
 	AceLog.printLog(["Done Loading  Table data via AceTableManager"])
 	
 
-func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
-	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)
-
 func _createTextLinkObject(filePath: String) -> Dictionary:
 
 	var file_name: String = filePath.get_file()
@@ -199,3 +219,12 @@ func _createTextLinkObject(filePath: String) -> Dictionary:
 		"text": "%s/%s" % [parent_dir, file_name],
 		"link": filePath
 	}
+
+func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
+	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)
+
+func _text_link_pressed(link: String) -> void:
+	AceLog.printLog(["Text link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
+	var abs_path: String = ProjectSettings.globalize_path(link)
+	OS.shell_open(abs_path)
+	

@@ -76,5 +76,5 @@ func _on_addon_manager_clicked():
 	pass
 
 func _on_about_to_popup():
-	# pass
-	plugin_manager.main_view.getAddons()
+	pass
+	# plugin_manager.main_view.getAddons()
