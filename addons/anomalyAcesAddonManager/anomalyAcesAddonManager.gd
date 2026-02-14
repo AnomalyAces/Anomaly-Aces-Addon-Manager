@@ -18,7 +18,8 @@ func _enter_tree() -> void:
 		window.add_child(plugin_manager)
 		window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 		window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
-		window.content_scale_size = Vector2i(1920,1080)
+		window.content_scale_size = Vector2i(2048, 1152)
+		window.size = Vector2i(1600 ,720)
 		window.set_unparent_when_invisible(true)
 		window.close_requested.connect(func(): window.hide())
 		window.about_to_popup.connect(_on_about_to_popup)
@@ -72,7 +73,7 @@ func _on_addon_manager_clicked():
 		window.mode = Window.MODE_WINDOWED
 	else:
 		AceLog.printLog(["Open Addon Window Please"])
-		EditorInterface.popup_dialog_centered(window, Vector2i(1920,1080))
+		EditorInterface.popup_dialog_centered(window)
 	pass
 
 func _on_about_to_popup():
