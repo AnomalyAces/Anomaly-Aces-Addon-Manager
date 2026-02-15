@@ -156,7 +156,6 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_q1a5h")
 theme_override_font_sizes/font_size = 54
-text = "Conflicts"
 horizontal_alignment = 1
 
 [node name="AceTable" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]

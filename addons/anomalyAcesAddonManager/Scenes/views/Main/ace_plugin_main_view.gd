@@ -29,6 +29,7 @@ func getAddons() -> void:
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject]) -> void:
 	AceLog.printLog(["All Addons Downloaded from Remote Repo", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
+	_createAddonTable(addons)
 
 func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
 	AceLog.printLog(["Conflicting addons found:", JSON.parse_string(AceSerialize.serialize_array(conflicting_addons))], AceLog.LOG_LEVEL.INFO)
@@ -113,17 +114,17 @@ func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dict
 			"conflict_addon": conflict.conflicting_addon.repo,
 			"conflict_type": "Release Conflict" if conflict.releaseConflict else ("Version Conflict" if conflict.versionConflict else ("Branch Conflict" if conflict.branchConflict else "N/A")),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
-			"addon_file": _createTextLinkObject(conflict.addon.metadata.addon_file),
+			"addon_file": _createTextLinkObjectForFile(conflict.addon.metadata.addon_file),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
-			"conflicting_file": _createTextLinkObject(conflict.conflicting_addon.metadata.addon_file)
+			"conflicting_file": _createTextLinkObjectForFile(conflict.conflicting_addon.metadata.addon_file)
 		}
 		data.append(conflict_dict)
 	return data
 
 
-func _createAddonTable() -> void:
+func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	# 
-	# columns: selected, name, version/branch, dependencies, status, updates
+	# columns: selected, addon, version/branch, addon file, status, updates
 	#
 	var selectColDef: AceTableColumnDef = AceTableColumnDef.new()
 	selectColDef.columnId = "selected"
@@ -132,7 +133,68 @@ func _createAddonTable() -> void:
 	selectColDef.columnAlign = AceTableConstants.Align.CENTER
 	selectColDef.columnImageSize = Vector2i(64,64)
 	selectColDef.columnHasSelectAll = true
-	pass
+
+	var addonColDef: AceTableColumnDef = AceTableColumnDef.new()
+	addonColDef.columnId = "addon"
+	addonColDef.columnName = "Add-on"
+	addonColDef.columnType = AceTableConstants.ColumnType.LABEL
+	addonColDef.columnSort = true
+	addonColDef.columnAlign = AceTableConstants.Align.CENTER
+	addonColDef.columnImageSize = Vector2i(64,64)
+	addonColDef.columnImage = "res://addons/anomalyAcesAddonManager/Icons/Package.svg"
+	addonColDef.columnTextType = AceTableConstants.TextType.COMBO
+
+	var versionColDef: AceTableColumnDef = AceTableColumnDef.new()
+	versionColDef.columnId = "version"
+	versionColDef.columnName = "Version"
+	versionColDef.columnType = AceTableConstants.ColumnType.LABEL
+	versionColDef.columnSort = true
+	versionColDef.columnAlign = AceTableConstants.Align.CENTER
+	versionColDef.columnTextType = AceTableConstants.TextType.TEXT
+
+	var addonFileColDef: AceTableColumnDef = AceTableColumnDef.new()
+	addonFileColDef.columnId = "addon_file"
+	addonFileColDef.columnName = "Add-on File"
+	addonFileColDef.columnType = AceTableConstants.ColumnType.LABEL
+	addonFileColDef.columnSort = true
+	addonFileColDef.columnAlign = AceTableConstants.Align.CENTER
+	addonFileColDef.columnTextType = AceTableConstants.TextType.LINK
+	addonFileColDef.columnCallable = _text_link_pressed
+
+	var statusColDef: AceTableColumnDef = AceTableColumnDef.new()
+	statusColDef.columnId = "status"
+	statusColDef.columnName = "Status"
+	statusColDef.columnType = AceTableConstants.ColumnType.LABEL
+	statusColDef.columnSort = true
+	statusColDef.columnAlign = AceTableConstants.Align.CENTER
+	statusColDef.columnTextType = AceTableConstants.TextType.LINK
+	statusColDef.columnCallable = _handle_update
+	
+
+	var tableData: Array[Dictionary] = _createAddonTableData(addons)
+	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, versionColDef, addonFileColDef, statusColDef]
+
+	tableTtile.text = "Add-ons"
+
+	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
+	tablePlugin.printConfig()
+	_table = AceTableManager.createTable(tablePlugin, colDefs, tableData)
+	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
+
+func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]:
+	var data: Array[Dictionary] = []
+	for addon in addons:
+		var status: String = "Update Available" if addon.metadata.has_update else "Up to Date"
+		var conflict_dict: Dictionary = {
+			"selected": false,
+			"addon": addon.repo,
+			"version": addon.version if addon.isRelease else addon.branch,
+			"status": _createTextLinkObjectForUpdate(status, addon.metadata.has_update),
+			# Is data for a text link. Needs to be an object with "text" and "link" keys
+			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file)
+		}
+		data.append(conflict_dict)
+	return data
 
 func _createTable():
 	
@@ -210,7 +272,7 @@ func _createTable():
 	AceLog.printLog(["Done Loading  Table data via AceTableManager"])
 	
 
-func _createTextLinkObject(filePath: String) -> Dictionary:
+func _createTextLinkObjectForFile(filePath: String) -> Dictionary:
 
 	var file_name: String = filePath.get_file()
 	var parent_dir: String = filePath.get_base_dir().get_file()
@@ -220,6 +282,13 @@ func _createTextLinkObject(filePath: String) -> Dictionary:
 		"link": filePath
 	}
 
+func _createTextLinkObjectForUpdate(status: String, has_update: bool) -> Dictionary:
+	return {
+		"text": status,
+		"link": status if has_update else "",
+		"color": Color.BLUE if has_update else Color.GREEN
+	}
+
 func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
 	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)
 
@@ -227,4 +296,7 @@ func _text_link_pressed(link: String) -> void:
 	AceLog.printLog(["Text link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
 	var abs_path: String = ProjectSettings.globalize_path(link)
 	OS.shell_open(abs_path)
+
+func _handle_update(link: String) -> void:
+	AceLog.printLog(["Update link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
 	
