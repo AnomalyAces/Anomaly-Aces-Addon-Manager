@@ -10,13 +10,20 @@
 [ext_resource type="Texture2D" uid="uid://b33bc0yfbkjw" path="res://addons/anomalyAcesAddonManager/Icons/Github.svg" id="4_sg5kk"]
 [ext_resource type="Theme" uid="uid://wgkqeg5mojsr" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowTheme.tres" id="4_t5kl5"]
 [ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowCellTheme.tres" id="5_y0qvv"]
+[ext_resource type="PackedScene" uid="uid://cd0aapc45wg2k" path="res://addons/anomalyAcesAddonManager/Scenes/views/Loading/LoadingView.tscn" id="8_n0oye"]
 [ext_resource type="Theme" uid="uid://dvm3ul1pd018w" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderCellTheme.tres" id="10_q1a5h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0542m"]
 bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n0oye"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yb3ld"]
+
 [sub_resource type="Theme" id="Theme_l7mma"]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_0542m")
+RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_n0oye")
+RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_yb3ld")
 
 [node name="Main" type="Control" unique_id=368126978]
 layout_mode = 3
@@ -79,19 +86,6 @@ flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
 
-[node name="Update" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=766363093]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("5_y0qvv")
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 64
-theme_override_font_sizes/font_size = 32
-text = "Check For Updates"
-icon = ExtResource("2_1tjh4")
-flat = true
-autowrap_mode = 2
-autowrap_trim_flags = 0
-
 [node name="Install" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1549816277]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -101,6 +95,19 @@ theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 32
 text = "Install Selected Add-ons"
 icon = ExtResource("3_sg5kk")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
+[node name="Update" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=766363093]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/icon_max_width = 64
+theme_override_font_sizes/font_size = 32
+text = "Check For Updates"
+icon = ExtResource("2_1tjh4")
 flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
@@ -150,16 +157,26 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 
+[node name="LoadingView" parent="PanelContainer/VBoxContainer" unique_id=1213959645 instance=ExtResource("8_n0oye")]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
 [node name="TableTitle" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1521063001]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_q1a5h")
 theme_override_font_sizes/font_size = 54
 horizontal_alignment = 1
 
-[node name="AceTable" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]
+[node name="AddonTablePlugin" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
@@ -170,3 +187,19 @@ row_theme = ExtResource("4_t5kl5")
 row_cell_theme = ExtResource("5_y0qvv")
 cell_separation = 0
 metadata/_custom_type_script = "uid://sx1wgfw6xjis"
+
+[node name="ConflictTablePlugin" type="Control" parent="PanelContainer/VBoxContainer" unique_id=37003315]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+script = ExtResource("2_0542m")
+header_theme = ExtResource("3_l7mma")
+header_cell_theme = ExtResource("10_q1a5h")
+row_theme = ExtResource("4_t5kl5")
+row_cell_theme = ExtResource("5_y0qvv")
+cell_separation = 0
+metadata/_custom_type_script = "uid://sx1wgfw6xjis"
+
+[connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Reload" to="." method="_on_reload_pressed"]

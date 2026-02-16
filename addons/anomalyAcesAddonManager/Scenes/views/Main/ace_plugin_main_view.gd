@@ -2,13 +2,18 @@
 class_name AcePluginMainView extends Control
 
 # @onready var container: VBoxContainer = $VBoxContainer
-
-@onready var tablePlugin: AceTable = %AceTable
+@onready var loadingView: LoadingView = %LoadingView
+@onready var addonTablePlugin: AceTablePlugin = %AddonTablePlugin
+@onready var conflictTablePlugin: AceTablePlugin = %ConflictTablePlugin
 @onready var tableTtile: Label = %TableTitle
 
 var rrm: GitHubManager
 
-var _table: _AceTable
+var _addon_table: _AceTable
+var _conflict_table: _AceTable
+
+var _addons: Array[RemoteRepoObject] = []
+var _conflicts: Array[RemoteRepoConflict] = []
 
 func _ready() -> void:
 	rrm = GitHubManager.new(self)
@@ -18,24 +23,73 @@ func _ready() -> void:
 	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
 	rrm.conflicts_found.connect(_on_conflicts_found)
 
-	rrm.getAddonsFromRemoteRepo()
+	AceLog.printLog(["Current Animation: %s" % loadingView.animationPlayer.current_animation], AceLog.LOG_LEVEL.INFO)
+
+	if loadingView.animationPlayer.current_animation != "Loading":
+		loadingView.playAnimation()
 
 
 	
 
 func getAddons() -> void:
+	_setLoadingViewSize()
+	loadingView.visible = true
+	tableTtile.visible = false
+	addonTablePlugin.visible = false
+	conflictTablePlugin.visible = false
 	rrm.getAddonsFromRemoteRepo()
 
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject]) -> void:
+	loadingView.visible = false
 	AceLog.printLog(["All Addons Downloaded from Remote Repo", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
-	_createAddonTable(addons)
+	tableTtile.text = "Add-ons"
+	tableTtile.visible = true
+	addonTablePlugin.visible = true
+	conflictTablePlugin.visible = false
+	
+	if _addon_table != null:
+		var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(addons))
+		AceTableManager.setTableData(_addon_table, tableData)
+	else:
+		_createAddonTable(addons)
+	
+	_addons = addons
 
 func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
+	loadingView.visible = false
 	AceLog.printLog(["Conflicting addons found:", JSON.parse_string(AceSerialize.serialize_array(conflicting_addons))], AceLog.LOG_LEVEL.INFO)
-	_createConflictTable(conflicting_addons)
+	tableTtile.text = "Conflicts"
+	tableTtile.visible = true
+	addonTablePlugin.visible = false
+	conflictTablePlugin.visible = true
+
+	if _conflict_table != null:
+		var tableData: Array[Dictionary] = _createConflictTableData(conflicting_addons)
+		AceTableManager.setTableData(_conflict_table, tableData)
+	else:
+		_createConflictTable(conflicting_addons)
+	
+	_conflicts = conflicting_addons
+
+func _on_reload_pressed() -> void:
+	getAddons()
 
 #############################
+
+func _setLoadingViewSize() -> void:
+	# Set the loading view to be a square based on the smaller dimension of the current view size
+	var view_size: Vector2 = size
+	AceLog.printLog(["Current view size: %s" % view_size], AceLog.LOG_LEVEL.INFO)
+	var max_dimension: float = max(view_size.x, view_size.y)
+	# Make the custom minimum size x 1/4 of maximum dimension of the screen size and y 70% of the x dimension to account for typical loading animation aspect ratio
+	var x_dim: float = max_dimension * .25
+	var y_dim: float = x_dim * .7
+	# Make the custom minimum size 1/4 of the screen size
+	var loading_size: Vector2 = Vector2(x_dim, y_dim)
+	AceLog.printLog(["Loading view size: %s" % loading_size], AceLog.LOG_LEVEL.INFO)
+	
+	loadingView.custom_minimum_size = loading_size
 
 func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	# 
@@ -98,11 +152,9 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	var tableData: Array[Dictionary] = _createConflictTableData(conflics)
 	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, conflictAddonColDef, conflictTypeColDef, addonFileColDef, conflictFileColDef]
 
-	tableTtile.text = "Conflicts"
-
 	AceLog.printLog(["Loading Conflict Table data via AceTableManager"])
-	tablePlugin.printConfig()
-	_table = AceTableManager.createTable(tablePlugin, colDefs, tableData)
+	conflictTablePlugin.printConfig()
+	_conflict_table = AceTableManager.createTable(conflictTablePlugin, colDefs, tableData)
 	AceLog.printLog(["Done Loading Conflict Table data via AceTableManager"])
 
 func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dictionary]:
@@ -119,6 +171,7 @@ func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dict
 			"conflicting_file": _createTextLinkObjectForFile(conflict.conflicting_addon.metadata.addon_file)
 		}
 		data.append(conflict_dict)
+		data.append_array(_createConflictTableData(conflict.dependencies))
 	return data
 
 
@@ -171,106 +224,46 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	statusColDef.columnCallable = _handle_update
 	
 
-	var tableData: Array[Dictionary] = _createAddonTableData(addons)
+	var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(addons))
+
 	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, versionColDef, addonFileColDef, statusColDef]
 
-	tableTtile.text = "Add-ons"
-
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
-	tablePlugin.printConfig()
-	_table = AceTableManager.createTable(tablePlugin, colDefs, tableData)
+	addonTablePlugin.printConfig()
+	_addon_table = AceTableManager.createTable(addonTablePlugin, colDefs, tableData)
 	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
 
 func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]:
 	var data: Array[Dictionary] = []
 	for addon in addons:
-		var status: String = "Update Available" if addon.metadata.has_update else "Up to Date"
-		var conflict_dict: Dictionary = {
+		var addon_dict: Dictionary = {
 			"selected": false,
 			"addon": addon.repo,
 			"version": addon.version if addon.isRelease else addon.branch,
-			"status": _createTextLinkObjectForUpdate(status, addon.metadata.has_update),
+			"status": _createTextLinkObjectForUpdate(addon.metadata.status),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
 			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file)
 		}
-		data.append(conflict_dict)
+		data.append(addon_dict)
+		data.append_array(_createAddonTableData(addon.dependencies))
 	return data
 
-func _createTable():
+
+func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
+	# This function can be used to normalize or preprocess the data before feeding it to the table
+	# For example, you could flatten nested data structures, format certain fields, etc.
+	var normalized_data: Array[Dictionary] = []
+	var normalized_dict: Dictionary = {}
+	for dict in table_data:
+		var dict_key = "|".join([dict["addon"], dict["version"]])
+		if not normalized_dict.has(dict_key):
+			normalized_dict[dict_key] = dict
 	
-	var textRect = TextureRect.new()
-	textRect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	textRect.size_flags_horizontal = SIZE_EXPAND_FILL
-	textRect.set_texture(load("res://icon.svg"))
 
-	var selectColDef: AceTableColumnDef = AceTableColumnDef.new()
-	selectColDef.columnId = "selected"
-	selectColDef.columnName = ""
-	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
-	selectColDef.columnAlign = AceTableConstants.Align.CENTER
-	selectColDef.columnImageSize = Vector2i(64,64)
-	selectColDef.columnHasSelectAll = true
+	normalized_data.assign(normalized_dict.values())
 
-	var fooColDef: AceTableColumnDef = AceTableColumnDef.new()
-	fooColDef.columnId = "foo"
-	fooColDef.columnName = "Foo"
-	fooColDef.columnSort = true
-	fooColDef.columnType = AceTableConstants.ColumnType.LABEL
-	fooColDef.columnAlign = AceTableConstants.Align.CENTER
+	return normalized_data
 
-	var barColDef: AceTableColumnDef = AceTableColumnDef.new()
-	barColDef.columnId = "bar"
-	barColDef.columnName = "Bar"
-	barColDef.columnSort = true
-	barColDef.columnType = AceTableConstants.ColumnType.BUTTON
-	barColDef.columnAlign = AceTableConstants.Align.CENTER
-	barColDef.columnImage = "res://icon.svg"
-	barColDef.columnImageAlign = AceTableConstants.ImageAlign.LEFT
-	barColDef.columnButtonIconUpdateWithState = false
-	barColDef.columnImageSize = Vector2i(64,64)
-	barColDef.columnCallable = _button_pressed
-
-	var foobarColDef: AceTableColumnDef = AceTableColumnDef.new()
-	foobarColDef.columnId = "foobar"
-	foobarColDef.columnName = "FooBar"
-	foobarColDef.columnType = AceTableConstants.ColumnType.TEXTURE_RECT
-	foobarColDef.columnAlign = AceTableConstants.Align.CENTER
-	foobarColDef.columnImageSize = Vector2i(64,64)
-	# foobarColDef.columnNode = textRect
-
-	var colDefs: Array[AceTableColumnDef] = [selectColDef, fooColDef, barColDef, foobarColDef]
-	
-	var data: Array[Dictionary] = [
-		{
-			"selected":false,
-			"foo":"12",
-			"bar":"Press Me",
-			"foobar": "res://icon.svg"
-		},
-		{
-			"selected":false,
-			"foo":"15",
-			"bar":"Old Me",
-			"foobar": "res://icon.svg"
-		},
-		{
-			"selected":false,
-			"foo":"10",
-			"bar":"Press Me",
-			"foobar": "res://icon.svg"
-		},
-		{
-			"selected":false,
-			"foo":"17",
-			"bar":"New Me",
-			"foobar": "res://icon.svg"
-		}
-	]
-	AceLog.printLog(["Loading Table data via AceTableManager"])
-	tablePlugin.printConfig()
-	_table = AceTableManager.createTable(tablePlugin, colDefs, data)
-	AceLog.printLog(["Done Loading  Table data via AceTableManager"])
-	
 
 func _createTextLinkObjectForFile(filePath: String) -> Dictionary:
 
@@ -282,12 +275,51 @@ func _createTextLinkObjectForFile(filePath: String) -> Dictionary:
 		"link": filePath
 	}
 
-func _createTextLinkObjectForUpdate(status: String, has_update: bool) -> Dictionary:
-	return {
-		"text": status,
-		"link": status if has_update else "",
-		"color": Color.BLUE if has_update else Color.GREEN
-	}
+func _createTextLinkObjectForUpdate(status: RemoteRepoConstants.STATUS) -> Dictionary:
+
+	match status:
+		RemoteRepoConstants.STATUS.NOT_AVAILABLE:
+			return {
+				"text": "Not Available",
+				"link": "",
+				"color": Color.RED
+			}
+		RemoteRepoConstants.STATUS.DOWNLOAD_AVAILABLE:
+			return {
+				"text": "Download Available",
+				"link": "Download Available",
+				"color": Color.BLUE
+			}
+		RemoteRepoConstants.STATUS.DOWNLOADED:
+			return {
+				"text": "Downloaded",
+				"link": "Downloaded",
+				"color": Color.YELLOW
+			}
+		RemoteRepoConstants.STATUS.INSTALLED:
+			return {
+				"text": "Installed",
+				"link": "",
+				"color": Color.YELLOW
+			}
+		RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
+			return {
+				"text": "Update Available",
+				"link": "Update Available",
+				"color": Color.BLUE
+			}
+		RemoteRepoConstants.STATUS.UP_TO_DATE:
+			return {
+				"text": "Up to Date",
+				"link": "",
+				"color": Color.GREEN
+			}
+		_:
+			return {
+				"text": "Unknown",
+				"link": "",
+				"color": Color.GRAY
+			}
 
 func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
 	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)

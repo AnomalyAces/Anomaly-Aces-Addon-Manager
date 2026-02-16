@@ -6,6 +6,7 @@ const GITHUB_API_HEADERS: PackedStringArray = [
 	"Accept: application/vnd.github+json",
 ]
 const GITHUB_RELEASES_API_URL: String = "https://api.github.com/repos/%s/%s/releases/tags/%s"
+const GITHUB_RELEASES_LATEST_API_URL: String = "https://api.github.com/repos/%s/%s/releases/latest"
 const GITHUB_BRANCH_API_URL: String = "https://api.github.com/repos/%s/%s/branches/%s"
 
 const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipball/%s"
@@ -22,6 +23,8 @@ var _num_requests: int = 0
 var _requests_completed: int = 0
 var _num_download_requests: int = 0
 var _download_requests_completed: int = 0
+var _num_update_requests: int = 0
+var _update_requests_completed: int = 0
 
 func getAddonsFromRemoteRepo():
 	_addons = _parseAddonFiles()
@@ -34,10 +37,7 @@ func getAddonsFromRemoteRepo():
 		return
 
 	#Intialize counters
-	_num_requests = _get_num_requests(_addons)
-	_num_download_requests = 0
-	_requests_completed = 0
-	_download_requests_completed = 0
+	_initialize_counters()
 	
 	for addon in _addons:
 		_getAddonFromRemoteRepo(addon)
@@ -60,6 +60,24 @@ func getAddonsFromRemoteRepo():
 	# AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons ])
 
 	# return _addons
+
+func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
+	# Similar to getAddonsFromRemoteRepo but checks for updates based on version or branch commit date and emits a different signal for addons that have updates available
+	_initialize_counters()
+
+	for addon in addons:
+		_getAddonUpdatesFromRemoteRepo(addon)
+	
+	await addons_processed
+	AceLog.printLog(["Addon Updates Processed from Remote Repo "])
+
+
+func _initialize_counters():
+	#Intialize counters
+	_num_requests = _get_num_requests(_addons)
+	_num_download_requests = 0
+	_requests_completed = 0
+	_download_requests_completed = 0
 
 func _get_num_requests(addons: Array[RemoteRepoObject]) -> int:
 	_num_requests = 0
@@ -95,6 +113,7 @@ func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	await http.request_completed
 	if resp != OK:
 		AceLog.printLog(["Failed to make HTTP request for addon: %s" % addon.repo], AceLog.LOG_LEVEL.ERROR)
+		addon.metadata.status = RemoteRepoConstants.STATUS.NOT_AVAILABLE
 	
 	_requests_completed += 1
 	AceLog.printLog(["Requests Completed: %d / %d" % [_requests_completed, _num_requests]])
@@ -102,6 +121,20 @@ func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	if _requests_completed >= _num_requests:
 		addons_processed.emit()
 
+func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
+	# Similar to _getAddonFromRemoteRepo but checks for updates based on version or branch commit date and emits a different signal for addons that have updates available
+	if update.dependencies.size() > 0:
+		for dependency in update.dependencies:
+			_getAddonUpdatesFromRemoteRepo(dependency)
+			
+
+	var http: HTTPRequest = HTTPRequest.new()
+	parent_node.add_child(http)
+	_setHTTPAddonInfoSignal(http, update)
+	AceLog.printLog(["Checking for updates for Addon: %s" % update.repo])
+	# 
+	var github_latest_url: String = GITHUB_RELEASES_LATEST_API_URL % [update.owner, update.repo] if update.isRelease else GITHUB_BRANCH_API_URL % [update.owner, update.repo, update.branch]
+	pass
 
 func _setHTTPAddonInfoSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void:
 	if http.request_completed.is_connected(_http_addon_info_request_completed):
@@ -167,6 +200,7 @@ func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 
 	if addon.metadata.download_url == null || addon.metadata.download_url.is_empty():
 		AceLog.printLog(["No download URL for addon: %s, skipping download." % addon.repo], AceLog.LOG_LEVEL.WARN)
+		addon.metadata.status = RemoteRepoConstants.STATUS.NOT_AVAILABLE
 		return
 	
 	var http: HTTPRequest = HTTPRequest.new()
@@ -212,8 +246,9 @@ func _http_addon_download_request_completed(result: int, response_code: int, _he
 			return
 		else:
 			if FileAccess.file_exists(http.download_file):
-				AceLog.printLog(["Successfully downloaded addon: %s to path: %s" % [addon.repo, http.download_file]])
 				AceFileUtil.Zip.extract_all_from_zip(http.download_file, http.download_file.get_base_dir(), addon.subfolder)
+				addon.metadata.status = RemoteRepoConstants.STATUS.DOWNLOADED
+				AceLog.printLog(["Successfully downloaded addon: %s to path: %s" % [addon.repo, http.download_file]])
 			else:
 				AceLog.printLog(["Failed to download addon: %s to path: %s" % [addon.repo, http.download_file]], AceLog.LOG_LEVEL.ERROR)
 			

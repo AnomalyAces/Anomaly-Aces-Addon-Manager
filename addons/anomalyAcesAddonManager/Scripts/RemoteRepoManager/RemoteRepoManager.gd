@@ -129,3 +129,4 @@ func _checkForConflicts(addons: Array[RemoteRepoObject]) -> Array[RemoteRepoConf
 
 
 @abstract func getAddonsFromRemoteRepo()
+@abstract func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject])
