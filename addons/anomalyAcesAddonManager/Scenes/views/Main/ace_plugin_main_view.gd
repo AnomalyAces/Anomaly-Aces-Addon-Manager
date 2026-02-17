@@ -40,7 +40,11 @@ func getAddons() -> void:
 	rrm.getAddonsFromRemoteRepo()
 
 ##### Signal Callbacks #####
-func _on_addon_downloads_completed(addons: Array[RemoteRepoObject]) -> void:
+func _on_addon_downloads_completed(addons: Array[RemoteRepoObject], isUpdate: bool) -> void:
+	if isUpdate:
+		AceLog.printLog(["Add-on updates downloaded from Remote Repo will process with another signal", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.DEBUG)
+		return
+	
 	loadingView.visible = false
 	AceLog.printLog(["All Addons Downloaded from Remote Repo", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
 	tableTtile.text = "Add-ons"
