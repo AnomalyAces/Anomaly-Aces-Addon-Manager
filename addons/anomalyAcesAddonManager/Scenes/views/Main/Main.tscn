@@ -203,3 +203,4 @@ cell_separation = 0
 metadata/_custom_type_script = "uid://sx1wgfw6xjis"
 
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Reload" to="." method="_on_reload_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Install" to="." method="_on_install_pressed"]

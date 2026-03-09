@@ -32,11 +32,13 @@ var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
 
 var settings: AceSettings
 var parent_node: Node
+var _editor_interface: EditorInterface
 
 
 
-func _init(parent: Node) -> void:
+func _init(parent: Node, editor_interface: EditorInterface) -> void:
 	parent_node = parent
+	_editor_interface = editor_interface
 	settings = AceSettings.new()
 	settings.initialize_settings(SETTINGS_CONFIGURATION, SETTINGS_ROOT)
 	settings.prepare()

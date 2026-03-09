@@ -11,6 +11,7 @@ var plugin_manager: AcePluginManager
 func _enter_tree() -> void:
 	if Engine.is_editor_hint():
 		plugin_manager = PluginManagerScene.instantiate()
+		plugin_manager.assignEditorInterface(get_editor_interface())
 
 		add_tool_menu_item("Ace Add-On Manager", _on_addon_manager_clicked)
 		window = Window.new()

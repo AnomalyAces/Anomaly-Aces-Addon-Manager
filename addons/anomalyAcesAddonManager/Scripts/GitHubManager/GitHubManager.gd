@@ -11,12 +11,13 @@ const GITHUB_RELEASES_LATEST_API_URL: String = "https://api.github.com/repos/%s/
 const GITHUB_BRANCH_API_URL: String = "https://api.github.com/repos/%s/%s/branches/%s"
 const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipball/%s"
 
-const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github/"
+const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github"
 
 ## Signals ##
 signal addons_processed
 signal addon_updates_processed
 signal addons_downloaded(addons: Array[RemoteRepoObject], is_update: bool)
+signal addons_installed(addon: Array[RemoteRepoObject])
 signal conflicts_found(conflicting_addons: Array[RemoteRepoConflict])
 
 var _addons: Array[RemoteRepoObject] = []
@@ -58,6 +59,12 @@ func getAddonsFromRemoteRepo():
 	
 	await addons_downloaded
 
+	if isAutoInstallDownloadsEnabled():
+		_installAddons()
+	else:
+		AceLog.printLog(["Auto Install Addons is disabled. Skipping addon installs. Should draw attention to install button", AceLog.LOG_LEVEL.INFO])
+
+	await addons_installed
 	# AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons ])
 
 	# return _addons
@@ -76,27 +83,14 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
 
 	AceLog.printLog(["Total Update Download Requests to complete: %d" % _num_download_requests])
 
-	if isAutoDownloadEnabled():
-		for addon in _addons:
-			_downloadAddonFromRemoteRepo(addon, true)
-	else:
-		AceLog.printLog(["Auto Download Addons is disabled. Skipping addon downloads. Should draw attention to download button", AceLog.LOG_LEVEL.INFO])
+	for addon in _addons:
+		_downloadAddonFromRemoteRepo(addon, true)
 	
 	await addons_downloaded
 
-	# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
-	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)
+	_installAddons()
 
-	if _addon_installs_cfg != null:
-		# Process the existing addons
-		pass
-
-	if isAutoInstallDownloadsEnabled(): 
-		AceLog.printLog(["Auto Install Downloads is enabled. Emitting signal to install addons."])
-		addons_downloaded.emit(_addons, true)
-	else:
-		AceLog.printLog(["Auto Install Downloads is disabled. Skipping addon installation. Should draw attention to install button", AceLog.LOG_LEVEL.INFO])
-
+	await addons_installed
 
 
 
@@ -230,7 +224,7 @@ func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject, isUpdate: bool = fals
 		DirAccess.make_dir_recursive_absolute(GITHUB_TEMP_DOWNLOAD_PATH)
 
 	#Set Download File Path
-	http.download_file = GITHUB_TEMP_DOWNLOAD_PATH + "%s.zip" % addon.repo
+	http.download_file = GITHUB_TEMP_DOWNLOAD_PATH + "/%s.zip" % addon.repo
 
 	var resp = http.request(github_url, _get_headers())
 	AceLog.printLog(["Wating for GitHub API download request %s" % github_url] )
@@ -320,6 +314,34 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 		addon_updates_processed.emit()
 
 
+func _installAddons() -> void:
+	# Check if the addonInstalls.cfg file exists. If it doesn't, create it
+	var _addon_installs_cfg_exists: bool = AceFileUtil.File.file_exists("%s/addonInstalls.cfg" % ADDON_DIR)
+
+	if !_addon_installs_cfg_exists:
+		#Create the addonInstalls.cfg file
+		AceFileUtil.File.create_file("%s/addonInstalls.cfg" % ADDON_DIR)
+
+	# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
+	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)
+
+	if _addon_installs_cfg != null:
+		_compareDownloadsToInstalls(_addons, _addon_installs_cfg)
+		for addon in _addons:
+			if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
+				AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "version", ""), addon.version]])
+				#Move the downloaded addon to the addons folder
+				AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
+				
+				#Update the addonInstalls.cfg file
+				_addon_installs_cfg.set_value(addon.repo, "version", addon.version)
+				_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit)
+				_addon_installs_cfg.set_value(addon.repo, "install_date", Time.get_datetime_string_from_system())
+
+
+		addons_installed.emit(_addons)
+
+
 func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject], addon_install_cfg: ConfigFile) -> void:
 	# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
 	if addon_install_cfg != null:
@@ -342,6 +364,9 @@ func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject], addon_install_
 					else:
 						addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
 						AceLog.printLog(["Addon: %s is up to date. Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, installed_commit_date, addon.metadata.branch_last_commit]])
+			else:
+				addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
+				AceLog.printLog(["Addon: %s has not been installed by Ace Addon Manager. Installing..." % addon.repo])
 
 
 func _is_version_newer(latest_version: String, installed_version: String) -> bool:

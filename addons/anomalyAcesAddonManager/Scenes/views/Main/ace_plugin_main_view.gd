@@ -9,19 +9,24 @@ class_name AcePluginMainView extends Control
 
 var rrm: GitHubManager
 
+var _editor_interface: EditorInterface
+
 var _addon_table: _AceTable
 var _conflict_table: _AceTable
 
 var _addons: Array[RemoteRepoObject] = []
+var _selected_addons: Array[RemoteRepoObject] = []
 var _conflicts: Array[RemoteRepoConflict] = []
+var _selected_conflicts: Array[RemoteRepoConflict] = []
 
 func _ready() -> void:
-	rrm = GitHubManager.new(self)
+	rrm = GitHubManager.new(self, _editor_interface)
 	# _createTable()
 	# for i in randi_range(1,3):
 	# 	_add_addonInfo()
 	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
 	rrm.conflicts_found.connect(_on_conflicts_found)
+	rrm.addons_installed.connect(_on_addons_installed)
 
 	AceLog.printLog(["Current Animation: %s" % loadingView.animationPlayer.current_animation], AceLog.LOG_LEVEL.INFO)
 
@@ -38,6 +43,14 @@ func getAddons() -> void:
 	addonTablePlugin.visible = false
 	conflictTablePlugin.visible = false
 	rrm.getAddonsFromRemoteRepo()
+
+func installUpdates() -> void:
+	_setLoadingViewSize()
+	loadingView.visible = true
+	tableTtile.visible = false
+	addonTablePlugin.visible = false
+	conflictTablePlugin.visible = false
+	rrm.getAddonUpdatesFromRemoteRepo(_selected_addons)
 
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject], isUpdate: bool) -> void:
@@ -76,8 +89,42 @@ func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
 	
 	_conflicts = conflicting_addons
 
+func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
+	loadingView.visible = false
+	AceLog.printLog(["Addons Installed", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
+	tableTtile.visible = true
+	addonTablePlugin.visible = true
+	conflictTablePlugin.visible = false
+	
+	if _addon_table != null:
+		var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(addons))
+		AceTableManager.setTableData(_addon_table, tableData)
+	else:
+		_createAddonTable(addons)
+	
+	_addons = addons
+
+func _on_conflict_table_selection(_table_data: Array[Dictionary]) -> void:
+	var _selected_table_data: Array[Dictionary] = _table_data.filter(func (dict: Dictionary): return dict["selected"])
+	AceLog.printLog(["Conflict Table Selection: " ,_selected_table_data], AceLog.LOG_LEVEL.DEBUG)
+	var deserializeRes: AceDeserializeResult = AceSerialize.deserialize(JSON.stringify(_selected_table_data), RemoteRepoConflict)
+	if deserializeRes.error == OK:
+		_selected_conflicts.assign(deserializeRes.data)
+
+func _on_addon_table_selection(_table_data: Array[Dictionary]) -> void:
+	var _selected_table_data: Array[Dictionary] = _table_data.filter(func (dict: Dictionary): return dict["selected"])
+	AceLog.printLog(["Add-on Table Selection: ",_selected_table_data], AceLog.LOG_LEVEL.DEBUG)
+	var deserializeRes: AceDeserializeResult = AceSerialize.deserialize(JSON.stringify(_selected_table_data), RemoteRepoObject)
+	if deserializeRes.error == OK:
+		_selected_addons.assign(deserializeRes.data)
+
 func _on_reload_pressed() -> void:
 	getAddons()
+
+func _on_install_pressed() -> void:
+	installUpdates()
+
+
 
 #############################
 
@@ -159,6 +206,7 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	AceLog.printLog(["Loading Conflict Table data via AceTableManager"])
 	conflictTablePlugin.printConfig()
 	_conflict_table = AceTableManager.createTable(conflictTablePlugin, colDefs, tableData)
+	_conflict_table.row_selected.connect(_on_conflict_table_selection)
 	AceLog.printLog(["Done Loading Conflict Table data via AceTableManager"])
 
 func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dictionary]:
@@ -235,6 +283,7 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	addonTablePlugin.printConfig()
 	_addon_table = AceTableManager.createTable(addonTablePlugin, colDefs, tableData)
+	_addon_table.row_selected.connect(_on_addon_table_selection)
 	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
 
 func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]:
@@ -298,12 +347,6 @@ func _createTextLinkObjectForUpdate(status: RemoteRepoConstants.STATUS) -> Dicti
 			return {
 				"text": "Downloaded",
 				"link": "Downloaded",
-				"color": Color.YELLOW
-			}
-		RemoteRepoConstants.STATUS.INSTALLED:
-			return {
-				"text": "Installed",
-				"link": "",
 				"color": Color.YELLOW
 			}
 		RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
