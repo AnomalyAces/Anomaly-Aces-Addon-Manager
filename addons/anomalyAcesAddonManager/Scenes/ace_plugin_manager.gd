@@ -5,6 +5,7 @@ class_name AcePluginManager extends Control
 
 
 func assignEditorInterface(editorInterface: EditorInterface) -> void:
-	main_view._editor_interface = editorInterface
+	if main_view != null:
+		main_view._editor_interface = editorInterface
 
 
