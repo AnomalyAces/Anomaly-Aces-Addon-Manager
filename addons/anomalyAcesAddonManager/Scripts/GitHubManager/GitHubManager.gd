@@ -331,7 +331,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)
 
 	if _addon_installs_cfg != null:
-		AceLog.printLog(["Addons to Install", JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
+		AceLog.printLog(["Addon to Install", JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
 		_compareDownloadsToInstalls(addon, _addon_installs_cfg)
 
 		if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
@@ -384,7 +384,7 @@ func _compareDownloadsToInstalls(addon: RemoteRepoObject, addon_install_cfg: Con
 				addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
 				AceLog.printLog(["Addon: %s has not been installed by Ace Addon Manager. Installing..." % addon.repo])
 		else:
-			AceLog.printLog(["Addon: %s has not been downloaded by Ace Addon Manager. Current Status: %s" % addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]], AceLog.LOG_LEVEL.DEBUG)
+			AceLog.printLog(["Addon: %s has not been downloaded by Ace Addon Manager. Current Status: %s" % [addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]]], AceLog.LOG_LEVEL.DEBUG)
 
 
 func _is_version_newer(latest_version: String, installed_version: String) -> bool:
