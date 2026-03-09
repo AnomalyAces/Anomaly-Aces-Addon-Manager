@@ -60,7 +60,8 @@ func getAddonsFromRemoteRepo():
 	await addons_downloaded
 
 	if isAutoInstallDownloadsEnabled():
-		_installAddons()
+		for addon in _addons:
+			_installAddons(addon)
 	else:
 		AceLog.printLog(["Auto Install Addons is disabled. Skipping addon installs. Should draw attention to install button", AceLog.LOG_LEVEL.INFO])
 
@@ -88,7 +89,8 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	
 	await addons_downloaded
 
-	_installAddons()
+	for addon in _addons:
+		_installAddons(addon)
 
 	await addons_installed
 
@@ -314,7 +316,10 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 		addon_updates_processed.emit()
 
 
-func _installAddons() -> void:
+func _installAddons(addon: RemoteRepoObject) -> void:
+	for dependency in addon.dependencies:
+		_installAddons(dependency)
+
 	# Check if the addonInstalls.cfg file exists. If it doesn't, create it
 	var _addon_installs_cfg_exists: bool = AceFileUtil.File.file_exists("%s/addonInstalls.cfg" % ADDON_DIR)
 
@@ -326,58 +331,57 @@ func _installAddons() -> void:
 	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)
 
 	if _addon_installs_cfg != null:
-		AceLog.printLog(["Addons to Install", JSON.parse_string(AceSerialize.serialize_array(_addons))], AceLog.LOG_LEVEL.DEBUG)
-		_compareDownloadsToInstalls(_addons, _addon_installs_cfg)
-		for addon in _addons:
-			if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
-				AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "version", ""), addon.version]])
-				#Move the downloaded addon to the addons folder
-				# AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
-				
-				#Update the addonInstalls.cfg file
-				_addon_installs_cfg.set_value(addon.repo, "version", addon.version)
-				_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit)
-				_addon_installs_cfg.set_value(addon.repo, "install_date", Time.get_datetime_string_from_system())
+		AceLog.printLog(["Addons to Install", JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
+		_compareDownloadsToInstalls(addon, _addon_installs_cfg)
 
-				AceFileUtil.Config.save_config(_addon_installs_cfg, "%s/addonInstalls.cfg" % ADDON_DIR)
-				#_addon_installs_cfg.save("%s/addonInstalls.cfg" % ADDON_DIR)
-				AceLog.printLog(["Update installed for addon: %s" % addon.repo])
+		if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
+			AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "version", ""), addon.version]])
+			#Move the downloaded addon to the addons folder
+			# AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
+			
+			#Update the addonInstalls.cfg file
+			_addon_installs_cfg.set_value(addon.repo, "version", addon.version)
+			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit)
+			_addon_installs_cfg.set_value(addon.repo, "install_date", Time.get_datetime_string_from_system())
 
-				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
-			else:
-				AceLog.printLog(["No updates available for addon:"  , JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
-				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
+			AceFileUtil.Config.save_config(_addon_installs_cfg, "%s/addonInstalls.cfg" % ADDON_DIR)
+			#_addon_installs_cfg.save("%s/addonInstalls.cfg" % ADDON_DIR)
+			AceLog.printLog(["Update installed for addon: %s" % addon.repo])
+
+			addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
+		else:
+			AceLog.printLog(["No updates available for addon:"  , JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
+			addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
 
 
 
 		addons_installed.emit(_addons)
 
 
-func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject], addon_install_cfg: ConfigFile) -> void:
+func _compareDownloadsToInstalls(addon: RemoteRepoObject, addon_install_cfg: ConfigFile) -> void:
 	# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
 	if addon_install_cfg != null:
 		# Each config section is a naemd after a addon repo name. The fields it has are version, last_commit_date, install_date
-		for addon in addons:
-			if addon_install_cfg.has_section(addon.repo):
-				var installed_version: String = addon_install_cfg.get_value(addon.repo, "version", "")
-				var installed_commit_date: String = addon_install_cfg.get_value(addon.repo, "last_commit_date", "")
-				if addon.isRelease:
-					if _is_version_newer(addon.version, installed_version):
-						addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
-						AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, installed_version, addon.version]])
-					else:
-						addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
-						AceLog.printLog(["Addon: %s is up to date. Installed Version: %s, Latest Version: %s" % [addon.repo, installed_version, addon.version]])
+		if addon_install_cfg.has_section(addon.repo):
+			var installed_version: String = addon_install_cfg.get_value(addon.repo, "version", "")
+			var installed_commit_date: String = addon_install_cfg.get_value(addon.repo, "last_commit_date", "")
+			if addon.isRelease:
+				if _is_version_newer(addon.version, installed_version):
+					addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
+					AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, installed_version, addon.version]])
 				else:
-					if _is_date_newer(addon.metadata.branch_last_commit, installed_commit_date):
-						addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
-						AceLog.printLog(["Update available for addon: %s - Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, installed_commit_date, addon.metadata.branch_last_commit]])
-					else:
-						addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
-						AceLog.printLog(["Addon: %s is up to date. Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, installed_commit_date, addon.metadata.branch_last_commit]])
+					addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
+					AceLog.printLog(["Addon: %s is up to date. Installed Version: %s, Latest Version: %s" % [addon.repo, installed_version, addon.version]])
 			else:
-				addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
-				AceLog.printLog(["Addon: %s has not been installed by Ace Addon Manager. Installing..." % addon.repo])
+				if _is_date_newer(addon.metadata.branch_last_commit, installed_commit_date):
+					addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
+					AceLog.printLog(["Update available for addon: %s - Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, installed_commit_date, addon.metadata.branch_last_commit]])
+				else:
+					addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
+					AceLog.printLog(["Addon: %s is up to date. Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, installed_commit_date, addon.metadata.branch_last_commit]])
+		else:
+			addon.metadata.status = RemoteRepoConstants.STATUS.UPDATE_AVAILABLE
+			AceLog.printLog(["Addon: %s has not been installed by Ace Addon Manager. Installing..." % addon.repo])
 
 
 func _is_version_newer(latest_version: String, installed_version: String) -> bool:
