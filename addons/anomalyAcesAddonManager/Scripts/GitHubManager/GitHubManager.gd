@@ -27,6 +27,9 @@ var _num_download_requests: int = 0
 var _download_requests_completed: int = 0
 var _num_update_requests: int = 0
 var _update_requests_completed: int = 0
+var _num_install_requests: int = 0
+var _install_requests_completed: int = 0
+var _installed_addons: Array[RemoteRepoObject] = []
 
 func getAddonsFromRemoteRepo():
 	_addons = _parseAddonFiles()
@@ -89,6 +92,8 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	
 	await addons_downloaded
 
+	_initialize_counters()
+
 	for addon in _addons:
 		_installAddons(addon)
 
@@ -104,6 +109,11 @@ func _initialize_counters():
 	_num_download_requests = 0
 	_requests_completed = 0
 	_download_requests_completed = 0
+	_num_update_requests = 0
+	_update_requests_completed = 0
+	_num_install_requests = _get_num_install_requests(_addons, 0)
+	_install_requests_completed = 0
+	_installed_addons = []
 
 func _get_num_requests(addons: Array[RemoteRepoObject]) -> int:
 	_num_requests = 0
@@ -121,6 +131,13 @@ func _get_num_download_requests(addons: Array[RemoteRepoObject], num_download_re
 			num_download_req = _get_num_download_requests(addon.dependencies, num_download_req)
 	return num_download_req
 
+func _get_num_install_requests(addons: Array[RemoteRepoObject], num_install_req: int) -> int:
+	for addon in addons:
+		if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
+			num_install_req += 1
+		if addon.dependencies.size() > 0:
+			num_install_req = _get_num_install_requests(addon.dependencies, num_install_req)
+	return num_install_req
 
 func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	if addon.dependencies.size() > 0:
@@ -349,13 +366,14 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			AceLog.printLog(["Update installed for addon: %s" % addon.repo])
 
 			addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
-		else:
-			AceLog.printLog(["No updates available for addon:"  , JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
-			addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
+
+			_install_requests_completed += 1
+			_installed_addons.append(addon)
+			AceLog.printLog(["Install Requests Completed: %d / %d" % [_install_requests_completed, _num_install_requests]])
 
 
-
-		addons_installed.emit(_addons)
+	if _install_requests_completed >= _num_install_requests:
+		addons_installed.emit(_installed_addons)
 
 
 func _compareDownloadsToInstalls(addon: RemoteRepoObject, addon_install_cfg: ConfigFile) -> void:
