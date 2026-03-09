@@ -343,6 +343,8 @@ func _installAddons() -> void:
 				AceLog.printLog(["Update installed for addon: %s" % addon.repo])
 
 				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
+			else:
+				AceLog.printLog(["No updates available for addon:"  ,  addon])
 
 
 
