@@ -326,6 +326,7 @@ func _installAddons() -> void:
 	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)
 
 	if _addon_installs_cfg != null:
+		AceLog.printLog(["Addons to Install", JSON.parse_string(AceSerialize.serialize_array(_addons))], AceLog.LOG_LEVEL.DEBUG)
 		_compareDownloadsToInstalls(_addons, _addon_installs_cfg)
 		for addon in _addons:
 			if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
@@ -344,7 +345,8 @@ func _installAddons() -> void:
 
 				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
 			else:
-				AceLog.printLog(["No updates available for addon:"  ,  addon])
+				AceLog.printLog(["No updates available for addon:"  , JSON.parse_string(AceSerialize.serialize(addon))])
+				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
 
 
 
