@@ -345,7 +345,7 @@ func _installAddons() -> void:
 
 				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
 			else:
-				AceLog.printLog(["No updates available for addon:"  , JSON.parse_string(AceSerialize.serialize(addon))])
+				AceLog.printLog(["No updates available for addon:"  , JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
 				addon.metadata.status = RemoteRepoConstants.STATUS.UP_TO_DATE
 
 
