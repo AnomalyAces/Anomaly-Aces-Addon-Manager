@@ -378,6 +378,8 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject]) -> void:
 	var addon_install_cfg: ConfigFile = _get_config_file()
 
+	AceLog.printLog(["Config file for installed addons: ", addon_install_cfg], AceLog.LOG_LEVEL.DEBUG)
+
 	# Each config section is a naemd after a addon repo name. The fields it has are version, last_commit_date, install_date
 	for addon in addons:
 		_compareDownloadsToInstalls(addon.dependencies)
