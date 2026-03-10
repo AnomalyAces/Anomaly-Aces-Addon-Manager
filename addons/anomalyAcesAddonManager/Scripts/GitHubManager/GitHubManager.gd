@@ -354,8 +354,8 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			# AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
 			
 			#Update the addonInstalls.cfg file
-			_addon_installs_cfg.set_value(addon.repo, "version", addon.version)
-			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit)
+			_addon_installs_cfg.set_value(addon.repo, "version", addon.version if addon.version != null else "")
+			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit if addon.metadata.branch_last_commit != null else "")
 			_addon_installs_cfg.set_value(addon.repo, "install_date", Time.get_datetime_string_from_system())
 
 			AceFileUtil.Config.save_config(_addon_installs_cfg, "%s/addonInstalls.cfg" % ADDON_DIR)
