@@ -343,7 +343,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 	for dependency in addon.dependencies:
 		_installAddons(dependency)
 
-	if _installed_addons.has(addon.repo):
+	if _installed_addons.has(addon):
 		_install_requests_completed += 1
 		AceLog.printLog(["Addon: %s is already installed. Skipping install. Install Requests Completed: %d / %d" % [addon.repo, _install_requests_completed, _num_install_requests]])
 	elif _addon_installs_cfg != null:
@@ -353,7 +353,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 		if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
 			AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "version", ""), addon.version]])
 			#Move the downloaded addon to the addons folder
-			# AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
+			AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
 			
 			#Update the addonInstalls.cfg file
 			_addon_installs_cfg.set_value(addon.repo, "version", addon.version if addon.version != null else "")
