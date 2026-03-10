@@ -380,8 +380,7 @@ func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject]) -> void:
 
 	# Each config section is a naemd after a addon repo name. The fields it has are version, last_commit_date, install_date
 	for addon in addons:
-		for dependency in addon.dependencies:
-			_compareDownloadsToInstalls([dependency])
+		_compareDownloadsToInstalls(addon.dependencies)
 		# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
 		if addon_install_cfg != null:
 			if addon.metadata.status == RemoteRepoConstants.STATUS.DOWNLOADED:
