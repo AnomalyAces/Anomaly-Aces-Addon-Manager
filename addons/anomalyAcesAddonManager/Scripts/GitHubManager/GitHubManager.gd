@@ -338,10 +338,11 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 
 
 func _installAddons(addon: RemoteRepoObject) -> void:
-	var _addon_installs_cfg: ConfigFile = _get_config_file()
 
 	for dependency in addon.dependencies:
 		_installAddons(dependency)
+	
+	var _addon_installs_cfg: ConfigFile = _get_config_file()
 
 	if _installed_addons.has(addon):
 		_install_requests_completed += 1
