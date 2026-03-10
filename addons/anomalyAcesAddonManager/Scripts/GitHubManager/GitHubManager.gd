@@ -86,19 +86,19 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	await addon_updates_processed
 	AceLog.printLog(["Addon Updates Processed from Remote Repo "])
 
-	_num_download_requests = _get_num_download_requests(_addons, _num_download_requests)
+	_num_download_requests = _get_num_download_requests(addons, _num_download_requests)
 
 	AceLog.printLog(["Total Update Download Requests to complete: %d" % _num_download_requests])
 
-	for addon in _addons:
+	for addon in addons:
 		_downloadAddonFromRemoteRepo(addon, true)
 	
 	await addons_downloaded
 
-	_compareDownloadsToInstalls(_addons)
+	_compareDownloadsToInstalls(addons)
 	_initialize_counters()
 
-	for addon in _addons:
+	for addon in addons:
 		_installAddons(addon)
 
 	await addons_installed
