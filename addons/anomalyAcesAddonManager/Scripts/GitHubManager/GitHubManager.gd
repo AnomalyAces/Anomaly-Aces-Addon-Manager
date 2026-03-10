@@ -375,7 +375,11 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			_install_requests_completed += 1
 			_installed_addons.append(addon)
 			AceLog.printLog(["Install Requests Completed: %d / %d" % [_install_requests_completed, _num_install_requests]])
-
+		elif addon.metadata.status == RemoteRepoConstants.STATUS.UP_TO_DATE:
+			AceLog.printLog(["Addon: %s is already up to date. Skipping install. Addon Status: %s" % [addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]]], AceLog.LOG_LEVEL.INFO)
+			_install_requests_completed += 1
+			_installed_addons.append(addon)
+			AceLog.printLog(["Install Requests Completed: %d / %d" % [_install_requests_completed, _num_install_requests]])
 		else:
 			AceLog.printLog(["No update available for addon: %s. Addon Status: %s" % [addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]]], AceLog.LOG_LEVEL.INFO)
 	else:
