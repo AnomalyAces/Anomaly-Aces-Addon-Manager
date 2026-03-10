@@ -358,7 +358,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			
 			#Update the addonInstalls.cfg file
 			_addon_installs_cfg.set_value(addon.repo, "version", addon.version if addon.version != null else "")
-			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit if addon.metadata.branch_last_commit != null else "")
+			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", _convert_utc_string_to_local_string(addon.metadata.branch_last_commit) if addon.metadata.branch_last_commit != null else "")
 			_addon_installs_cfg.set_value(addon.repo, "install_date", Time.get_datetime_string_from_system())
 
 			AceFileUtil.Config.save_config(_addon_installs_cfg, "%s/addonInstalls.cfg" % ADDON_DIR)
@@ -461,3 +461,26 @@ func _get_config_file() -> ConfigFile:
 	# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
 	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)
 	return _addon_installs_cfg
+
+func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
+	# 1. Parse the input string (assumed UTC for this example) into a dictionary.
+	# Note: Godot methods for converting from string assume "the same timezone" 
+	# unless specified otherwise, so the input string should ideally conform to ISO 8601 
+	# and you should handle any "Z" suffix manually if needed.
+	var datetime_dict = Time.get_datetime_dict_from_datetime_string(utc_datetime_string.replace("Z", ""), false)
+
+	# Check for parsing errors
+	if datetime_dict.is_empty() or "year" not in datetime_dict:
+		print("Error: Could not parse input datetime string")
+		return ""
+
+	# 2. Convert the dictionary to a Unix timestamp (seconds since epoch).
+	var unix_time = Time.get_unix_time_from_datetime_dict(datetime_dict)
+
+	# 3. Get Bias between UTC and local time in seconds
+	var bias_seconds = Time.get_time_zone_from_system()["bias"] * 60
+
+	# 4. Adjust the Unix timestamp by the bias to get local time
+	var local_datetime_string = Time.get_datetime_string_from_unix_time(unix_time + bias_seconds)
+
+	return local_datetime_string
