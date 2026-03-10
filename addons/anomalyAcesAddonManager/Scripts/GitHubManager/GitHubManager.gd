@@ -335,10 +335,11 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 
 
 func _installAddons(addon: RemoteRepoObject) -> void:
+	var _addon_installs_cfg: ConfigFile = _get_config_file()
+
 	for dependency in addon.dependencies:
 		_installAddons(dependency)
 
-	var _addon_installs_cfg: ConfigFile = _get_config_file()
 
 	if _addon_installs_cfg != null:
 		AceLog.printLog(["Addon to Install", JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
@@ -363,6 +364,11 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			_install_requests_completed += 1
 			_installed_addons.append(addon)
 			AceLog.printLog(["Install Requests Completed: %d / %d" % [_install_requests_completed, _num_install_requests]])
+
+		else:
+			AceLog.printLog(["No update available for addon: %s. Addon Status: %s" % [addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]]], AceLog.LOG_LEVEL.INFO)
+	else:
+			AceLog.printLog(["No addonInstalls.cfg file found. Cannot compare downloaded addons to installed addons for updates. Addon: %s" % addon.repo], AceLog.LOG_LEVEL.DEBUG)
 
 
 	if _install_requests_completed >= _num_install_requests:
@@ -401,6 +407,8 @@ func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject]) -> void:
 					AceLog.printLog(["Addon: %s has not been installed by Ace Addon Manager. Installing..." % addon.repo])
 			else:
 				AceLog.printLog(["Addon: %s has not been downloaded by Ace Addon Manager. Current Status: %s" % [addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]]], AceLog.LOG_LEVEL.DEBUG)
+		else:
+			AceLog.printLog(["No addonInstalls.cfg file found. Cannot compare downloaded addons to installed addons for updates. Addon: %s" % addon.repo], AceLog.LOG_LEVEL.DEBUG)
 
 
 func _is_version_newer(latest_version: String, installed_version: String) -> bool:
