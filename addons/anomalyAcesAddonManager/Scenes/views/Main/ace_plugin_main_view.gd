@@ -240,7 +240,7 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	selectColDef.columnHasSelectAll = true
 
 	var addonColDef: AceTableColumnDef = AceTableColumnDef.new()
-	addonColDef.columnId = "addon"
+	addonColDef.columnId = "repo"
 	addonColDef.columnName = "Add-on"
 	addonColDef.columnType = AceTableConstants.ColumnType.LABEL
 	addonColDef.columnSort = true
@@ -291,7 +291,7 @@ func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]
 	for addon in addons:
 		var addon_dict: Dictionary = {
 			"selected": false,
-			"addon": addon.repo,
+			"repo": addon.repo,
 			"version": addon.version if addon.isRelease else addon.branch,
 			"status": _createTextLinkObjectForUpdate(addon.metadata.status),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
