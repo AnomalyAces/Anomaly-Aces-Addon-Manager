@@ -199,7 +199,7 @@ func _http_addon_info_request_completed(result: int, response_code: int, _header
 					addon.metadata.download_url = json_data["zipball_url"]
 			else:
 				if json_data.has("commit") && json_data["commit"].has("commit"):
-					addon.metadata.branch_last_commit = json_data["commit"]["commit"]["author"]["date"]
+					addon.metadata.branch_last_commit = _convert_utc_string_to_local_string(json_data["commit"]["commit"]["author"]["date"])
 					AceLog.printLog(["Addon: %s - Branch Last Commit Date: %s" % [addon.repo, addon.metadata.branch_last_commit]])
 					addon.metadata.download_url = GITHUB_BRANCH_ZIP_URL % [addon.owner, addon.repo, addon.branch]
 
@@ -352,7 +352,10 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 		# _compareDownloadsToInstalls(addon, _addon_installs_cfg)
 
 		if addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
-			AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "version", ""), addon.version]])
+			if addon.isRelease:
+				AceLog.printLog(["Update available for addon: %s - Installed Version: %s, Latest Version: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "version", ""), addon.version]])
+			else:
+				AceLog.printLog(["Update available for addon: %s - Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "last_commit_date", ""), addon.metadata.branch_last_commit]])
 			#Move the downloaded addon to the addons folder
 			AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()])
 			
