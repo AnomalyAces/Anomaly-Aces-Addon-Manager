@@ -308,7 +308,7 @@ func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
 	var normalized_data: Array[Dictionary] = []
 	var normalized_dict: Dictionary = {}
 	for dict in table_data:
-		var dict_key = "|".join([dict["addon"], dict["version"]])
+		var dict_key = "|".join([dict["repo"], dict["version"]])
 		if not normalized_dict.has(dict_key):
 			normalized_dict[dict_key] = dict
 	
