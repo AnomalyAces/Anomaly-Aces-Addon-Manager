@@ -63,6 +63,9 @@ func getAddonsFromRemoteRepo():
 	await addons_downloaded
 
 	if isAutoInstallDownloadsEnabled():
+		_compareDownloadsToInstalls(_addons)
+		_initialize_counters()
+		
 		for addon in _addons:
 			_installAddons(addon)
 	else:
