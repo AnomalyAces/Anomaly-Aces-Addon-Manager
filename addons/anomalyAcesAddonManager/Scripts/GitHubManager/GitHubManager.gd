@@ -343,8 +343,10 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 	for dependency in addon.dependencies:
 		_installAddons(dependency)
 
-
-	if _addon_installs_cfg != null:
+	if _installed_addons.has(addon.repo):
+		_install_requests_completed += 1
+		AceLog.printLog(["Addon: %s is already installed. Skipping install. Install Requests Completed: %d / %d" % [addon.repo, _install_requests_completed, _num_install_requests]])
+	elif _addon_installs_cfg != null:
 		AceLog.printLog(["Addon to Install", JSON.parse_string(AceSerialize.serialize(addon))], AceLog.LOG_LEVEL.DEBUG)
 		# _compareDownloadsToInstalls(addon, _addon_installs_cfg)
 
