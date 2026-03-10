@@ -333,7 +333,7 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 		update.metadata.status = RemoteRepoConstants.STATUS.NOT_AVAILABLE
 	
 	_requests_completed += 1
-	AceLog.printLog(["Requests Completed: %d / %d" % [_requests_completed, _num_requests]])
+	AceLog.printLog(["Update Requests Completed: %d / %d" % [_requests_completed, _num_requests]])
 
 	if _requests_completed >= _num_requests:
 		addon_updates_processed.emit()
