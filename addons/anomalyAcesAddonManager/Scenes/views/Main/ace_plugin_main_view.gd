@@ -114,9 +114,8 @@ func _on_conflict_table_selection(_table_data: Array[Dictionary]) -> void:
 func _on_addon_table_selection(_table_data: Array[Dictionary]) -> void:
 	var _selected_table_data: Array[Dictionary] = _table_data.filter(func (dict: Dictionary): return dict["selected"])
 	AceLog.printLog(["Add-on Table Selection: ",_selected_table_data], AceLog.LOG_LEVEL.DEBUG)
-	var deserializeRes: AceDeserializeResult = AceSerialize.deserialize(JSON.stringify(_selected_table_data), RemoteRepoObject)
-	if deserializeRes.error == OK:
-		_selected_addons.assign(deserializeRes.data)
+	var addons_to_add: Array[RemoteRepoObject] = _addons.filter(func (addon: RemoteRepoObject): return AceArrayUtil.findFirst(_selected_table_data, func (dict: Dictionary): return dict["repo"] == addon.repo ) != null)
+	_selected_addons.assign(addons_to_add)
 
 func _on_reload_pressed() -> void:
 	getAddons()
