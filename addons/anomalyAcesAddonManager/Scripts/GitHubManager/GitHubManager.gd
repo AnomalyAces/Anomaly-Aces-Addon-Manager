@@ -79,8 +79,9 @@ func getAddonsFromRemoteRepo():
 func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	# Similar to getAddonsFromRemoteRepo but checks for updates based on version or branch commit date and emits a different signal for addons that have updates available
 	_initialize_counters()
+	_num_update_requests = _get_num_requests(addons)
 
-	AceLog.printLog(["Selected Addon Start Update Processing from Remote Repo ", addons])
+	AceLog.printLog(["Selected Addon Start Update Processing %s requests from Remote Repo " % _num_update_requests, addons])
 
 	for addon in addons:
 		_getAddonUpdatesFromRemoteRepo(addon)
@@ -333,9 +334,9 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 		update.metadata.status = RemoteRepoConstants.STATUS.NOT_AVAILABLE
 	
 	_requests_completed += 1
-	AceLog.printLog(["Update Requests Completed: %d / %d" % [_requests_completed, _num_requests]])
+	AceLog.printLog(["Update Requests Completed: %d / %d" % [_requests_completed, _num_update_requests]])
 
-	if _requests_completed >= _num_requests:
+	if _requests_completed >= _num_update_requests:
 		addon_updates_processed.emit()
 
 
