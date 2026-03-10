@@ -10,7 +10,7 @@
 			{
 				"owner": "anomalyaces",
 				"repo": "Anomaly-Aces-Util-Plugin",
-				"isRelease": true,
+				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
 				"subfolder": "addons/anomalyAcesUtil/"
@@ -26,7 +26,7 @@
 			{
 				"owner": "anomalyaces",
 				"repo": "Anomaly-Aces-Table-Plugin",
-				"isRelease": true,
+				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
 				"subfolder": "addons/anomalyAcesTable/"
