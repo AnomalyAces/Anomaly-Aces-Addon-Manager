@@ -387,9 +387,9 @@ func _merge_updated_addons(addons: Array[RemoteRepoObject]) -> void:
 		if existing_addon_index != -1:
 			# Update existing addon
 			# _addons[existing_addon_index] = updated_addon
-			AceLog.printLog(["Existing addon to update: %s" % _addons[existing_addon_index].repo], AceLog.LOG_LEVEL.DEBUG)
+			AceLog.printLog(["Existing addon to merge: %s" % _addons[existing_addon_index].repo], AceLog.LOG_LEVEL.DEBUG)
 		else:
 			# Add new addon
 			# _addons.append(updated_addon)
-			AceLog.printLog(["New addon to add: %s" % updated_addon.repo], AceLog.LOG_LEVEL.DEBUG)
+			AceLog.printLog(["New addon to merge: %s" % updated_addon.repo], AceLog.LOG_LEVEL.DEBUG)
 	
