@@ -64,8 +64,9 @@ func getAddonsFromRemoteRepo():
 
 	if isAutoInstallDownloadsEnabled():
 		_compareDownloadsToInstalls(_addons)
-		AceLog.printLog(["Total Install Requests to complete: %d" % _num_install_requests])
 		_initialize_counters()
+		_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
+		AceLog.printLog(["Total Install Requests to complete: %d" % _num_install_requests])
 		
 		for addon in _addons:
 			_installAddons(addon)
@@ -119,7 +120,7 @@ func _initialize_counters():
 	_download_requests_completed = 0
 	_num_update_requests = 0
 	_update_requests_completed = 0
-	_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
+	_num_install_requests = 0
 	_install_requests_completed = 0
 	_installed_addons = []
 
