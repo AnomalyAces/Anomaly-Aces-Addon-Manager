@@ -478,11 +478,13 @@ func _get_config_file() -> ConfigFile:
 	return _addon_installs_cfg
 
 func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
+	AceLog.printLog(["Converting UTC datetime string to local datetime string. Input UTC datetime string: %s" % utc_datetime_string], AceLog.LOG_LEVEL.DEBUG)
 	# 1. Parse the input string (assumed UTC for this example) into a dictionary.
 	# Note: Godot methods for converting from string assume "the same timezone" 
 	# unless specified otherwise, so the input string should ideally conform to ISO 8601 
 	# and you should handle any "Z" suffix manually if needed.
 	var datetime_dict = Time.get_datetime_dict_from_datetime_string(utc_datetime_string.replace("Z", ""), false)
+	AceLog.printLog(["Parsed datetime dictionary: %s" % datetime_dict], AceLog.LOG_LEVEL.DEBUG)
 
 	# Check for parsing errors
 	if datetime_dict.is_empty() or "year" not in datetime_dict:
