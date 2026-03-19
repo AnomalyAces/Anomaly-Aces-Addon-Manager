@@ -493,7 +493,7 @@ func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
 	var unix_time = Time.get_unix_time_from_datetime_dict(datetime_dict)
 
 	# 3. Get Bias between UTC and local time in seconds
-	AceLog.printLog(["Time Zone %s Bias from UTC in seconds: %d" % [Time.get_time_zone_from_system()["name"], Time.get_time_zone_from_system()["bias"] * 60]], AceLog.LOG_LEVEL.DEBUG)
+	AceLog.printLog(["Time Zone %s Bias from UTC in hours: %d" % [Time.get_time_zone_from_system()["name"], Time.get_time_zone_from_system()["bias"] / 60]], AceLog.LOG_LEVEL.DEBUG)
 	var bias_seconds = Time.get_time_zone_from_system()["bias"] * 60
 
 	# 4. Adjust the Unix timestamp by the bias to get local time
