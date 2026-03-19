@@ -3,8 +3,8 @@
 /android/
 /addons/anomalyAcesAddonManager/temp/github
 /addons/anomalyAcesLog
-/addons/anomalyAcesTable
 /addons/anomalyAcesUtil
 /addons/Asset_Drawer
 /addons/log
 /addons/addonInstalls.cfg
+/addons/*.zip
