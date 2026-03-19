@@ -92,6 +92,7 @@ func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
 func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
 	loadingView.visible = false
 	AceLog.printLog(["Addons Installed", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
+	_merge_updated_addons(addons)
 	tableTtile.visible = true
 	addonTablePlugin.visible = true
 	conflictTablePlugin.visible = false
@@ -377,4 +378,18 @@ func _text_link_pressed(link: String) -> void:
 
 func _handle_update(link: String) -> void:
 	AceLog.printLog(["Update link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
+
+func _merge_updated_addons(addons: Array[RemoteRepoObject]) -> void:
+	# This function can be used to merge the updated addons with the existing addons in the table
+	# For example, you could update the status of existing addons, add new addons, remove deleted addons, etc.
+	for updated_addon in addons:
+		var existing_addon_index: int = _addons.find(updated_addon)
+		if existing_addon_index != -1:
+			# Update existing addon
+			# _addons[existing_addon_index] = updated_addon
+			AceLog.printLog(["Existing addon to update: %s" % _addons[existing_addon_index].repo], AceLog.LOG_LEVEL.DEBUG)
+		else:
+			# Add new addon
+			# _addons.append(updated_addon)
+			AceLog.printLog(["New addon to add: %s" % updated_addon.repo], AceLog.LOG_LEVEL.DEBUG)
 	
