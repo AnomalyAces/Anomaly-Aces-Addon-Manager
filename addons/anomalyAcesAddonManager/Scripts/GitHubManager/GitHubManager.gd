@@ -369,7 +369,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			
 			#Update the addonInstalls.cfg file
 			_addon_installs_cfg.set_value(addon.repo, "version", addon.version if addon.version != null else "")
-			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", _convert_utc_string_to_local_string(addon.metadata.branch_last_commit) if addon.metadata.branch_last_commit != null else "")
+			_addon_installs_cfg.set_value(addon.repo, "last_commit_date", addon.metadata.branch_last_commit if addon.metadata.branch_last_commit != null else "")
 			_addon_installs_cfg.set_value(addon.repo, "install_date", Time.get_datetime_string_from_system())
 
 			AceFileUtil.Config.save_config(_addon_installs_cfg, "%s/addonInstalls.cfg" % ADDON_DIR)
