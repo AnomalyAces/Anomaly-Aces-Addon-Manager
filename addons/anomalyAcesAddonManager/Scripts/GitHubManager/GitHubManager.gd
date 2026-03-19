@@ -363,6 +363,9 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 				AceLog.printLog(["Update available for addon: %s - Installed Last Commit Date: %s, Latest Last Commit Date: %s" % [addon.repo, _addon_installs_cfg.get_value(addon.repo, "last_commit_date", ""), addon.metadata.branch_last_commit]])
 			#Move the downloaded addon to the addons folder
 			AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()], [".zip"])
+
+			#Delete Files and Folders that didn't get moved
+			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, ".zip")
 			
 			#Update the addonInstalls.cfg file
 			_addon_installs_cfg.set_value(addon.repo, "version", addon.version if addon.version != null else "")
