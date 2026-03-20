@@ -388,6 +388,15 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			_install_requests_completed += 1
 			_installed_addons.append(addon)
 			AceLog.printLog(["Install Requests Completed: %d / %d" % [_install_requests_completed, _num_install_requests]])
+
+			#Remove the downloaded zip addon file from the temp folder since it's not needed
+			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, ".zip")
+
+			#Delete Files and Folders that didn't get moved
+			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, addon.subfolder)
+
+
+
 		else:
 			AceLog.printLog(["No update available for addon: %s. Addon Status: %s" % [addon.repo, RemoteRepoConstants.STATUS.keys()[addon.metadata.status]]], AceLog.LOG_LEVEL.INFO)
 	else:
