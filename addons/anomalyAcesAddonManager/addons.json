@@ -5,7 +5,7 @@
 		"isRelease": false,
 		"version": "1.0",
 		"branch": "master",
-		"subfolder": "addons/anomalyAcesAddonManager/",
+		"subfolder": "addons/anomalyAcesAddonManager",
 		"dependencies": [
 			{
 				"owner": "anomalyaces",
@@ -13,7 +13,7 @@
 				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
-				"subfolder": "addons/anomalyAcesUtil/"
+				"subfolder": "addons/anomalyAcesUtil"
 			},
 			{
 				"owner": "anomalyaces",
@@ -21,7 +21,7 @@
 				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
-				"subfolder": "addons/anomalyAcesLog/"
+				"subfolder": "addons/anomalyAcesLog"
 			},
 			{
 				"owner": "anomalyaces",
@@ -29,7 +29,7 @@
 				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
-				"subfolder": "addons/anomalyAcesTable/"
+				"subfolder": "addons/anomalyAcesTable"
 			}
 		]
 	}

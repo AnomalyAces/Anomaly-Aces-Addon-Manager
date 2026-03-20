@@ -393,7 +393,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, ".zip")
 
 			#Delete Files and Folders that didn't get moved
-			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, addon.subfolder)
+			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, addon.subfolder.get_file())
 
 
 
