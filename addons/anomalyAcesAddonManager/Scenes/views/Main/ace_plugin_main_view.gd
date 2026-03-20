@@ -272,11 +272,19 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	statusColDef.columnAlign = AceTableConstants.Align.CENTER
 	statusColDef.columnTextType = AceTableConstants.TextType.LINK
 	statusColDef.columnCallable = _handle_update
+
+	var lastUpdateColDef: AceTableColumnDef = AceTableColumnDef.new()
+	lastUpdateColDef.columnId = "last_update"
+	lastUpdateColDef.columnName = "Last Update"
+	lastUpdateColDef.columnType = AceTableConstants.ColumnType.LABEL
+	lastUpdateColDef.columnSort = true
+	lastUpdateColDef.columnAlign = AceTableConstants.Align.CENTER
+	lastUpdateColDef.columnTextType = AceTableConstants.TextType.TEXT
 	
 
 	var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(addons))
 
-	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, versionColDef, addonFileColDef, statusColDef]
+	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, versionColDef, addonFileColDef, statusColDef, lastUpdateColDef]
 
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	addonTablePlugin.printConfig()
@@ -293,7 +301,8 @@ func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]
 			"version": addon.version if addon.isRelease else addon.branch,
 			"status": _createTextLinkObjectForUpdate(addon.metadata.status),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
-			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file)
+			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file),
+			"last_update": addon.metadata.version_release_date if addon.isRelease else addon.metadata.branch_last_commit_date
 		}
 		data.append(addon_dict)
 		data.append_array(_createAddonTableData(addon.dependencies))
