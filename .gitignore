@@ -2,7 +2,6 @@
 .godot/
 /android/
 /addons/anomalyAcesAddonManager/temp/github
-/addons/anomalyAcesLog
 /addons/log
 /addons/addonInstalls.cfg
 /addons/*.zip
