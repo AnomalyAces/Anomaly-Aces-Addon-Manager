@@ -98,13 +98,11 @@ func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
 	conflictTablePlugin.visible = false
 	
 	if _addon_table != null:
-		var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(addons))
+		var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(_addons))
 		AceTableManager.setTableData(_addon_table, tableData)
 	else:
-		_createAddonTable(addons)
+		_createAddonTable(_addons)
 	
-	_addons = addons
-
 func _on_conflict_table_selection(_table_data: Array[Dictionary]) -> void:
 	var _selected_table_data: Array[Dictionary] = _table_data.filter(func (dict: Dictionary): return dict["selected"])
 	AceLog.printLog(["Conflict Table Selection: " ,_selected_table_data], AceLog.LOG_LEVEL.DEBUG)
