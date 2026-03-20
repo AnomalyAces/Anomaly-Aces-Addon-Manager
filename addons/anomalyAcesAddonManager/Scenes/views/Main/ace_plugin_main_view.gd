@@ -284,7 +284,7 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 
 	var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(addons))
 
-	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, versionColDef, addonFileColDef, statusColDef, lastUpdateColDef]
+	var colDefs: Array[AceTableColumnDef] = [selectColDef, addonColDef, versionColDef, addonFileColDef, lastUpdateColDef, statusColDef]
 
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	addonTablePlugin.printConfig()
