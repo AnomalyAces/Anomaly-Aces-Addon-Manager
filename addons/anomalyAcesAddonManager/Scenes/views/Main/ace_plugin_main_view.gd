@@ -302,7 +302,7 @@ func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]
 			"status": _createTextLinkObjectForUpdate(addon.metadata.status),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
 			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file),
-			"last_update": addon.metadata.version_release_date if addon.isRelease else addon.metadata.branch_last_commit_date
+			"last_update": addon.metadata.version_release_date.replace("T", " ") if addon.isRelease else addon.metadata.branch_last_commit_date.replace("T", " ")
 		}
 		data.append(addon_dict)
 		data.append_array(_createAddonTableData(addon.dependencies))
