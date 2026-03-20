@@ -44,13 +44,23 @@ func getAddons() -> void:
 	conflictTablePlugin.visible = false
 	rrm.getAddonsFromRemoteRepo()
 
-func installUpdates() -> void:
+
+func checkUpdates() -> void:
 	_setLoadingViewSize()
 	loadingView.visible = true
 	tableTtile.visible = false
 	addonTablePlugin.visible = false
 	conflictTablePlugin.visible = false
-	rrm.getAddonUpdatesFromRemoteRepo(_selected_addons)
+	rrm.getAddonUpdatesFromRemoteRepo(_addons)
+
+
+func installSelectedUpdates() -> void:
+	_setLoadingViewSize()
+	loadingView.visible = true
+	tableTtile.visible = false
+	addonTablePlugin.visible = false
+	conflictTablePlugin.visible = false
+	rrm.getAddonUpdatesFromRemoteRepo(_selected_addons, true)
 
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject], isUpdate: bool) -> void:
@@ -119,8 +129,11 @@ func _on_addon_table_selection(_table_data: Array[Dictionary]) -> void:
 func _on_reload_pressed() -> void:
 	getAddons()
 
+func _on_update_pressed() -> void:
+	checkUpdates()
+
 func _on_install_pressed() -> void:
-	installUpdates()
+	installSelectedUpdates()
 
 
 

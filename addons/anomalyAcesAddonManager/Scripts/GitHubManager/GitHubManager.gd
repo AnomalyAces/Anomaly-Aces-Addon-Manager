@@ -70,15 +70,17 @@ func getAddonsFromRemoteRepo():
 		
 		for addon in _addons:
 			_installAddons(addon)
+		
+
+		await addons_installed
 	else:
 		AceLog.printLog(["Auto Install Addons is disabled. Skipping addon installs. Should draw attention to install button", AceLog.LOG_LEVEL.INFO])
 
-	await addons_installed
 	# AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons ])
 
 	# return _addons
 
-func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
+func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject], isInstall: bool = false):
 	# Similar to getAddonsFromRemoteRepo but checks for updates based on version or branch commit date and emits a different signal for addons that have updates available
 	_initialize_counters()
 	_num_update_requests = _get_num_requests(addons)
@@ -99,17 +101,20 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject]):
 		_downloadAddonFromRemoteRepo(addon, true)
 	
 	await addons_downloaded
+	if isInstall:
+		_compareDownloadsToInstalls(addons)
+		_initialize_counters()
+		_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
+		AceLog.printLog(["Total Update Install Requests to complete: %d" % _num_install_requests])
 
-	_compareDownloadsToInstalls(addons)
-	_initialize_counters()
-	_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
-	AceLog.printLog(["Total Update Install Requests to complete: %d" % _num_install_requests])
-
-	for addon in addons:
-		_installAddons(addon)
-
-	await addons_installed
-
+		for addon in addons:
+			_installAddons(addon)
+		
+		await addons_installed
+	else:
+		_compareDownloadsToInstalls(_addons)
+		AceLog.printLog(["Update Processing for addons completed. Need notification to let user now that updates are available", AceLog.LOG_LEVEL.INFO])
+		addons_installed.emit(_addons)
 
 
 
@@ -333,7 +338,7 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 	var github_latest_url: String = GITHUB_RELEASES_LATEST_API_URL % [update.owner, update.repo] if update.isRelease else GITHUB_BRANCH_API_URL % [update.owner, update.repo, update.branch]
 
 	var resp = http.request(github_latest_url, _get_headers())
-	AceLog.printLog(["Wating for GitHub API request %s" % github_latest_url] )
+	AceLog.printLog(["Wating for Update GitHub API request %s" % github_latest_url] )
 	await http.request_completed
 	if resp != OK:
 		AceLog.printLog(["Failed to make HTTP request for addon: %s" % update.repo], AceLog.LOG_LEVEL.ERROR)
