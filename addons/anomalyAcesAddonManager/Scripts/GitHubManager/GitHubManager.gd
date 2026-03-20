@@ -204,6 +204,8 @@ func _http_addon_info_request_completed(result: int, response_code: int, _header
 			if addon.isRelease:
 				if json_data.has("zipball_url"):
 					addon.metadata.download_url = json_data["zipball_url"]
+				if json_data.has("published_at"):
+					addon.metadata.version_release_date = _convert_utc_string_to_local_string(json_data["published_at"])
 			else:
 				if json_data.has("commit") && json_data["commit"].has("commit"):
 					addon.metadata.branch_last_commit_date = _convert_utc_string_to_local_string(json_data["commit"]["commit"]["author"]["date"])
