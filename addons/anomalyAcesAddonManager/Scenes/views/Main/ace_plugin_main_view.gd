@@ -287,8 +287,8 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	statusColDef.columnCallable = _handle_update
 
 	var lastUpdateColDef: AceTableColumnDef = AceTableColumnDef.new()
-	lastUpdateColDef.columnId = "last_update"
-	lastUpdateColDef.columnName = "Last Update"
+	lastUpdateColDef.columnId = "latest_update"
+	lastUpdateColDef.columnName = "Latest Update"
 	lastUpdateColDef.columnType = AceTableConstants.ColumnType.LABEL
 	lastUpdateColDef.columnSort = true
 	lastUpdateColDef.columnAlign = AceTableConstants.Align.CENTER
@@ -315,7 +315,7 @@ func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]
 			"status": _createTextLinkObjectForUpdate(addon.metadata.status),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
 			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file),
-			"last_update": addon.metadata.version_release_date.replace("T", " ") if addon.isRelease else addon.metadata.branch_last_commit_date.replace("T", " ")
+			"latest_update": addon.metadata.version_release_date.replace("T", " ") if addon.isRelease else addon.metadata.branch_last_commit_date.replace("T", " ")
 		}
 		data.append(addon_dict)
 		data.append_array(_createAddonTableData(addon.dependencies))
@@ -361,7 +361,7 @@ func _createTextLinkObjectForUpdate(status: RemoteRepoConstants.STATUS) -> Dicti
 			return {
 				"text": "Download Available",
 				"link": "Download Available",
-				"color": Color.BLUE
+				"color": Color.CYAN
 			}
 		RemoteRepoConstants.STATUS.DOWNLOADED:
 			return {
@@ -373,7 +373,7 @@ func _createTextLinkObjectForUpdate(status: RemoteRepoConstants.STATUS) -> Dicti
 			return {
 				"text": "Update Available",
 				"link": "Update Available",
-				"color": Color.BLUE
+				"color": Color.CYAN
 			}
 		RemoteRepoConstants.STATUS.UP_TO_DATE:
 			return {

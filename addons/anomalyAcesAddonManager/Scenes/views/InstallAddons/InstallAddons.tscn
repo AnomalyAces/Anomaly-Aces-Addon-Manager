@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://cclal1evfyb24"]
+
+[ext_resource type="Script" uid="uid://bbjhmu7wcumoo" path="res://addons/anomalyAcesAddonManager/Scenes/views/InstallAddons/ace_plugin_install_addons_view.gd" id="1_ptdwp"]
+[ext_resource type="FontFile" uid="uid://cpb0xvgcv3wdl" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Medium.ttf" id="2_uu8fy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyycq"]
+bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yq3iu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0ba0b"]
+
+[sub_resource type="Theme" id="Theme_oxym2"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_lyycq")
+RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_yq3iu")
+RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_0ba0b")
+
+[node name="InstallAddons" type="Control" unique_id=2121648271]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ptdwp")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=2087539497]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_oxym2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=998148114]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer" unique_id=410168649]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_uu8fy")
+theme_override_font_sizes/font_size = 64
+text = "Install Addons"
+horizontal_alignment = 1
