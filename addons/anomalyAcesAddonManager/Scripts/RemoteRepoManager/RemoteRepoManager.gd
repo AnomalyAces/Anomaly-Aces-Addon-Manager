@@ -10,8 +10,6 @@ const AUTO_DOWNLOAD_ADDONS: String = "settings/auto_download_addons"
 const CHECK_FOR_UPDATES: String = "settings/check_for_updates"
 ## Time interval (in minutes) for checking updates. Default is 1 hour (60 minutes)
 const UPDATE_INTERVAL: String = "settings/update_interval"
-## Auto install dowloads. If true this plugin will automatically install downloaded addons
-const AUTO_INSTALL_DOWNLOADS: String = "settings/auto_install_downloads"
 ## Github Personal Access Token for increasing rate 
 const GITHUB_PERSONAL_ACCESS_TOKEN: String = "settings/github_personal_access_token"
 
@@ -26,7 +24,6 @@ var  SETTINGS_CONFIGURATION : Dictionary[String, AceSettingConfig] = {
 	AUTO_DOWNLOAD_ADDONS: AceSettingConfig.new(AUTO_DOWNLOAD_ADDONS, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
 	CHECK_FOR_UPDATES: AceSettingConfig.new(CHECK_FOR_UPDATES, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
 	UPDATE_INTERVAL: AceSettingConfig.new(UPDATE_INTERVAL, TYPE_INT, 60, PROPERTY_HINT_RANGE, "1,1440"),
-	AUTO_INSTALL_DOWNLOADS: AceSettingConfig.new(AUTO_INSTALL_DOWNLOADS, TYPE_BOOL, true, PROPERTY_USAGE_CHECKABLE),
 	GITHUB_PERSONAL_ACCESS_TOKEN: AceSettingConfig.new(GITHUB_PERSONAL_ACCESS_TOKEN, TYPE_STRING, "", PROPERTY_HINT_PASSWORD)
 }
 
@@ -52,9 +49,6 @@ func isCheckForUpdatesEnabled() -> bool:
 
 func getUpdateCheckInterval() -> int:
 	return settings.get_setting(UPDATE_INTERVAL, 60)
-
-func isAutoInstallDownloadsEnabled() -> bool:
-	return settings.get_setting(AUTO_INSTALL_DOWNLOADS, false)
 
 func getGithubPersonalAccessToken() -> String:
 	return settings.get_setting(GITHUB_PERSONAL_ACCESS_TOKEN, "")

@@ -32,14 +32,18 @@ var _install_requests_completed: int = 0
 var _installed_addons: Array[RemoteRepoObject] = []
 
 func getAddonsFromRemoteRepo():
-	_addons = _parseAddonFiles()
+	var _unprocessed_addons = _parseAddonFiles()
 
 	#Check for conflicts
-	var conflicting_addons: Array[RemoteRepoConflict] = _checkForConflicts(_addons)
+	var conflicting_addons: Array[RemoteRepoConflict] = _checkForConflicts(_unprocessed_addons)
 	if conflicting_addons.size() > 0:
 		conflicts_found.emit(conflicting_addons)
 		AceLog.printLog(["Conflicts found in addons from remote repos."], AceLog.LOG_LEVEL.ERROR)
 		return
+
+	
+	#Flatten the addons and their dependencies
+	_addons = _flatten_addons(_unprocessed_addons)
 
 	#Intialize counters
 	_initialize_counters()
@@ -62,19 +66,9 @@ func getAddonsFromRemoteRepo():
 	
 	await addons_downloaded
 
-	if isAutoInstallDownloadsEnabled():
-		_compareDownloadsToInstalls(_addons)
-		_initialize_counters()
-		_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
-		AceLog.printLog(["Total Install Requests to complete: %d" % _num_install_requests])
-		
-		for addon in _addons:
-			_installAddons(addon)
-		
-
-		await addons_installed
-	else:
-		AceLog.printLog(["Auto Install Addons is disabled. Skipping addon installs. Should draw attention to install button", AceLog.LOG_LEVEL.INFO])
+	_compareDownloadsToInstalls(_addons)
+	AceLog.printLog(["Update Processing for addons completed. Need notification to let user now that updates are available", AceLog.LOG_LEVEL.INFO])
+	addons_installed.emit(_addons)
 
 	# AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons ])
 
@@ -117,6 +111,25 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject], isInstall: b
 		addons_installed.emit(_addons)
 
 
+
+func _flatten_addons(addons: Array[RemoteRepoObject]) -> Array[RemoteRepoObject]:
+	#Function to flatten the addons and their dependencies to ensure duplicate addons are not processed
+	var unique_addons: Dictionary[String, RemoteRepoObject] = {}
+	
+	for addon in addons:
+		#Check addon itself
+		if !unique_addons.has(addon.repo):
+			unique_addons[addon.repo] = addon
+		
+		#check dependencies
+		if addon.dependencies.size() > 0:
+			for dependency in addon.dependencies:
+				if !unique_addons.has(dependency.repo):
+					unique_addons[dependency.repo] = dependency
+	
+	AceLog.printLog(["Flattened addons and their dependencies. Unique addons to process: %d" % unique_addons.size(), unique_addons.values()], AceLog.LOG_LEVEL.DEBUG)
+
+	return unique_addons.values()
 
 
 func _initialize_counters():
@@ -211,6 +224,8 @@ func _http_addon_info_request_completed(result: int, response_code: int, _header
 					addon.metadata.download_url = json_data["zipball_url"]
 				if json_data.has("published_at"):
 					addon.metadata.version_release_date = _convert_utc_string_to_local_string(json_data["published_at"])
+				if json_data.has("tag_name"):
+					addon.version = json_data["tag_name"]
 			else:
 				if json_data.has("commit") && json_data["commit"].has("commit"):
 					addon.metadata.branch_last_commit_date = _convert_utc_string_to_local_string(json_data["commit"]["commit"]["author"]["date"])
@@ -453,8 +468,9 @@ func _compareDownloadsToInstalls(addons: Array[RemoteRepoObject]) -> void:
 
 func _is_version_newer(latest_version: String, installed_version: String) -> bool:
 	# Strip the non numeric characters from the version strings
-	var numeric_latest_version = _strip_non_numeric(latest_version)
-	var numeric_installed_version = _strip_non_numeric(installed_version)
+	var numeric_latest_version: String = _strip_non_numeric(latest_version)
+	var numeric_installed_version: String = _strip_non_numeric(installed_version)
+	AceLog.printLog(["Comparing versions for updates. Latest Version: %s, Installed Version: %s" % [numeric_latest_version, numeric_installed_version]])
 	# Simple version comparison function that splits the version strings by . and compares each part as an integer. Returns true if the latest version is newer than the installed version.
 	var latest_parts: Array = numeric_latest_version.split(".")
 	var installed_parts: Array = numeric_installed_version.split(".")
@@ -471,7 +487,7 @@ func _is_version_newer(latest_version: String, installed_version: String) -> boo
 func _strip_non_numeric(version: String) -> String:
 	# Helper function to strip non-numeric characters from a version string for comparison. This is useful for versions that have suffixes like -beta or -rc1.
 	var regex = RegEx.new()
-	regex.compile("[^0-9]") # Matches any character that is NOT a digit
+	regex.compile("[^0-9.]") # Matches any character that is NOT a digit
 	return regex.sub(version, "", true)
 
 func _is_date_newer(latest_date: String, installed_date: String) -> bool:
