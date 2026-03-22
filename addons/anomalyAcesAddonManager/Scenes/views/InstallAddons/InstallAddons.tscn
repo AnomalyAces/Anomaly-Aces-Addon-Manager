@@ -33,13 +33,40 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_oxym2")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=998148114]
+[node name="PageContainer" type="VBoxContainer" parent="PanelContainer" unique_id=998148114]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="PanelContainer/VBoxContainer" unique_id=410168649]
+[node name="Title" type="Label" parent="PanelContainer/PageContainer" unique_id=410168649]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_uu8fy")
 theme_override_font_sizes/font_size = 64
 text = "Install Addons"
 horizontal_alignment = 1
+
+[node name="Addons" type="VBoxContainer" parent="PanelContainer/PageContainer" unique_id=1388761150]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/PageContainer" unique_id=848772331]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="Control" type="Control" parent="PanelContainer/PageContainer/ButtonContainer" unique_id=1525379976]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InstallButton" type="Button" parent="PanelContainer/PageContainer/ButtonContainer" unique_id=1809334008]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.5
+theme_override_font_sizes/font_size = 32
+text = "Install"
+
+[node name="Control2" type="Control" parent="PanelContainer/PageContainer/ButtonContainer" unique_id=151747598]
+layout_mode = 2
+size_flags_horizontal = 3

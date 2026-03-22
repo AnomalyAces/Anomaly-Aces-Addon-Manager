@@ -7,6 +7,9 @@ class_name AcePluginMainView extends Control
 @onready var conflictTablePlugin: AceTablePlugin = %ConflictTablePlugin
 @onready var tableTtile: Label = %TableTitle
 
+##Signals
+signal open_install_view(addons: Array, config_file: String)
+
 var rrm: GitHubManager
 
 var _editor_interface: EditorInterface
