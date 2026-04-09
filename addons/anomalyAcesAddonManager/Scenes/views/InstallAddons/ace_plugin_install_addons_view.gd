@@ -2,6 +2,7 @@
 class_name AcePluginInstallAddonsView extends Control
 
 @onready var installTablePlugin: AceTablePlugin = %InstallTablePlugin
+@onready var loadingView: LoadingView = %LoadingView
 
 ##Signals
 signal install_completed(addons: Array, config_file: String)
@@ -18,9 +19,9 @@ func _ready() -> void:
 	rrm.addons_installed.connect(_on_addons_installed)
 
 
-func initalizeInstallView(addons: Array[RemoteRepoObject], config_file: String) -> void:
-	AceLog.printLog(["Opening Install View with addons: %s and config: %s" % [addons, config_file]])
-	_addon_config = AceFileUtil.Config.load_config(config_file)
+func initalizeInstallView(addons: Array[RemoteRepoObject], config_file: ConfigFile) -> void:
+	AceLog.printLog(["Opening Install View with addons: ", addons])
+	_addon_config = config_file
 
 	_createAddonInstallTable(addons, _addon_config)
 
@@ -91,7 +92,7 @@ func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
 	var normalized_data: Array[Dictionary] = []
 	var normalized_dict: Dictionary = {}
 	for dict in table_data:
-		var dict_key = "|".join([dict["repo"], dict["version"]])
+		var dict_key = "|".join([dict["repo"], dict["installed_version"], dict["latest_version"]])
 		if not normalized_dict.has(dict_key):
 			normalized_dict[dict_key] = dict
 	

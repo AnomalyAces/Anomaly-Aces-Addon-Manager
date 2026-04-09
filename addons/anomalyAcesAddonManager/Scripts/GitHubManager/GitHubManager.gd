@@ -110,7 +110,8 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject], isInstall: b
 		AceLog.printLog(["Update Processing for addons completed. Need notification to let user now that updates are available", AceLog.LOG_LEVEL.INFO])
 		addons_installed.emit(_addons)
 
-
+func getConfigFile() -> ConfigFile:
+	return _get_config_file()
 
 func _flatten_addons(addons: Array[RemoteRepoObject]) -> Array[RemoteRepoObject]:
 	#Function to flatten the addons and their dependencies to ensure duplicate addons are not processed
@@ -127,7 +128,13 @@ func _flatten_addons(addons: Array[RemoteRepoObject]) -> Array[RemoteRepoObject]
 				if !unique_addons.has(dependency.repo):
 					unique_addons[dependency.repo] = dependency
 	
+
+	#Remove dependencies from flattened addons
+	for addon in unique_addons.values():
+		addon.dependencies.clear()
+	
 	AceLog.printLog(["Flattened addons and their dependencies. Unique addons to process: %d" % unique_addons.size(), unique_addons.values()], AceLog.LOG_LEVEL.DEBUG)
+
 
 	return unique_addons.values()
 

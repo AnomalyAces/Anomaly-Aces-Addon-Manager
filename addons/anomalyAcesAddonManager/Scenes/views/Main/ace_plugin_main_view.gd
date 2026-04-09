@@ -8,7 +8,7 @@ class_name AcePluginMainView extends Control
 @onready var tableTtile: Label = %TableTitle
 
 ##Signals
-signal open_install_view(addons: Array, config_file: String)
+signal open_install_view(addons: Array, config_file: ConfigFile)
 
 var rrm: GitHubManager
 
@@ -58,12 +58,13 @@ func checkUpdates() -> void:
 
 
 func installSelectedUpdates() -> void:
-	_setLoadingViewSize()
-	loadingView.visible = true
-	tableTtile.visible = false
-	addonTablePlugin.visible = false
-	conflictTablePlugin.visible = false
-	rrm.getAddonUpdatesFromRemoteRepo(_selected_addons, true)
+	# _setLoadingViewSize()
+	# loadingView.visible = true
+	# tableTtile.visible = false
+	# addonTablePlugin.visible = false
+	# conflictTablePlugin.visible = false
+	# rrm.getAddonUpdatesFromRemoteRepo(_selected_addons, true)
+	open_install_view.emit(_selected_addons, rrm.getConfigFile())
 
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject], isUpdate: bool) -> void:
