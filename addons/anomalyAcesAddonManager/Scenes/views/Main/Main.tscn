@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://b33bc0yfbkjw" path="res://addons/anomalyAcesAddonManager/Icons/Github.svg" id="4_sg5kk"]
 [ext_resource type="Theme" uid="uid://wgkqeg5mojsr" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowTheme.tres" id="4_t5kl5"]
 [ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowCellTheme.tres" id="5_y0qvv"]
+[ext_resource type="Texture2D" uid="uid://b6cygpgtnaomm" path="res://addons/anomalyAcesTable/Icons/AceTableCheckboxChecked.svg" id="7_yb3ld"]
 [ext_resource type="PackedScene" uid="uid://cd0aapc45wg2k" path="res://addons/anomalyAcesAddonManager/Scenes/views/Loading/LoadingView.tscn" id="8_n0oye"]
 [ext_resource type="Theme" uid="uid://dvm3ul1pd018w" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderCellTheme.tres" id="10_q1a5h"]
 
@@ -102,12 +103,27 @@ autowrap_trim_flags = 0
 [node name="Install" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1549816277]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.1
 theme = ExtResource("5_y0qvv")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 32
 text = "Install Selected Add-ons"
 icon = ExtResource("3_sg5kk")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
+[node name="Install2" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=910910059]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.1
+theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/icon_max_width = 64
+theme_override_font_sizes/font_size = 32
+text = "Select Available Updates"
+icon = ExtResource("7_yb3ld")
 flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
@@ -205,3 +221,4 @@ metadata/_custom_type_script = "uid://sx1wgfw6xjis"
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Reload" to="." method="_on_reload_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Update" to="." method="_on_update_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Install" to="." method="_on_install_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Install2" to="." method="_on_install_pressed"]
