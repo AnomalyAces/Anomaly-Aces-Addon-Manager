@@ -100,6 +100,20 @@ flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
 
+[node name="Select" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=910910059]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.1
+theme = ExtResource("5_y0qvv")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/icon_max_width = 64
+theme_override_font_sizes/font_size = 32
+text = "Select Available Updates"
+icon = ExtResource("7_yb3ld")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
 [node name="Install" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1549816277]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -110,20 +124,6 @@ theme_override_constants/icon_max_width = 64
 theme_override_font_sizes/font_size = 32
 text = "Install Selected Add-ons"
 icon = ExtResource("3_sg5kk")
-flat = true
-autowrap_mode = 2
-autowrap_trim_flags = 0
-
-[node name="Install2" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=910910059]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.1
-theme = ExtResource("5_y0qvv")
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 64
-theme_override_font_sizes/font_size = 32
-text = "Select Available Updates"
-icon = ExtResource("7_yb3ld")
 flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
@@ -220,5 +220,5 @@ metadata/_custom_type_script = "uid://sx1wgfw6xjis"
 
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Reload" to="." method="_on_reload_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Update" to="." method="_on_update_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Select" to="." method="_on_install_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Install" to="." method="_on_install_pressed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Install2" to="." method="_on_install_pressed"]
