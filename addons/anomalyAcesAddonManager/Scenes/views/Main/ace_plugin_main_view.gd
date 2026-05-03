@@ -66,6 +66,18 @@ func installSelectedUpdates() -> void:
 	# rrm.getAddonUpdatesFromRemoteRepo(_selected_addons, true)
 	open_install_view.emit(_selected_addons, rrm.getConfigFile())
 
+func selectAvailableUpdates() -> void:
+	var updatable_addons = _addons.filter(func (addon: RemoteRepoObject): return addon.metadata.status == RemoteRepoConstants.STATUS.UPDATE_AVAILABLE)
+
+	var tableData: Array[Dictionary] = _addon_table.get_rows()
+
+	for data in tableData:
+		if updatable_addons.find_custom(func (addon: RemoteRepoObject): return addon.repo == data["repo"]) != -1:
+			data["selected"] = true
+
+	AceTableManager.setTableData(_addon_table, tableData)
+	# _on_addon_table_selection(tableData)
+
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject], isUpdate: bool) -> void:
 	if isUpdate:
@@ -139,6 +151,8 @@ func _on_update_pressed() -> void:
 func _on_install_pressed() -> void:
 	installSelectedUpdates()
 
+func _on_select_pressed() -> void:
+	selectAvailableUpdates()
 
 
 #############################
@@ -416,4 +430,3 @@ func _merge_updated_addons(addons: Array[RemoteRepoObject]) -> void:
 			# Add new addon
 			AceLog.printLog(["New addon to merge: %s" % updated_addon.repo], AceLog.LOG_LEVEL.DEBUG)
 			_addons.append(updated_addon)
-	
