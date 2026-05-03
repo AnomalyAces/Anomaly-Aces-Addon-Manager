@@ -53,6 +53,14 @@ func _createAddonInstallTable(addons: Array[RemoteRepoObject], configFile: Confi
 	installedVersionColDef.columnAlign = AceTableConstants.Align.CENTER
 	installedVersionColDef.columnTextType = AceTableConstants.TextType.TEXT
 
+	var installCommitDateColDef: AceTableColumnDef = AceTableColumnDef.new()
+	installCommitDateColDef.columnId = "install_commit_date"
+	installCommitDateColDef.columnName = "Install Commit Date"
+	installCommitDateColDef.columnType = AceTableConstants.ColumnType.LABEL
+	installCommitDateColDef.columnSort = true
+	installCommitDateColDef.columnAlign = AceTableConstants.Align.CENTER
+	installCommitDateColDef.columnTextType = AceTableConstants.TextType.TEXT
+
 	var latestVersionColDef: AceTableColumnDef = AceTableColumnDef.new()
 	latestVersionColDef.columnId = "latest_version"
 	latestVersionColDef.columnName = "Latest Version"
@@ -63,7 +71,7 @@ func _createAddonInstallTable(addons: Array[RemoteRepoObject], configFile: Confi
 
 	var tableData: Array[Dictionary] = _normalize_table_data(_createInstallAddonsTableData(addons, configFile))
 
-	var colDefs: Array[AceTableColumnDef] = [addonColDef, installedVersionColDef, latestVersionColDef]
+	var colDefs: Array[AceTableColumnDef] = [addonColDef, installedVersionColDef, installCommitDateColDef, latestVersionColDef]
 
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	installTablePlugin.printConfig()
@@ -80,7 +88,8 @@ func _createInstallAddonsTableData(addons: Array[RemoteRepoObject], configFile: 
 		var addon_dict: Dictionary = {
 			"repo": addon.repo,
 			"installed_version": addon.version if addon.isRelease else addon.branch,
-			"latest_version": configFile.get_value(addon.repo, "version") if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date")
+			"install_commit_date": "" if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date"),
+			"latest_version": addon.version if addon.isRelease else addon.metadata.branch_last_commit_date
 		}
 		data.append(addon_dict)
 		data.append_array(_createInstallAddonsTableData(addon.dependencies, configFile))
