@@ -3,9 +3,11 @@ class_name AcePluginInstallAddonsView extends Control
 
 @onready var installTablePlugin: AceTablePlugin = %InstallTablePlugin
 @onready var loadingView: LoadingView = %LoadingView
+@onready var backButton: Button = %Back
 
 ##Signals
 signal install_completed(addons: Array, config_file: String)
+signal back_to_main_view()
 
 var rrm: GitHubManager
 
@@ -22,10 +24,15 @@ func _ready() -> void:
 func initalizeInstallView(addons: Array[RemoteRepoObject], config_file: ConfigFile) -> void:
 	AceLog.printLog(["Opening Install View with addons: ", addons])
 	_addon_config = config_file
+	if _addon_install_table != null:
+		var tableData: Array[Dictionary] = _normalize_table_data(_createInstallAddonsTableData(addons, config_file))
+		AceTableManager.setTableData(_addon_install_table, tableData)
+	else:
+		_createAddonInstallTable(addons, _addon_config)
 
-	_createAddonInstallTable(addons, _addon_config)
 
-
+func _on_back_pressed() -> void:
+	back_to_main_view.emit()
 
 func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
 	AceLog.printLog(["Addons Installation Completed: %s" % addons])
@@ -88,7 +95,7 @@ func _createInstallAddonsTableData(addons: Array[RemoteRepoObject], configFile: 
 		var addon_dict: Dictionary = {
 			"repo": addon.repo,
 			"installed_version": addon.version if addon.isRelease else addon.branch,
-			"install_commit_date": "" if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date"),
+			"install_commit_date": "N/A" if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date"),
 			"latest_version": addon.version if addon.isRelease else addon.metadata.branch_last_commit_date
 		}
 		data.append(addon_dict)
@@ -109,3 +116,4 @@ func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
 	normalized_data.assign(normalized_dict.values())
 
 	return normalized_data
+

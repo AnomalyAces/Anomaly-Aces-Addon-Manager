@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cclal1evfyb24"]
 
 [ext_resource type="Script" uid="uid://bbjhmu7wcumoo" path="res://addons/anomalyAcesAddonManager/Scenes/views/InstallAddons/ace_plugin_install_addons_view.gd" id="1_ptdwp"]
+[ext_resource type="Texture2D" uid="uid://cteynqempaseb" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonBack.svg" id="2_1erv5"]
 [ext_resource type="FontFile" uid="uid://cpb0xvgcv3wdl" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Medium.ttf" id="2_uu8fy"]
 [ext_resource type="Script" uid="uid://sx1wgfw6xjis" path="res://addons/anomalyAcesTable/Scripts/ace_table_properties.gd" id="3_lyycq"]
 [ext_resource type="Theme" uid="uid://bx1fly6adbouv" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-HeaderTheme.tres" id="4_2iuyi"]
@@ -39,23 +40,56 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_oxym2")
 
-[node name="PageContainer" type="VBoxContainer" parent="PanelContainer" unique_id=998148114]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1694393823]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="PageContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=998148114]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="PanelContainer/PageContainer" unique_id=410168649]
+[node name="HeaderContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1069900459]
 layout_mode = 2
+alignment = 1
+
+[node name="Back" type="Button" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=1998712538]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
+theme = ExtResource("7_t7svs")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/icon_max_width = 64
+theme_override_font_sizes/font_size = 32
+text = "Back"
+icon = ExtResource("2_1erv5")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=410168649]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_uu8fy")
 theme_override_font_sizes/font_size = 64
 text = "Install Addons"
 horizontal_alignment = 1
 
-[node name="Control" type="Control" parent="PanelContainer/PageContainer" unique_id=1832858296]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=145888758]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1832858296]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
 
-[node name="InstallTablePlugin" type="Control" parent="PanelContainer/PageContainer" unique_id=1596511995]
+[node name="InstallTablePlugin" type="Control" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1596511995]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -68,29 +102,29 @@ row_cell_theme = ExtResource("7_t7svs")
 cell_separation = 0
 metadata/_custom_type_script = "uid://sx1wgfw6xjis"
 
-[node name="LoadingView" parent="PanelContainer/PageContainer" unique_id=1213959645 instance=ExtResource("8_bt30r")]
+[node name="LoadingView" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1213959645 instance=ExtResource("8_bt30r")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_stretch_ratio = 3.0
 
-[node name="Addons" type="VBoxContainer" parent="PanelContainer/PageContainer" unique_id=1388761150]
+[node name="Addons" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1388761150]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/PageContainer" unique_id=848772331]
+[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=848772331]
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
 
-[node name="Control" type="Control" parent="PanelContainer/PageContainer/ButtonContainer" unique_id=1525379976]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=1525379976]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="InstallButton" type="Button" parent="PanelContainer/PageContainer/ButtonContainer" unique_id=1809334008]
+[node name="InstallButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=1809334008]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -98,6 +132,8 @@ size_flags_stretch_ratio = 2.5
 theme_override_font_sizes/font_size = 32
 text = "Install"
 
-[node name="Control2" type="Control" parent="PanelContainer/PageContainer/ButtonContainer" unique_id=151747598]
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=151747598]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[connection signal="pressed" from="PanelContainer/MarginContainer/PageContainer/HeaderContainer/Back" to="." method="_on_back_pressed"]

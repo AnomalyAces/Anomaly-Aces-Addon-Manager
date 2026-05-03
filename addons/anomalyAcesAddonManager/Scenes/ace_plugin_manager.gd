@@ -9,6 +9,9 @@ func _ready() -> void:
 	if main_view != null:
 		main_view.open_install_view.connect(_on_open_install_addons)
 
+	if install_addons != null:
+		install_addons.back_to_main_view.connect(_on_close_install_addons)
+
 func assignEditorInterface(editorInterface: EditorInterface) -> void:
 	if main_view != null:
 		main_view._editor_interface = editorInterface
@@ -22,3 +25,7 @@ func _on_open_install_addons(addons: Array[RemoteRepoObject], config_file: Confi
 	install_addons.initalizeInstallView(addons, config_file)
 	main_view.hide()
 	install_addons.show()
+
+func _on_close_install_addons() -> void:
+	install_addons.hide()
+	main_view.show()
