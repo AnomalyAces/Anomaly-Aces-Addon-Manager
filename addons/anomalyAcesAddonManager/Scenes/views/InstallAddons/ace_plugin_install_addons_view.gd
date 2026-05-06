@@ -15,6 +15,8 @@ var _editor_interface: EditorInterface
 var _addon_install_table: _AceTable
 var _addon_config: ConfigFile
 
+var _addons: Array[RemoteRepoObject] = []
+
 func _ready() -> void:
 	rrm = GitHubManager.new(self, _editor_interface)
 
@@ -23,16 +25,20 @@ func _ready() -> void:
 
 func initalizeInstallView(addons: Array[RemoteRepoObject], config_file: ConfigFile) -> void:
 	AceLog.printLog(["Opening Install View with addons: ", addons])
+	_addons = addons
 	_addon_config = config_file
 	if _addon_install_table != null:
-		var tableData: Array[Dictionary] = _normalize_table_data(_createInstallAddonsTableData(addons, config_file))
+		var tableData: Array[Dictionary] = _normalize_table_data(_createInstallAddonsTableData(_addons, _addon_config))
 		AceTableManager.setTableData(_addon_install_table, tableData)
 	else:
-		_createAddonInstallTable(addons, _addon_config)
+		_createAddonInstallTable(_addons, _addon_config)
 
 
 func _on_back_pressed() -> void:
 	back_to_main_view.emit()
+
+func _on_install_button_pressed() -> void:
+	rrm.installAddonsFromRemoteRepo(_addons) # Replace with function body.
 
 func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
 	AceLog.printLog(["Addons Installation Completed: %s" % addons])
@@ -76,9 +82,18 @@ func _createAddonInstallTable(addons: Array[RemoteRepoObject], configFile: Confi
 	latestVersionColDef.columnAlign = AceTableConstants.Align.CENTER
 	latestVersionColDef.columnTextType = AceTableConstants.TextType.TEXT
 
+	var statusColDef: AceTableColumnDef = AceTableColumnDef.new()
+	statusColDef.columnId = "status"
+	statusColDef.columnName = "Status"
+	statusColDef.columnType = AceTableConstants.ColumnType.LABEL
+	statusColDef.columnSort = true
+	statusColDef.columnAlign = AceTableConstants.Align.CENTER
+	statusColDef.columnTextType = AceTableConstants.TextType.LINK
+	statusColDef.columnCallable = _handle_update
+
 	var tableData: Array[Dictionary] = _normalize_table_data(_createInstallAddonsTableData(addons, configFile))
 
-	var colDefs: Array[AceTableColumnDef] = [addonColDef, installedVersionColDef, installCommitDateColDef, latestVersionColDef]
+	var colDefs: Array[AceTableColumnDef] = [addonColDef, installedVersionColDef, installCommitDateColDef, latestVersionColDef, statusColDef]
 
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	installTablePlugin.printConfig()
@@ -96,7 +111,8 @@ func _createInstallAddonsTableData(addons: Array[RemoteRepoObject], configFile: 
 			"repo": addon.repo,
 			"installed_version": addon.version if addon.isRelease else addon.branch,
 			"install_commit_date": "N/A" if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date"),
-			"latest_version": addon.version if addon.isRelease else addon.metadata.branch_last_commit_date
+			"latest_version": addon.version if addon.isRelease else addon.metadata.branch_last_commit_date,
+			"status": rrm.createTextLinkObjectForUpdate(addon),
 		}
 		data.append(addon_dict)
 		data.append_array(_createInstallAddonsTableData(addon.dependencies, configFile))
@@ -116,4 +132,7 @@ func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
 	normalized_data.assign(normalized_dict.values())
 
 	return normalized_data
+
+func _handle_update(link: String) -> void:
+	AceLog.printLog(["Update link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
 

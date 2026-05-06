@@ -108,13 +108,6 @@ visible = false
 layout_mode = 2
 size_flags_stretch_ratio = 3.0
 
-[node name="Addons" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1388761150]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 3.0
-
 [node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=848772331]
 layout_mode = 2
 size_flags_vertical = 3
@@ -137,3 +130,4 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/PageContainer/HeaderContainer/Back" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="PanelContainer/MarginContainer/PageContainer/ButtonContainer/InstallButton" to="." method="_on_install_button_pressed"]

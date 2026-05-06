@@ -17,7 +17,8 @@ const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/
 signal addons_processed
 signal addon_updates_processed
 signal addons_downloaded(addons: Array[RemoteRepoObject], is_update: bool)
-signal addons_installed(addon: Array[RemoteRepoObject])
+signal addons_install_ready(addons: Array[RemoteRepoObject])
+signal addons_installed(addons: Array[RemoteRepoObject])
 signal conflicts_found(conflicting_addons: Array[RemoteRepoConflict])
 
 var _addons: Array[RemoteRepoObject] = []
@@ -68,13 +69,13 @@ func getAddonsFromRemoteRepo():
 
 	_compareDownloadsToInstalls(_addons)
 	AceLog.printLog(["Update Processing for addons completed. Need notification to let user now that updates are available", AceLog.LOG_LEVEL.INFO])
-	addons_installed.emit(_addons)
+	addons_install_ready.emit(_addons)
 
 	# AceLog.printLog(["All Addons Processed and Downloaded from Remote Repo: ", _addons ])
 
 	# return _addons
 
-func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject], isInstall: bool = false):
+func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	# Similar to getAddonsFromRemoteRepo but checks for updates based on version or branch commit date and emits a different signal for addons that have updates available
 	_initialize_counters()
 	_num_update_requests = _get_num_requests(addons)
@@ -95,20 +96,17 @@ func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject], isInstall: b
 		_downloadAddonFromRemoteRepo(addon, true)
 	
 	await addons_downloaded
-	if isInstall:
-		_compareDownloadsToInstalls(addons)
-		_initialize_counters()
-		_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
-		AceLog.printLog(["Total Update Install Requests to complete: %d" % _num_install_requests])
 
-		for addon in addons:
-			_installAddons(addon)
-		
-		await addons_installed
-	else:
-		_compareDownloadsToInstalls(_addons)
-		AceLog.printLog(["Update Processing for addons completed. Need notification to let user now that updates are available", AceLog.LOG_LEVEL.INFO])
-		addons_installed.emit(_addons)
+	_compareDownloadsToInstalls(addons)
+	_initialize_counters()
+	_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
+	AceLog.printLog(["Total Update Install Requests to complete: %d" % _num_install_requests])
+
+	for addon in addons:
+		_installAddons(addon)
+	
+	await addons_installed
+
 
 func getConfigFile() -> ConfigFile:
 	return _get_config_file()

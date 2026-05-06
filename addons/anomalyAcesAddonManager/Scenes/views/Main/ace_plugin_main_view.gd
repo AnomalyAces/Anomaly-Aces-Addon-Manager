@@ -29,7 +29,7 @@ func _ready() -> void:
 	# 	_add_addonInfo()
 	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
 	rrm.conflicts_found.connect(_on_conflicts_found)
-	rrm.addons_installed.connect(_on_addons_installed)
+	rrm.addons_install_ready.connect(_on_addons_install_ready)
 
 	AceLog.printLog(["Current Animation: %s" % loadingView.animationPlayer.current_animation], AceLog.LOG_LEVEL.INFO)
 
@@ -47,14 +47,6 @@ func getAddons() -> void:
 	conflictTablePlugin.visible = false
 	rrm.getAddonsFromRemoteRepo()
 
-
-func checkUpdates() -> void:
-	_setLoadingViewSize()
-	loadingView.visible = true
-	tableTtile.visible = false
-	addonTablePlugin.visible = false
-	conflictTablePlugin.visible = false
-	rrm.getAddonUpdatesFromRemoteRepo(_addons)
 
 
 func installSelectedUpdates() -> void:
@@ -115,9 +107,9 @@ func _on_conflicts_found(conflicting_addons: Array[RemoteRepoConflict]) -> void:
 	
 	_conflicts = conflicting_addons
 
-func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
+func _on_addons_install_ready(addons: Array[RemoteRepoObject]) -> void:
 	loadingView.visible = false
-	AceLog.printLog(["Addons Installed", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
+	AceLog.printLog(["Addons are ready for installation", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
 	_merge_updated_addons(addons)
 	tableTtile.visible = true
 	addonTablePlugin.visible = true
@@ -145,8 +137,6 @@ func _on_addon_table_selection(_table_data: Array[Dictionary]) -> void:
 func _on_reload_pressed() -> void:
 	getAddons()
 
-func _on_update_pressed() -> void:
-	checkUpdates()
 
 func _on_install_pressed() -> void:
 	installSelectedUpdates()
@@ -247,9 +237,9 @@ func _createConflictTableData(conflics: Array[RemoteRepoConflict]) -> Array[Dict
 			"conflict_addon": conflict.conflicting_addon.repo,
 			"conflict_type": "Release Conflict" if conflict.releaseConflict else ("Version Conflict" if conflict.versionConflict else ("Branch Conflict" if conflict.branchConflict else "N/A")),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
-			"addon_file": _createTextLinkObjectForFile(conflict.addon.metadata.addon_file),
+			"addon_file": rrm.createTextLinkObjectForFile(conflict.addon),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
-			"conflicting_file": _createTextLinkObjectForFile(conflict.conflicting_addon.metadata.addon_file)
+			"conflicting_file": rrm.createTextLinkObjectForFile(conflict.conflicting_addon)
 		}
 		data.append(conflict_dict)
 		data.append_array(_createConflictTableData(conflict.dependencies))
@@ -330,9 +320,9 @@ func _createAddonTableData(addons: Array[RemoteRepoObject]) -> Array[Dictionary]
 			"selected": false,
 			"repo": addon.repo,
 			"version": addon.version if addon.isRelease else addon.branch,
-			"status": _createTextLinkObjectForUpdate(addon.metadata.status),
+			"status": rrm.createTextLinkObjectForUpdate(addon),
 			# Is data for a text link. Needs to be an object with "text" and "link" keys
-			"addon_file": _createTextLinkObjectForFile(addon.metadata.addon_file),
+			"addon_file": rrm.createTextLinkObjectForFile(addon),
 			"latest_update": addon.metadata.version_release_date.replace("T", " ") if addon.isRelease else addon.metadata.branch_last_commit_date.replace("T", " ")
 		}
 		data.append(addon_dict)
@@ -356,55 +346,6 @@ func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
 	return normalized_data
 
 
-func _createTextLinkObjectForFile(filePath: String) -> Dictionary:
-
-	var file_name: String = filePath.get_file()
-	var parent_dir: String = filePath.get_base_dir().get_file()
-
-	return {
-		"text": "%s/%s" % [parent_dir, file_name],
-		"link": filePath
-	}
-
-func _createTextLinkObjectForUpdate(status: RemoteRepoConstants.STATUS) -> Dictionary:
-
-	match status:
-		RemoteRepoConstants.STATUS.NOT_AVAILABLE:
-			return {
-				"text": "Not Available",
-				"link": "",
-				"color": Color.RED
-			}
-		RemoteRepoConstants.STATUS.DOWNLOAD_AVAILABLE:
-			return {
-				"text": "Download Available",
-				"link": "Download Available",
-				"color": Color.CYAN
-			}
-		RemoteRepoConstants.STATUS.DOWNLOADED:
-			return {
-				"text": "Downloaded",
-				"link": "Downloaded",
-				"color": Color.YELLOW
-			}
-		RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
-			return {
-				"text": "Update Available",
-				"link": "Update Available",
-				"color": Color.CYAN
-			}
-		RemoteRepoConstants.STATUS.UP_TO_DATE:
-			return {
-				"text": "Up to Date",
-				"link": "",
-				"color": Color.GREEN
-			}
-		_:
-			return {
-				"text": "Unknown",
-				"link": "",
-				"color": Color.GRAY
-			}
 
 func _button_pressed(colDef: AceTableColumnDef, dt: Dictionary):
 	AceLog.printLog(["data from Button from column %s: %s" % [colDef.columnName,dt]], AceLog.LOG_LEVEL.INFO)

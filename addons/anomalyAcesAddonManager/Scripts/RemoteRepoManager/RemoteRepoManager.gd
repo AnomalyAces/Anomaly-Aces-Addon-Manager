@@ -53,6 +53,72 @@ func getUpdateCheckInterval() -> int:
 func getGithubPersonalAccessToken() -> String:
 	return settings.get_setting(GITHUB_PERSONAL_ACCESS_TOKEN, "")
 
+func createTextLinkObjectForFile(rro: RemoteRepoObject) -> Dictionary:
+
+	if rro.metadata.addon_file == null or rro.metadata.addon_file == "":
+		return {
+			"text": "",
+			"link": "",
+		}
+	
+	var filePath: String = rro.metadata.addon_file
+
+	var file_name: String = filePath.get_file()
+	var parent_dir: String = filePath.get_base_dir().get_file()
+
+	return {
+		"text": "%s/%s" % [parent_dir, file_name],
+		"link": filePath
+	}
+
+func createTextLinkObjectForUpdate(rro: RemoteRepoObject) -> Dictionary:
+
+	if rro.metadata.status == null:
+		return {
+			"text": "",
+			"link": "",
+		}
+	
+	var status: RemoteRepoConstants.STATUS = rro.metadata.status
+
+	match status:
+		RemoteRepoConstants.STATUS.NOT_AVAILABLE:
+			return {
+				"text": "Not Available",
+				"link": "",
+				"color": Color.RED
+			}
+		RemoteRepoConstants.STATUS.DOWNLOAD_AVAILABLE:
+			return {
+				"text": "Download Available",
+				"link": "Download Available",
+				"color": Color.CYAN
+			}
+		RemoteRepoConstants.STATUS.DOWNLOADED:
+			return {
+				"text": "Downloaded",
+				"link": "Downloaded",
+				"color": Color.YELLOW
+			}
+		RemoteRepoConstants.STATUS.UPDATE_AVAILABLE:
+			return {
+				"text": "Update Available",
+				"link": "Update Available",
+				"color": Color.CYAN
+			}
+		RemoteRepoConstants.STATUS.UP_TO_DATE:
+			return {
+				"text": "Up to Date",
+				"link": "",
+				"color": Color.GREEN
+			}
+		_:
+			return {
+				"text": "Unknown",
+				"link": "",
+				"color": Color.GRAY
+			}
+
 func _parseAddonFiles() -> Array[RemoteRepoObject]:
 	AceLog.printLog(["Parsing Addon Files...."])
 	var rroList: Array[RemoteRepoObject] = []
@@ -137,4 +203,4 @@ func _checkForConflicts(addons: Array[RemoteRepoObject]) -> Array[RemoteRepoConf
 
 
 @abstract func getAddonsFromRemoteRepo()
-@abstract func getAddonUpdatesFromRemoteRepo(addons: Array[RemoteRepoObject])
+@abstract func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject])
