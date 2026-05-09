@@ -6,7 +6,7 @@ class_name AcePluginInstallAddonsView extends Control
 @onready var backButton: Button = %Back
 
 ##Signals
-signal install_completed(addons: Array, config_file: String)
+signal install_completed(addons: Array, config_file: ConfigFile)
 signal back_to_main_view()
 
 var rrm: GitHubManager
