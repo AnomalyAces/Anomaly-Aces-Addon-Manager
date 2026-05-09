@@ -11,7 +11,7 @@ func _ready() -> void:
 
 	if install_addons != null:
 		install_addons.back_to_main_view.connect(_on_close_install_addons)
-		install_addons.install_completed.connect(_on_close_install_addons)
+		install_addons.install_completed.connect(_on_install_completed)
 
 func assignEditorInterface(editorInterface: EditorInterface) -> void:
 	if main_view != null:
