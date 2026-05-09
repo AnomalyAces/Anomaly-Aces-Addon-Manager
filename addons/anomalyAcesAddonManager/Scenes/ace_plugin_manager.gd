@@ -31,7 +31,7 @@ func _on_close_install_addons() -> void:
 	install_addons.hide()
 	main_view.show()
 
-func _on_install_completed(addons: Array, config_file: String) -> void:
+func _on_install_completed(addons: Array, config_file: ConfigFile) -> void:
 	AceLog.printLog(["Addons Installed:", addons])
 	install_addons.hide()
 	main_view.show()
