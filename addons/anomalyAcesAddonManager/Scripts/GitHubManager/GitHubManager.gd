@@ -99,7 +99,7 @@ func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject]):
 
 	_compareDownloadsToInstalls(addons)
 	_initialize_counters()
-	_num_install_requests = _get_num_install_requests(_addons, _num_install_requests)
+	_num_install_requests = _get_num_install_requests(addons, _num_install_requests)
 	AceLog.printLog(["Total Update Install Requests to complete: %d" % _num_install_requests])
 
 	for addon in addons:
