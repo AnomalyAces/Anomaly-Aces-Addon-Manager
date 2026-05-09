@@ -105,7 +105,7 @@ func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	for addon in addons:
 		_installAddons(addon)
 	
-	await addons_installed
+	# await addons_installed
 
 
 func getConfigFile() -> ConfigFile:
