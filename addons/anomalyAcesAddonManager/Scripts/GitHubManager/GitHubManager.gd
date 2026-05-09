@@ -105,7 +105,7 @@ func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	for addon in addons:
 		_installAddons(addon)
 	
-	# await addons_installed
+	await addons_installed
 
 
 func getConfigFile() -> ConfigFile:
@@ -431,6 +431,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 
 
 	if _install_requests_completed >= _num_install_requests:
+		AceLog.printLog(["All install requests completed. Emitting addons_installed signal. Install Requests Completed: %d / %d" % [_install_requests_completed, _num_install_requests]])
 		addons_installed.emit(_installed_addons)
 
 

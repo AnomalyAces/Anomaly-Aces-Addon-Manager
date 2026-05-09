@@ -43,7 +43,7 @@ func _on_install_button_pressed() -> void:
 	rrm.installAddonsFromRemoteRepo(_addons) # Replace with function body.
 
 func _on_addons_installed(addons: Array[RemoteRepoObject]) -> void:
-	AceLog.printLog(["Addons Installation Completed: %s" % addons])
+	AceLog.printLog(["Addons Installation Completed:", addons])
 	loadingView.hide()
 	installTablePlugin.show()
 	install_completed.emit(	addons, _addon_config)
