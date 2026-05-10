@@ -9,7 +9,7 @@
 		"dependencies": [
 			{
 				"owner": "anomalyaces",
-				"repo": "Anomaly-Aces-Util-Plugin",
+				"repo": "Anomaly-Aces-Util",
 				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
@@ -17,7 +17,7 @@
 			},
 			{
 				"owner": "anomalyaces",
-				"repo": "Anomaly-Aces-Log-Plugin",
+				"repo": "Anomaly-Aces-Log",
 				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",
@@ -25,7 +25,7 @@
 			},
 			{
 				"owner": "anomalyaces",
-				"repo": "Anomaly-Aces-Table-Plugin",
+				"repo": "Anomaly-Aces-Table",
 				"isRelease": false,
 				"version": "1.0",
 				"branch": "master",

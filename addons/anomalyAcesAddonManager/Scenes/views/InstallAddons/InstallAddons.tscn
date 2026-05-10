@@ -9,6 +9,7 @@
 [ext_resource type="Theme" uid="uid://wgkqeg5mojsr" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowTheme.tres" id="6_1erv5"]
 [ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowCellTheme.tres" id="7_t7svs"]
 [ext_resource type="PackedScene" uid="uid://cd0aapc45wg2k" path="res://addons/anomalyAcesAddonManager/Scenes/views/Loading/LoadingView.tscn" id="8_bt30r"]
+[ext_resource type="Texture2D" uid="uid://dheudj0jp7p0o" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonInstall.svg" id="10_t7svs"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyycq"]
 bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
@@ -117,13 +118,21 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="InstallButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=1809334008]
+[node name="InstallButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=897545897]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 size_flags_stretch_ratio = 2.5
+theme = ExtResource("7_t7svs")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 64
+theme_override_constants/align_to_largest_stylebox = 0
 theme_override_font_sizes/font_size = 32
 text = "Install"
+icon = ExtResource("10_t7svs")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
 
 [node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=151747598]
 layout_mode = 2
