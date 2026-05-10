@@ -30,6 +30,7 @@ func _ready() -> void:
 	rrm.addons_downloaded.connect(_on_addon_downloads_completed)
 	rrm.conflicts_found.connect(_on_conflicts_found)
 	rrm.addons_install_ready.connect(_on_addons_install_ready)
+	rrm.addon_updates_processed.connect(_on_addon_updates_processed)
 
 	AceLog.printLog(["Current Animation: %s" % loadingView.animationPlayer.current_animation], AceLog.LOG_LEVEL.INFO)
 
@@ -69,6 +70,14 @@ func selectAvailableUpdates() -> void:
 
 	AceTableManager.setTableData(_addon_table, tableData)
 	# _on_addon_table_selection(tableData)
+
+func updateAddons() -> void:
+	_setLoadingViewSize()
+	loadingView.visible = true
+	tableTtile.visible = false
+	addonTablePlugin.visible = false
+	conflictTablePlugin.visible = false
+	rrm.updateAddonsFromRemoteRepo()
 
 ##### Signal Callbacks #####
 func _on_addon_downloads_completed(addons: Array[RemoteRepoObject], isUpdate: bool) -> void:
@@ -115,6 +124,20 @@ func _on_addons_install_ready(addons: Array[RemoteRepoObject]) -> void:
 	addonTablePlugin.visible = true
 	conflictTablePlugin.visible = false
 	
+	if _addon_table != null:
+		var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(_addons))
+		AceTableManager.setTableData(_addon_table, tableData)
+	else:
+		_createAddonTable(_addons)
+
+func _on_addon_updates_processed(addons: Array[RemoteRepoObject]) -> void:
+	loadingView.visible = false
+	AceLog.printLog(["Add-on updates processed from Remote Repo", JSON.parse_string(AceSerialize.serialize_array(addons))], AceLog.LOG_LEVEL.INFO)
+	_merge_updated_addons(addons)
+	tableTtile.visible = true
+	addonTablePlugin.visible = true
+	conflictTablePlugin.visible = false
+
 	if _addon_table != null:
 		var tableData: Array[Dictionary] = _normalize_table_data(_createAddonTableData(_addons))
 		AceTableManager.setTableData(_addon_table, tableData)

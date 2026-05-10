@@ -14,8 +14,8 @@ const GITHUB_BRANCH_ZIP_URL: String = "https://api.github.com/repos/%s/%s/zipbal
 const GITHUB_TEMP_DOWNLOAD_PATH: String = "res://addons/anomalyAcesAddonManager/temp/github"
 
 ## Signals ##
-signal addons_processed
-signal addon_updates_processed
+signal addons_processed(addons: Array[RemoteRepoObject])
+signal addon_updates_processed(addons: Array[RemoteRepoObject])
 signal addons_downloaded(addons: Array[RemoteRepoObject], is_update: bool)
 signal addons_install_ready(addons: Array[RemoteRepoObject])
 signal addons_installed(addons: Array[RemoteRepoObject])
@@ -107,6 +107,28 @@ func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject]):
 	
 	await addons_installed
 
+func updateAddonsFromRemoteRepo():
+	var _unprocessed_addons = _parseAddonFiles()
+
+	#Check for conflicts
+	var conflicting_addons: Array[RemoteRepoConflict] = _checkForConflicts(_unprocessed_addons)
+	if conflicting_addons.size() > 0:
+		conflicts_found.emit(conflicting_addons)
+		AceLog.printLog(["Conflicts found in addons from remote repos."], AceLog.LOG_LEVEL.ERROR)
+		return
+
+	
+	#Flatten the addons and their dependencies
+	_addons = _flatten_addons(_unprocessed_addons)
+
+	#Intialize counters
+	_initialize_counters()
+	
+	for addon in _addons:
+		_getAddonFromRemoteRepo(addon)
+
+	addon_updates_processed.emit(_addons)
+	AceLog.printLog(["Updates Processed from Remote Repo "])
 
 func getConfigFile() -> ConfigFile:
 	return _get_config_file()

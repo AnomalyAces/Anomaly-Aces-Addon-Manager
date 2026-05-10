@@ -145,8 +145,6 @@ class File:
 				if err != OK:
 					AceLog.printLog(["Failed to delete file: %s in directory: %s. Error code: %d" % [file_name, target_dir, err]], AceLog.LOG_LEVEL.ERROR)
 
-				AceLog.printLog(["Deleted file: %s in directory: %s" % [file_name, target_dir]], AceLog.LOG_LEVEL.DEBUG)
-
 		# 2. Handle subdirectories
 		for dir_name in dir.get_directories():
 			var full_path = target_dir.path_join(dir_name)
