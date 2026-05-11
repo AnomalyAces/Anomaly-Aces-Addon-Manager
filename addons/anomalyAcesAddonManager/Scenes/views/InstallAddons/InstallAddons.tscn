@@ -117,6 +117,7 @@ alignment = 1
 [node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=1525379976]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
 
 [node name="InstallButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=897545897]
 layout_mode = 2
@@ -127,7 +128,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 64
 theme_override_constants/align_to_largest_stylebox = 0
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 64
 text = "Install"
 icon = ExtResource("10_t7svs")
 flat = true
@@ -137,6 +138,7 @@ autowrap_trim_flags = 0
 [node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=151747598]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/PageContainer/HeaderContainer/Back" to="." method="_on_back_pressed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/PageContainer/ButtonContainer/InstallButton" to="." method="_on_install_button_pressed"]
