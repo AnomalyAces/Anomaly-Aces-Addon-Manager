@@ -114,7 +114,7 @@ func _createInstallAddonsTableData(addons: Array[RemoteRepoObject], configFile: 
 		var addon_dict: Dictionary = {
 			"repo": addon.repo,
 			"installed_version": addon.version if addon.isRelease else addon.branch,
-			"install_commit_date": "N/A" if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date"),
+			"install_commit_date": "N/A" if addon.isRelease else configFile.get_value(addon.repo, "last_commit_date", "N/A"),
 			"latest_version": addon.version if addon.isRelease else addon.metadata.branch_last_commit_date,
 			"status": rrm.createTextLinkObjectForUpdate(addon),
 		}
