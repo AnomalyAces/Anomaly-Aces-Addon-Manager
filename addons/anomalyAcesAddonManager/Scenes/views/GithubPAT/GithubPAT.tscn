@@ -1,0 +1,169 @@
+[gd_scene format=3 uid="uid://cp6jkh5oiekiu"]
+
+[ext_resource type="Script" uid="uid://bhtstq4isiqen" path="res://addons/anomalyAcesAddonManager/Scenes/views/GithubPAT/github_pat_view.gd" id="1_jseeb"]
+[ext_resource type="Theme" uid="uid://byewiscuxyxda" path="res://addons/anomalyAcesAddonManager/Scenes/views/Main/Main-RowCellTheme.tres" id="2_3smj0"]
+[ext_resource type="Texture2D" uid="uid://cteynqempaseb" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonBack.svg" id="3_5tkj5"]
+[ext_resource type="FontFile" uid="uid://cpb0xvgcv3wdl" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Medium.ttf" id="4_iiqbm"]
+[ext_resource type="Texture2D" uid="uid://cb78m3lmpsaxm" path="res://addons/anomalyAcesAddonManager/Icons/AceAddonVerifySettings.svg" id="5_fttpx"]
+[ext_resource type="PackedScene" uid="uid://cd0aapc45wg2k" path="res://addons/anomalyAcesAddonManager/Scenes/views/Loading/LoadingView.tscn" id="9_2u2jl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qd447"]
+bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yt8t8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0s8nl"]
+
+[sub_resource type="Theme" id="Theme_yblqi"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_qd447")
+RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_yt8t8")
+RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_0s8nl")
+
+[node name="GithubPat" type="Control" unique_id=2058642828]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jseeb")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1313011914]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_yblqi")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1719086673]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="PageContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1605587454]
+layout_mode = 2
+
+[node name="HeaderContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=21395943]
+layout_mode = 2
+alignment = 1
+
+[node name="Back" type="Button" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=985718705]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
+theme = ExtResource("2_3smj0")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/icon_max_width = 64
+theme_override_font_sizes/font_size = 32
+text = "Back"
+icon = ExtResource("3_5tkj5")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=787169261]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_iiqbm")
+theme_override_font_sizes/font_size = 64
+text = "Github Personal Access Token"
+horizontal_alignment = 1
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=1559358132]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
+
+[node name="PATContent" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=869506299]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 64
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1218706036]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+
+[node name="TokenInputContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=434608234]
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=68888852]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=1703894660]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_iiqbm")
+theme_override_font_sizes/font_size = 48
+text = "Token"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=1822429873]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("2_3smj0")
+alignment = 1
+caret_blink = true
+secret = true
+
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=1837985417]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+
+[node name="TokenStatusContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1833575120]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1438814704]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1307567493]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1982317590]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="CheckButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1848092896]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.5
+theme = ExtResource("2_3smj0")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 64
+theme_override_constants/align_to_largest_stylebox = 0
+theme_override_font_sizes/font_size = 64
+text = "Check Token"
+icon = ExtResource("5_fttpx")
+flat = true
+autowrap_mode = 2
+autowrap_trim_flags = 0
+
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1930958835]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="LoadingView" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1213959645 instance=ExtResource("9_2u2jl")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_stretch_ratio = 3.0
