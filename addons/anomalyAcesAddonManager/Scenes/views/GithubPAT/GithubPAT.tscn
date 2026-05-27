@@ -10,17 +10,17 @@
 [ext_resource type="FontFile" uid="uid://csknraugtg53m" path="res://addons/anomalyAcesAddonManager/Fonts/Chakra_Petch/ChakraPetch-Italic.ttf" id="7_5tkj5"]
 [ext_resource type="PackedScene" uid="uid://cd0aapc45wg2k" path="res://addons/anomalyAcesAddonManager/Scenes/views/Loading/LoadingView.tscn" id="9_2u2jl"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qd447"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4qfn1"]
 bg_color = Color(0.0006904672, 0.02125666, 0.04044265, 1)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yt8t8"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3smj0"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0s8nl"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5tkj5"]
 
-[sub_resource type="Theme" id="Theme_yblqi"]
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_qd447")
-RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_yt8t8")
-RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_0s8nl")
+[sub_resource type="Theme" id="Theme_iiqbm"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_4qfn1")
+RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_3smj0")
+RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_5tkj5")
 
 [node name="GithubPat" type="Control" unique_id=2058642828]
 layout_mode = 3
@@ -31,31 +31,30 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_jseeb")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1313011914]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1967397481]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_yblqi")
+theme = SubResource("Theme_iiqbm")
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1719086673]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=746525800]
 layout_mode = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="PageContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1605587454]
+[node name="PageContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=259246943]
 layout_mode = 2
 
-[node name="HeaderContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=21395943]
+[node name="HeaderContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=428268113]
 layout_mode = 2
 alignment = 1
 
-[node name="Back" type="Button" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=985718705]
-unique_name_in_owner = true
+[node name="Back" type="Button" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=805815278]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
@@ -69,7 +68,7 @@ flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
 
-[node name="Title" type="Label" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=787169261]
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=1841298392]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
@@ -79,38 +78,37 @@ theme_override_font_sizes/font_size = 64
 text = "Github Personal Access Token"
 horizontal_alignment = 1
 
-[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=1559358132]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=497272274]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
 
-[node name="PATContent" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=869506299]
+[node name="PATContent" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1792165454]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 64
 
-[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1218706036]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1247885310]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
 
-[node name="TokenInputContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=434608234]
+[node name="TokenInputContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=47021974]
 layout_mode = 2
 theme_override_constants/separation = 32
 alignment = 1
 
-[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=68888852]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=982138515]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.7
 
-[node name="Label" type="Label" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=1703894660]
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=402834074]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_iiqbm")
 theme_override_font_sizes/font_size = 48
 text = "Token"
 
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=1822429873]
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=299579535]
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_3smj0")
@@ -118,19 +116,19 @@ alignment = 1
 caret_blink = true
 secret = true
 
-[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=1837985417]
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=136320361]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.7
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1188691508]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=820625542]
 layout_mode = 2
 
-[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer" unique_id=1278684527]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer" unique_id=1473558683]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TokenStatusContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer" unique_id=1833575120]
+[node name="TokenStatusContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer" unique_id=139346971]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -138,8 +136,7 @@ size_flags_stretch_ratio = 3.0
 theme_override_constants/separation = 32
 alignment = 1
 
-[node name="TokenStatus" type="RichTextLabel" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer/TokenStatusContainer" unique_id=1873657195]
-unique_name_in_owner = true
+[node name="TokenStatus" type="RichTextLabel" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer/TokenStatusContainer" unique_id=21887858]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
@@ -157,8 +154,7 @@ text = "ghgghg"
 fit_content = true
 vertical_alignment = 1
 
-[node name="TokenNotes" type="RichTextLabel" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer/TokenStatusContainer" unique_id=650025858]
-unique_name_in_owner = true
+[node name="TokenNotes" type="RichTextLabel" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer/TokenStatusContainer" unique_id=1716126703]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
@@ -176,48 +172,47 @@ text = "ghgghg"
 fit_content = true
 vertical_alignment = 1
 
-[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer" unique_id=1275778698]
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer" unique_id=933596596]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1438814704]
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1688071023]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=1307567493]
+[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/PageContainer/PATContent" unique_id=227412145]
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
 
-[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1982317590]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=815681799]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 5.0
+size_flags_stretch_ratio = 3.0
 
-[node name="CheckButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1848092896]
+[node name="CheckButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1543403430]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 2.5
+size_flags_stretch_ratio = 1.5
 theme = ExtResource("2_3smj0")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 64
 theme_override_constants/align_to_largest_stylebox = 0
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 48
 text = "Check Token"
 icon = ExtResource("5_fttpx")
 flat = true
 autowrap_mode = 2
 autowrap_trim_flags = 0
 
-[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1930958835]
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer" unique_id=1951377985]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 5.0
+size_flags_stretch_ratio = 3.0
 
 [node name="LoadingView" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1213959645 instance=ExtResource("9_2u2jl")]
-unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_stretch_ratio = 3.0

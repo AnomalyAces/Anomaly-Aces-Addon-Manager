@@ -540,27 +540,4 @@ func _get_config_file() -> ConfigFile:
 	return _addon_installs_cfg
 
 func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
-	AceLog.printLog(["Converting UTC datetime string to local datetime string. Input UTC datetime string: %s" % utc_datetime_string], AceLog.LOG_LEVEL.DEBUG)
-	# 1. Parse the input string (assumed UTC for this example) into a dictionary.
-	# Note: Godot methods for converting from string assume "the same timezone" 
-	# unless specified otherwise, so the input string should ideally conform to ISO 8601 
-	# and you should handle any "Z" suffix manually if needed.
-	var datetime_dict = Time.get_datetime_dict_from_datetime_string(utc_datetime_string.replace("Z", ""), false)
-	AceLog.printLog(["Parsed datetime dictionary: %s" % datetime_dict], AceLog.LOG_LEVEL.DEBUG)
-
-	# Check for parsing errors
-	if datetime_dict.is_empty() or "year" not in datetime_dict:
-		print("Error: Could not parse input datetime string")
-		return ""
-
-	# 2. Convert the dictionary to a Unix timestamp (seconds since epoch).
-	var unix_time = Time.get_unix_time_from_datetime_dict(datetime_dict)
-
-	# 3. Get Bias between UTC and local time in seconds
-	AceLog.printLog(["Time Zone %s Bias from UTC in hours: %d" % [Time.get_time_zone_from_system()["name"], Time.get_time_zone_from_system()["bias"] / 60]], AceLog.LOG_LEVEL.DEBUG)
-	var bias_seconds = Time.get_time_zone_from_system()["bias"] * 60
-
-	# 4. Adjust the Unix timestamp by the bias to get local time
-	var local_datetime_string = Time.get_datetime_string_from_unix_time(unix_time + bias_seconds)
-
-	return local_datetime_string
+	return AceDateTimeUtil.DateTime.utc_string_to_local_datetime_string(utc_datetime_string) 

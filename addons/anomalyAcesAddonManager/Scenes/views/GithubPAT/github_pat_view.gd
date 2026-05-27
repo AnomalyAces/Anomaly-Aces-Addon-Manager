@@ -16,6 +16,7 @@ func _ready() -> void:
 
 func _on_check_button_pressed() -> void:
 	AceLog.printLog(["Check Button Pressed"], AceLog.LOG_LEVEL.DEBUG) # Replace with function body.
+	_check_github_pat()
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	personal_access_token = new_text
@@ -55,6 +56,7 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 	
 	# 2. Extract expiration date from headers
 	var expiration_date: String = "No expiration date found (Likely set to 'No Expiration')"
+
 	
 	for header in headers:
 		if header.to_lower().begins_with("github-authentication-token-expiration:"):
@@ -64,6 +66,7 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 				expiration_date = parts[1].strip_edges()
 			break
 
-	AceLog.printLog(["Token is VALID."], AceLog.LOG_LEVEL.DEBUG)
-	AceLog.printLog(["Expires on: ", expiration_date], AceLog.LOG_LEVEL.DEBUG)
+	AceLog.printLog(["Token is VALID."], AceLog.LOG_LEVEL.INFO)
+	AceLog.printLog(["Expires on: ", expiration_date], AceLog.LOG_LEVEL.INFO)
+	AceLog.printLog(["Expires on (local time): ", AceDateTimeUtil.DateTime.utc_string_to_local_formatted_string(expiration_date)], AceLog.LOG_LEVEL.INFO)
 	
