@@ -3,6 +3,7 @@ class_name GithubPATView extends Control
 
 @onready var http: HTTPRequest = $HTTPRequest
 @onready var checkButton: Button = %CheckButton
+@onready var tokenStatusRTL: RichTextLabel = %TokenStatus
 
 var personal_access_token: String = ""
 
@@ -42,6 +43,7 @@ func _check_github_pat() -> void:
 
 
 func _on_github_pat_check_completed(result: int, response_code: int, headers: Array, body: PackedByteArray) -> void:
+	tokenStatusRTL.clear()
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["Network request failed with error code: ", result], AceLog.LOG_LEVEL.ERROR)
 		return
@@ -67,6 +69,13 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 			break
 
 	AceLog.printLog(["Token is VALID."], AceLog.LOG_LEVEL.INFO)
+	tokenStatusRTL.append_text("Token is [color=green]VALID[/color].")
 	AceLog.printLog(["Expires on: ", expiration_date], AceLog.LOG_LEVEL.INFO)
-	AceLog.printLog(["Expires on (local time): ", AceDateTimeUtil.DateTime.utc_string_to_local_formatted_string(expiration_date)], AceLog.LOG_LEVEL.INFO)
+	var local_time_expiration_iso: String = AceDateTimeUtil.DateTime.utc_string_to_local_formatted_string(expiration_date, AceDateTimeUtil.FORMAT_DATETIME_ISO_8601) 
+	AceLog.printLog(["Expires on (local time [ISO 8601]): ", local_time_expiration_iso], AceLog.LOG_LEVEL.INFO)
+	AceLog.printLog(["Expires on (local time formatted): ", AceDateTimeUtil.DateTime.format_datetime_string(local_time_expiration_iso, AceDateTimeUtil.FORMAT_DATETIME_WITH_TZ)], AceLog.LOG_LEVEL.INFO)
+	# var local_time_expiration_iso: String = AceDateTimeUtil.DateTime.format_datetime_string(local_time_expiration, AceDateTimeUtil.FORMAT_DATE_ISO_8601)
+	# AceLog.printLog(["Token expiration date (Local ISO): ", local_time_expiration_iso], AceLog.LOG_LEVEL.INFO)
+
+
 	
