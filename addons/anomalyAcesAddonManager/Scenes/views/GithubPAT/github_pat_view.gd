@@ -4,6 +4,7 @@ class_name GithubPATView extends Control
 @onready var http: HTTPRequest = $HTTPRequest
 @onready var checkButton: Button = %CheckButton
 @onready var tokenStatusRTL: RichTextLabel = %TokenStatus
+@onready var tokenNotesRTL: RichTextLabel = %TokenNotes
 
 var personal_access_token: String = ""
 
@@ -44,6 +45,7 @@ func _check_github_pat() -> void:
 
 func _on_github_pat_check_completed(result: int, response_code: int, headers: Array, body: PackedByteArray) -> void:
 	tokenStatusRTL.clear()
+	tokenNotesRTL.clear()
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["Network request failed with error code: ", result], AceLog.LOG_LEVEL.ERROR)
 		return
@@ -73,9 +75,31 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 	AceLog.printLog(["Expires on: ", expiration_date], AceLog.LOG_LEVEL.INFO)
 	var local_time_expiration_iso: String = AceDateTimeUtil.DateTime.utc_string_to_local_formatted_string(expiration_date, AceDateTimeUtil.FORMAT_DATETIME_ISO_8601) 
 	AceLog.printLog(["Expires on (local time [ISO 8601]): ", local_time_expiration_iso], AceLog.LOG_LEVEL.INFO)
-	AceLog.printLog(["Expires on (local time formatted): ", AceDateTimeUtil.DateTime.format_datetime_string(local_time_expiration_iso, AceDateTimeUtil.FORMAT_DATETIME_WITH_TZ)], AceLog.LOG_LEVEL.INFO)
+	var local_time_expiration: String = AceDateTimeUtil.DateTime.utc_string_to_local_formatted_string(expiration_date, AceDateTimeUtil.FORMAT_DATETIME_WITH_TZ)
+	AceLog.printLog(["Expires on (local time formatted): ", AceDateTimeUtil.DateTime.format_datetime_string(local_time_expiration, AceDateTimeUtil.FORMAT_DATETIME_WITH_TZ)], AceLog.LOG_LEVEL.INFO)
 	# var local_time_expiration_iso: String = AceDateTimeUtil.DateTime.format_datetime_string(local_time_expiration, AceDateTimeUtil.FORMAT_DATE_ISO_8601)
 	# AceLog.printLog(["Token expiration date (Local ISO): ", local_time_expiration_iso], AceLog.LOG_LEVEL.INFO)
+
+	tokenNotesRTL.append_text("[font_size=36]Token Expires on: [b]" + local_time_expiration + "[/b][/font_size][br]")
+	tokenNotesRTL.newline()
+	tokenNotesRTL.append_text("[b]Step 1: Generate a New Token on GitHub[/b][br]")
+	tokenNotesRTL.push_list(1, RichTextLabel.ListType.LIST_DOTS,true) # Start a new numbered list with indentation and spacing.
+	# tokenNotesRTL.append_text("[ul]")
+	tokenNotesRTL.append_text("Go to your GitHub Settings and click on [b]Developer settings[/b] in the left sidebar.[br]")
+	tokenNotesRTL.append_text("Click on [b]Personal access tokens[/b] and select [b]Fine-grained tokens[/b].")
+		# tokenNotesRTL.append_text("[*]Click [b]Generate new token[/b].")
+	# tokenNotesRTL.append_text("[*]Set the expiration and select your repositories.")
+	# tokenNotesRTL.append_text("[*]Under Permissions, set [b]Contents[/b] to [b]Read and write[/b].")
+	# tokenNotesRTL.append_text("[*]Click [b]Generate token[/b] and copy it.")
+	# tokenNotesRTL.append_text("[/list]")
+	# tokenNotesRTL.append_text("[b]Step 2: Update Godot 4 Credentials[/b]")
+	# tokenNotesRTL.append_text("[list=1]")
+	# tokenNotesRTL.append_text("[*]Open your project in Godot 4.")
+	# tokenNotesRTL.append_text("[*]Navigate to [b]Version Control > Version Control Settings...[/b].")
+	# tokenNotesRTL.append_text("[*]Ensure [b]Username[/b] is your GitHub username.")
+	# tokenNotesRTL.append_text("[*]Paste your PAT into the [b]Password[/b] field.")
+	# tokenNotesRTL.append_text("[*]Click [b]OK[/b] to apply changes.")
+	tokenNotesRTL.pop() # End the list.
 
 
 	
