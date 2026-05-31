@@ -533,7 +533,7 @@ func _get_config_file() -> ConfigFile:
 
 	if !_addon_installs_cfg_exists:
 		#Create the addonInstalls.cfg file
-		AceFileUtil.File.create_file("%s/addonInstalls.cfg" % ADDON_DIR)
+		AceFileUtil.File.create_file("%s/addonInstalls.cfg" % ADDON_DIR, FileAccess.READ_WRITE)
 
 	# Check addonInstalls.cfg and compare versions aand last commit dates to determine if there are updates available.
 	var _addon_installs_cfg: ConfigFile = AceFileUtil.Config.load_config("%s/addonInstalls.cfg" % ADDON_DIR)

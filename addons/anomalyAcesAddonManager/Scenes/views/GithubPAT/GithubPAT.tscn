@@ -109,7 +109,8 @@ theme_override_fonts/font = ExtResource("4_iiqbm")
 theme_override_font_sizes/font_size = 48
 text = "Token"
 
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=299579535]
+[node name="TokenInput" type="LineEdit" parent="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer" unique_id=299579535]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_3smj0")
@@ -160,7 +161,7 @@ vertical_alignment = 1
 
 [node name="TokenNotes" type="RichTextLabel" parent="PanelContainer/MarginContainer/PageContainer/PATContent/HBoxContainer/TokenStatusContainer" unique_id=1716126703]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 350)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/normal_font = ExtResource("4_iiqbm")
@@ -224,5 +225,5 @@ size_flags_stretch_ratio = 3.0
 
 [node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1356283695]
 
-[connection signal="text_submitted" from="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
+[connection signal="text_submitted" from="PanelContainer/MarginContainer/PageContainer/PATContent/TokenInputContainer/TokenInput" to="." method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/PageContainer/PATContent/ButtonContainer/CheckButton" to="." method="_on_check_button_pressed"]

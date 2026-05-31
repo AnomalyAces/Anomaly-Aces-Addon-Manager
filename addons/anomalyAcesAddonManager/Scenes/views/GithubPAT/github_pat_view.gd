@@ -1,16 +1,46 @@
 @tool
 class_name GithubPATView extends Control
 
+const GITHUB_PAT_FILE_PATH: String = "user://github_pat.json"
+
 @onready var http: HTTPRequest = $HTTPRequest
 @onready var checkButton: Button = %CheckButton
 @onready var tokenStatusRTL: RichTextLabel = %TokenStatus
 @onready var tokenNotesRTL: RichTextLabel = %TokenNotes
+@onready var tokenInput: LineEdit = %TokenInput
 
 var personal_access_token: String = ""
+var expiration_date: String = "No expiration date found (Likely set to 'No Expiration')"
 
+
+class GithubPATInfo extends Object:
+	var token: String
+	var expiration_date: String
 
 
 func _ready() -> void:
+	if AceFileUtil.File.file_exists(GITHUB_PAT_FILE_PATH):
+		var file: FileAccess = AceFileUtil.File.create_file(GITHUB_PAT_FILE_PATH, FileAccess.READ)
+		var content: String = file.get_as_text()
+		file.close()
+
+		var pat_res: AceDeserializeResult = AceSerialize.deserialize(content, GithubPATInfo)
+
+		if pat_res.error != OK:
+			AceLog.printLog(["Failed to deserialize PAT info from file. Error code: ", pat_res.error], AceLog.LOG_LEVEL.ERROR)
+			return
+		
+		var pat_info: GithubPATInfo = pat_res.data
+
+		if pat_info != null:
+			personal_access_token = pat_info.token
+			AceLog.printLog(["Loaded Personal Access Token from file. Expiration Date: ", pat_info.expiration_date], AceLog.LOG_LEVEL.INFO)
+			tokenInput.text = personal_access_token
+			_check_github_pat()
+		else:
+			AceLog.printLog(["Failed to deserialize Personal Access Token info from file."], AceLog.LOG_LEVEL.ERROR)
+	else:
+		AceLog.printLog(["No existing Personal Access Token found. Please enter a token and click 'Check Token'."], AceLog.LOG_LEVEL.INFO)
 	pass
 
 
@@ -26,6 +56,7 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 
 
 func _check_github_pat() -> void:
+	personal_access_token = tokenInput.text.strip_edges()
 	if personal_access_token.is_empty():
 		AceLog.printLog(["Personal Access Token is empty. Please enter a valid token."], AceLog.LOG_LEVEL.WARN)
 		return
@@ -49,31 +80,31 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 	var isPATValid: bool = false
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["Network request failed with error code: ", result], AceLog.LOG_LEVEL.ERROR)
-		return
 	
 	# 1. Check if token is expired/invalid based on status code
 	if response_code == 401:
 		AceLog.printLog(["Token is EXPIRED or INVALID."], AceLog.LOG_LEVEL.DEBUG)
-		return
+		isPATValid = false
 	elif response_code != 200:
 		AceLog.printLog(["Unexpected server response: ", response_code], AceLog.LOG_LEVEL.DEBUG)
-		return
+		isPATValid = false
+	else:
+		isPATValid = true
 	
-	# 2. Extract expiration date from headers
-	var expiration_date: String = "No expiration date found (Likely set to 'No Expiration')"
-
-	
-	for header in headers:
-		if header.to_lower().begins_with("github-authentication-token-expiration:"):
-			# Split the header name from its value
-			var parts = header.split(":", true, 1)
-			if parts.size() > 1:
-				expiration_date = parts[1].strip_edges()
-			break
-
-	isPATValid = true
 
 	if isPATValid:
+		# 2. Extract expiration date from headers
+		expiration_date = "No expiration date found (Likely set to 'No Expiration')"
+
+		for header in headers:
+			if header.to_lower().begins_with("github-authentication-token-expiration:"):
+				# Split the header name from its value
+				var parts = header.split(":", true, 1)
+				if parts.size() > 1:
+					expiration_date = parts[1].strip_edges()
+				break
+
+
 		AceLog.printLog(["Token is VALID."], AceLog.LOG_LEVEL.INFO)
 		tokenStatusRTL.append_text("Token is [color=green]VALID[/color].")
 		AceLog.printLog(["Expires on: ", expiration_date], AceLog.LOG_LEVEL.INFO)
@@ -84,9 +115,22 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 		# var local_time_expiration_iso: String = AceDateTimeUtil.DateTime.format_datetime_string(local_time_expiration, AceDateTimeUtil.FORMAT_DATE_ISO_8601)
 		# AceLog.printLog(["Token expiration date (Local ISO): ", local_time_expiration_iso], AceLog.LOG_LEVEL.INFO)
 
+		tokenNotesRTL.set_custom_minimum_size(Vector2(0, 200)) # Reduce minimum height when token is valid to save space.
 		tokenNotesRTL.append_text("[font_size=36]Token Expires on: [b]" + local_time_expiration + "[/b][/font_size]")
 		tokenNotesRTL.newline()
+
+		# 3. Save the token and expiration date to the file system
+		var pat_info: GithubPATInfo = GithubPATInfo.new()
+		pat_info.token = tokenInput.text.strip_edges()
+		pat_info.expiration_date = expiration_date
+
+		var file: FileAccess = AceFileUtil.File.create_file(GITHUB_PAT_FILE_PATH, FileAccess.READ_WRITE)
+		file.store_string(AceSerialize.serialize(pat_info))
+		file.close()
 	else:
+		AceLog.printLog(["Token is INVALID."], AceLog.LOG_LEVEL.INFO)
+		tokenStatusRTL.append_text("Token is [color=red]INVALID[/color].")
+		tokenNotesRTL.set_custom_minimum_size(Vector2(0, 400)) 
 		tokenNotesRTL.append_text("[font_size=36][b]How to Update/Generate Your Token[/b][/font_size]")
 		tokenNotesRTL.newline()
 		tokenNotesRTL.newline()
