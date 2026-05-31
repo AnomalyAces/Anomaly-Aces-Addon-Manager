@@ -85,6 +85,7 @@ size_flags_stretch_ratio = 0.3
 
 [node name="PATContent" type="VBoxContainer" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1792165454]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 48
@@ -115,7 +116,10 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_3smj0")
+<<<<<<< HEAD
 text = ""
+=======
+>>>>>>> 2808576 (removing secret in text)
 alignment = 1
 caret_blink = true
 caret_force_displayed = true
@@ -220,7 +224,6 @@ size_flags_stretch_ratio = 3.0
 
 [node name="LoadingView" parent="PanelContainer/MarginContainer/PageContainer" unique_id=1213959645 instance=ExtResource("9_2u2jl")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_stretch_ratio = 3.0
 

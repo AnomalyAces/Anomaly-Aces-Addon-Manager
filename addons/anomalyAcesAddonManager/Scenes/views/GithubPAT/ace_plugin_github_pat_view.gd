@@ -41,6 +41,7 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 	AceLog.printLog(["New Personal Access Token Submitted: ", personal_access_token], AceLog.LOG_LEVEL.DEBUG)
 
 func _on_back_pressed() -> void:
+	tokenInput.text = ""
 	back_to_main_view.emit()
 
 func _check_github_pat() -> void:
