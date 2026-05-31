@@ -207,3 +207,4 @@ metadata/_custom_type_script = "uid://sx1wgfw6xjis"
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Reload" to="." method="_on_reload_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Select" to="." method="_on_select_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/Install" to="." method="_on_install_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/ActionButtons/GithubPAT" to="." method="_on_github_pat_pressed"]

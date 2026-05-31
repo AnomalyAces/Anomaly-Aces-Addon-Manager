@@ -358,7 +358,7 @@ func _printAddonDownloadErrorMessage(addon: RemoteRepoObject) -> void:
 
 func _get_headers() -> PackedStringArray:
 	var headers: PackedStringArray = GITHUB_API_HEADERS.duplicate()
-	var token: String = getGithubPersonalAccessToken()
+	var token: String = AddonManagerUtil.get_github_pat().token
 	if token != null && !token.is_empty():
 		headers.append("Authorization: Bearer %s" % token)
 		AceLog.printLog(["Using GitHub Personal Access Token for API requests."], AceLog.LOG_LEVEL.INFO)
@@ -540,4 +540,6 @@ func _get_config_file() -> ConfigFile:
 	return _addon_installs_cfg
 
 func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
-	return AceDateTimeUtil.DateTime.utc_string_to_local_datetime_string(utc_datetime_string) 
+	return AceDateTimeUtil.DateTime.utc_string_to_local_datetime_string(utc_datetime_string)
+
+

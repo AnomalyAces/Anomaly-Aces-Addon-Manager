@@ -1,5 +1,5 @@
 @tool
-class_name GithubPATView extends Control
+class_name AcePluginGithubPATView extends Control
 
 const GITHUB_PAT_FILE_PATH: String = "user://github_pat.json"
 
@@ -8,40 +8,26 @@ const GITHUB_PAT_FILE_PATH: String = "user://github_pat.json"
 @onready var tokenStatusRTL: RichTextLabel = %TokenStatus
 @onready var tokenNotesRTL: RichTextLabel = %TokenNotes
 @onready var tokenInput: LineEdit = %TokenInput
+@onready var loadingView: LoadingView = %LoadingView
+@onready var patContent: VBoxContainer = %PATContent
+
+##Signals
+signal back_to_main_view()
 
 var personal_access_token: String = ""
 var expiration_date: String = "No expiration date found (Likely set to 'No Expiration')"
 
 
-class GithubPATInfo extends Object:
-	var token: String
-	var expiration_date: String
-
 
 func _ready() -> void:
-	if AceFileUtil.File.file_exists(GITHUB_PAT_FILE_PATH):
-		var file: FileAccess = AceFileUtil.File.create_file(GITHUB_PAT_FILE_PATH, FileAccess.READ)
-		var content: String = file.get_as_text()
-		file.close()
-
-		var pat_res: AceDeserializeResult = AceSerialize.deserialize(content, GithubPATInfo)
-
-		if pat_res.error != OK:
-			AceLog.printLog(["Failed to deserialize PAT info from file. Error code: ", pat_res.error], AceLog.LOG_LEVEL.ERROR)
-			return
-		
-		var pat_info: GithubPATInfo = pat_res.data
-
-		if pat_info != null:
-			personal_access_token = pat_info.token
-			AceLog.printLog(["Loaded Personal Access Token from file. Expiration Date: ", pat_info.expiration_date], AceLog.LOG_LEVEL.INFO)
-			tokenInput.text = personal_access_token
-			_check_github_pat()
-		else:
-			AceLog.printLog(["Failed to deserialize Personal Access Token info from file."], AceLog.LOG_LEVEL.ERROR)
+	var pat_info: GithubPATInfo = AddonManagerUtil.get_github_pat()
+	if pat_info.token != null and not pat_info.token.is_empty():
+		personal_access_token = pat_info.token
+		tokenInput.text = personal_access_token
+		AceLog.printLog(["Loaded Personal Access Token from file. Expiration Date: ", pat_info.expiration_date], AceLog.LOG_LEVEL.INFO)
+		_check_github_pat()
 	else:
 		AceLog.printLog(["No existing Personal Access Token found. Please enter a token and click 'Check Token'."], AceLog.LOG_LEVEL.INFO)
-	pass
 
 
 
@@ -54,11 +40,16 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 	personal_access_token = new_text
 	AceLog.printLog(["New Personal Access Token Submitted: ", personal_access_token], AceLog.LOG_LEVEL.DEBUG)
 
+func _on_back_pressed() -> void:
+	back_to_main_view.emit()
 
 func _check_github_pat() -> void:
+	tokenStatusRTL.clear()
+	tokenNotesRTL.clear()
 	personal_access_token = tokenInput.text.strip_edges()
 	if personal_access_token.is_empty():
 		AceLog.printLog(["Personal Access Token is empty. Please enter a valid token."], AceLog.LOG_LEVEL.WARN)
+		tokenStatusRTL.append_text("Personal Access Token is empty. Please enter a valid token.")
 		return
 	
 	var url: String = "https://api.github.com/user"
@@ -71,12 +62,14 @@ func _check_github_pat() -> void:
 
 	http.request_completed.connect(_on_github_pat_check_completed)
 	
+	loadingView.show()
+	patContent.hide()
 	var result: int = http.request(url, headers)
 
 
 func _on_github_pat_check_completed(result: int, response_code: int, headers: Array, body: PackedByteArray) -> void:
-	tokenStatusRTL.clear()
-	tokenNotesRTL.clear()
+	loadingView.hide()
+	patContent.show()
 	var isPATValid: bool = false
 	if result != HTTPRequest.RESULT_SUCCESS:
 		AceLog.printLog(["Network request failed with error code: ", result], AceLog.LOG_LEVEL.ERROR)

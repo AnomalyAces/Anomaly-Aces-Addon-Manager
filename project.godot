@@ -1,0 +1,43 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[aceLog]
+
+settings/logLevel="DEBUG"
+settings/folder/debug=Array[String](["res://addons/anomalyAcesAddonManager", "res://addons/anomalyAcesUtil", "res://addons/anomalyAcesLog", "res://addons/anomalyAcesTable"])
+
+[application]
+
+config/name="Anomaly Aces Addon Manager"
+config/tags=PackedStringArray("plugin")
+config/features=PackedStringArray("4.6", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+AceLog="*res://addons/anomalyAcesLog/scripts/AceLog.gd"
+AceArrayUtil="*uid://1l3f2fepppfy"
+AceSerialize="*uid://dklal3gftdk36"
+AceStringUtil="*uid://bsx4ai05gt2b"
+AceFileUtil="*uid://c2osbx2dl1k5s"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/anomalyAcesAddonManager/plugin.cfg", "res://addons/anomalyAcesLog/plugin.cfg", "res://addons/anomalyAcesTable/plugin.cfg", "res://addons/anomalyAcesUtil/plugin.cfg", "res://addons/log/plugin.cfg")
+
+[log_gd]
+
+config/use_newlines=true

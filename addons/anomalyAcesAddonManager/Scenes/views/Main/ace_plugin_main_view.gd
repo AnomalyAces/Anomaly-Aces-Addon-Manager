@@ -9,6 +9,7 @@ class_name AcePluginMainView extends Control
 
 ##Signals
 signal open_install_view(addons: Array, config_file: ConfigFile)
+signal open_github_pat_view()
 
 var rrm: GitHubManager
 
@@ -166,6 +167,9 @@ func _on_install_pressed() -> void:
 
 func _on_select_pressed() -> void:
 	selectAvailableUpdates()
+
+func _on_github_pat_pressed() -> void:
+	open_github_pat_view.emit()
 
 
 #############################
