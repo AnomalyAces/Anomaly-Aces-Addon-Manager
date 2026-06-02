@@ -20,6 +20,10 @@ var expiration_date: String = "No expiration date found (Likely set to 'No Expir
 
 
 func _ready() -> void:
+	initialize()
+
+
+func initialize() -> void:
 	var pat_info: GithubPATInfo = AddonManagerUtil.get_github_pat()
 	if pat_info.token != null and not pat_info.token.is_empty():
 		personal_access_token = pat_info.token
@@ -28,9 +32,6 @@ func _ready() -> void:
 		_check_github_pat()
 	else:
 		AceLog.printLog(["No existing Personal Access Token found. Please enter a token and click 'Check Token'."], AceLog.LOG_LEVEL.INFO)
-
-
-
 
 func _on_check_button_pressed() -> void:
 	AceLog.printLog(["Check Button Pressed"], AceLog.LOG_LEVEL.DEBUG) # Replace with function body.

@@ -43,6 +43,7 @@ func _on_install_completed(addons: Array, config_file: ConfigFile) -> void:
 	main_view.updateAddons()
 
 func _on_open_github_pat() -> void:
+	github_pat.initialize()
 	main_view.hide()
 	github_pat.show()
 
