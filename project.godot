@@ -20,14 +20,6 @@ config/tags=PackedStringArray("plugin")
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
-[autoload]
-
-AceLog="*res://addons/anomalyAcesLog/scripts/AceLog.gd"
-AceArrayUtil="*uid://1l3f2fepppfy"
-AceSerialize="*uid://dklal3gftdk36"
-AceStringUtil="*uid://bsx4ai05gt2b"
-AceFileUtil="*uid://c2osbx2dl1k5s"
-
 [display]
 
 window/size/viewport_width=1920
@@ -36,7 +28,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/anomalyAcesAddonManager/plugin.cfg", "res://addons/anomalyAcesLog/plugin.cfg", "res://addons/anomalyAcesTable/plugin.cfg", "res://addons/anomalyAcesUtil/plugin.cfg", "res://addons/log/plugin.cfg")
+enabled=PackedStringArray("res://addons/anomalyAcesAddonManager/plugin.cfg", "res://addons/anomalyAcesTable/plugin.cfg", "res://addons/log/plugin.cfg")
 
 [log_gd]
 

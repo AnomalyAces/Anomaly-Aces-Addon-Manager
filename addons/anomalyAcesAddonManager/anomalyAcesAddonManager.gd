@@ -25,6 +25,8 @@ func _enter_tree() -> void:
 		window.close_requested.connect(func(): window.hide())
 		window.about_to_popup.connect(_on_about_to_popup)
 
+		AddonManagerUtil.enable_addons() # Automatically enable all addons in the res://addons/ directory on plugin activation.
+
 		
 		# add_control_to_container(CONTAINER_TOOLBAR, custom_menu_button)
 
