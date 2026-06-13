@@ -39,6 +39,7 @@ func _on_back_pressed() -> void:
 
 func _on_install_button_pressed() -> void:
 	loadingView.show()
+	loadingView.playAnimation()
 	installTablePlugin.hide()
 	rrm.installAddonsFromRemoteRepo(_addons) # Replace with function body.
 
