@@ -28,7 +28,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/anomalyAcesAddonManager/plugin.cfg", "res://addons/anomalyAcesTable/plugin.cfg", "res://addons/log/plugin.cfg")
+enabled=PackedStringArray("res://addons/anomalyAcesAddonManager/plugin.cfg", "res://addons/anomalyAcesLog/plugin.cfg", "res://addons/anomalyAcesTable/plugin.cfg", "res://addons/anomalyAcesUtil/plugin.cfg", "res://addons/log/plugin.cfg")
 
 [log_gd]
 
