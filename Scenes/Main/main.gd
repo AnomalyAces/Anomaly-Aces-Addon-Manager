@@ -1,6 +1,6 @@
 extends Control
 
-const ADDON_CARD_SCENE = preload("res://addon_card.tscn")
+const ADDON_CARD_SCENE = preload("res://Scenes/AddonCard/addon_card.tscn")
 
 @onready var grid_container = $VBoxContainer/ContentMargins/ScrollContainer/GridContainer
 @onready var search_input = $VBoxContainer/Header/HBox/Controls/SearchInput

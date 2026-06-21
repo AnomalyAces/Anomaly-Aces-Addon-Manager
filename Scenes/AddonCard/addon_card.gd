@@ -27,7 +27,10 @@ func set_addon_details(addon_name: String, version: String, author: String, desc
             btn.tooltip_text = demo_path
             # Store demo_path in a local variable for the lambda closure
             var target_scene = demo_path
-            btn.pressed.connect(func(): get_tree().change_scene_to_file(target_scene))
+            btn.pressed.connect(func():
+                AddonPreviewerOverlay.target_demo_scene = target_scene
+                get_tree().change_scene_to_file("res://Scenes/DemoPreviewer/demo_previewer.tscn")
+            )
             btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
             demos_list.add_child(btn)
     else:
