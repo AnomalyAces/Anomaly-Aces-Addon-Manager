@@ -182,8 +182,12 @@ func render_addon_cards():
 		item["card"] = card
 
 func _on_run_demo_requested(demo_path: String):
-	if Engine.is_editor_hint() and plugin_ref != null:
-		plugin_ref.switch_to_view("res://Scenes/DemoPreviewer/demo_previewer.tscn", demo_path)
+	if Engine.is_editor_hint():
+		var file = FileAccess.open("res://.preview_target.txt", FileAccess.WRITE)
+		if file:
+			file.store_string(demo_path)
+			file.close()
+		EditorInterface.play_custom_scene("res://Scenes/DemoPreviewer/demo_previewer.tscn")
 	else:
 		AddonPreviewerOverlay.target_demo_scene = demo_path
 		get_tree().change_scene_to_file("res://Scenes/DemoPreviewer/demo_previewer.tscn")
