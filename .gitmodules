@@ -1,0 +1,3 @@
+[submodule "submodules/anomalyAcesAddonManager"]
+	path = submodules/anomalyAcesAddonManager
+	url = https://github.com/AnomalyAces/Anomaly-Aces-Addon-Manager.git

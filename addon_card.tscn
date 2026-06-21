@@ -1,0 +1,93 @@
+[gd_scene load_steps=4 format=3 uid="uid://c6v2nux1q2g0k"]
+
+[ext_resource type="Script" path="res://addon_card.gd" id="1_1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.121569, 0.12549, 0.152941, 0.901961)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.231373, 0.239216, 0.278431, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_version"]
+bg_color = Color(0.298039, 0.356863, 0.941176, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+
+[node name="AddonCard" type="PanelContainer"]
+custom_minimum_size = Vector2(350, 240)
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+script = ExtResource("1_1")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "My Addon"
+text_overrun_behavior = 3
+
+[node name="Version" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_version")
+theme_override_font_sizes/font_size = 12
+text = "v1.0.0"
+
+[node name="Author" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65098, 0.65098, 0.686275, 1)
+theme_override_font_sizes/font_size = 13
+text = "by Developer"
+
+[node name="Description" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85098, 0.85098, 0.882353, 1)
+theme_override_font_sizes/font_size = 14
+text = "A simple description of what the addon does."
+autowrap_mode = 3
+max_lines_visible = 3
+
+[node name="HSeparator" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="DemosSection" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="DemosLabel" type="Label" parent="VBox/DemosSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.6, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "AVAILABLE DEMOS:"
+
+[node name="DemosList" type="VBoxContainer" parent="VBox/DemosSection"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NoDemosLabel" type="Label" parent="VBox/DemosSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.53, 1)
+theme_override_font_sizes/font_size = 12
+text = "(No demo scenes found in this addon)"

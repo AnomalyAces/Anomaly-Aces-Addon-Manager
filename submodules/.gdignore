@@ -1,0 +1,1 @@
+# Prevent Godot from scanning or importing files inside the submodules staging folder

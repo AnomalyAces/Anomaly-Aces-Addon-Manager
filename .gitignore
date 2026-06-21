@@ -1,0 +1,16 @@
+# Godot-specific ignores
+.godot/
+*.translation
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# General temp/log files
+*.tmp
+*.log
+*.log.*
+
+# Ignore dynamically generated links inside addons/
+addons/*
+!addons/.gitkeep
