@@ -21,12 +21,9 @@ func _apply_editor_scaling(node: Node, scale: float):
 		if node.custom_minimum_size != Vector2.ZERO:
 			node.custom_minimum_size = node.custom_minimum_size * scale
 		
-		# Scale font size overrides or defaults
+		# Scale font size overrides
 		var font_size_key = "font_size"
 		if node.has_theme_font_size_override(font_size_key):
-			var current_size = node.get_theme_font_size(font_size_key)
-			node.add_theme_font_size_override(font_size_key, int(round(current_size * scale)))
-		elif node is Label or node is Button or node is LineEdit or node is CheckButton:
 			var current_size = node.get_theme_font_size(font_size_key)
 			node.add_theme_font_size_override(font_size_key, int(round(current_size * scale)))
 			
