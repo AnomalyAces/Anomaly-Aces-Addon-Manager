@@ -24,7 +24,10 @@ func _ready():
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_right = 6
 	style.corner_radius_bottom_left = 6
-	style.set_content_margin_all(8)
+	style.content_margin_left = 8
+	style.content_margin_top = 8
+	style.content_margin_right = 8
+	style.content_margin_bottom = 8
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -45,7 +48,10 @@ func _ready():
 	btn_style.corner_radius_top_right = 4
 	btn_style.corner_radius_bottom_right = 4
 	btn_style.corner_radius_bottom_left = 4
-	btn_style.set_content_margin_individual(12, 6, 12, 6)
+	btn_style.content_margin_left = 12
+	btn_style.content_margin_top = 6
+	btn_style.content_margin_right = 12
+	btn_style.content_margin_bottom = 6
 	
 	button.add_theme_stylebox_override("normal", btn_style)
 	panel.add_child(button)
