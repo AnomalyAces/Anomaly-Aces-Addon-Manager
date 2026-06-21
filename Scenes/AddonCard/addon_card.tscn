@@ -60,6 +60,15 @@ theme_override_colors/font_color = Color(0.65098, 0.65098, 0.686275, 1)
 theme_override_font_sizes/font_size = 13
 text = "by Developer"
 
+[node name="StatusContainer" type="HBoxContainer" parent="VBox" unique_id=184710321]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StatusToggle" type="CheckButton" parent="VBox/StatusContainer" unique_id=184710322]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Disabled"
+
 [node name="Description" type="Label" parent="VBox" unique_id=1124455566]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85098, 0.85098, 0.882353, 1)
