@@ -62,8 +62,11 @@ func _go_back() -> void:
 	if Engine.is_editor_hint() and plugin_ref != null:
 		plugin_ref.switch_to_view("res://Scenes/Main/main.tscn")
 	else:
-		AddonPreviewerOverlay.target_demo_scene = ""
-		get_tree().change_scene_to_file("res://Scenes/Main/main.tscn")
+		if AddonPreviewerOverlay.target_demo_scene == "":
+			get_tree().quit()
+		else:
+			AddonPreviewerOverlay.target_demo_scene = ""
+			get_tree().change_scene_to_file("res://Scenes/Main/main.tscn")
 
 func _on_back_pressed() -> void:
 	_go_back()
