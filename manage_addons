@@ -25,12 +25,14 @@ show_help() {
     echo "  commit <addon_name> <msg>   Stage, commit, and push changes in the specified submodule"
     echo "  list                        List all installed addons and their submodule git status"
     echo "  update                      Update all addon submodules to their latest remote commit"
+    echo "  fix-remotes                 Convert all submodule remotes from HTTPS to SSH (for SSH key auth)"
     echo "  setup                       Install the 'ap' command/alias globally in your shell config"
     echo "  help                        Show this help message"
     echo ""
     echo "Examples:"
-    echo "  ap add https://github.com/user/my-addon.git my_addon"
+    echo "  ap add git@github.com:user/my-addon.git my_addon"
     echo "  ap commit my_addon \"Add new demo scene\""
+    echo "  ap fix-remotes"
     echo "  ap remove my_addon"
     echo "  ap list"
 }
@@ -96,6 +98,20 @@ remove_link() {
         else
             rm -rf "$link"
         fi
+    fi
+}
+
+# Converts the current repo's origin remote from HTTPS to SSH (GitHub)
+ensure_ssh_remote() {
+    local remote_url
+    remote_url=$(git remote get-url origin 2>/dev/null)
+    if [[ "$remote_url" == https://github.com/* ]]; then
+        local ssh_url
+        ssh_url="git@github.com:${remote_url#https://github.com/}"
+        # Normalise .git suffix
+        [[ "$ssh_url" != *.git ]] && ssh_url="${ssh_url}.git"
+        echo "Switching remote origin to SSH: $ssh_url"
+        git remote set-url origin "$ssh_url"
     fi
 }
 
@@ -237,13 +253,24 @@ link_all_addons() {
 cmd_add() {
     local url="$1"
     local name="$2"
-    
+
     if [ -z "$url" ] || [ -z "$name" ]; then
         echo "Error: Missing arguments."
-        echo "Usage: ap add <git_url> <addon_name>"
+        echo "Usage: ap add <ssh_git_url> <addon_name>"
+        echo "Example: ap add git@github.com:user/my-addon.git my_addon"
         exit 1
     fi
-    
+
+    # Only SSH URLs are supported — HTTPS has no auth support
+    if [[ "$url" == https://* ]]; then
+        echo "Error: HTTPS URLs are not supported. Only SSH authentication is used."
+        echo "Convert your URL to SSH format:"
+        local ssh_suggestion
+        ssh_suggestion=$(echo "$url" | sed 's|https://github.com/|git@github.com:|')
+        echo "  $ssh_suggestion"
+        exit 1
+    fi
+
     cd "$PROJECT_ROOT" || exit 1
     
     # Check if this URL is already registered in .gitmodules
@@ -353,9 +380,22 @@ cmd_list() {
 
 cmd_update() {
     cd "$PROJECT_ROOT" || exit 1
+
+    # Ensure all submodule remotes use SSH before fetching
+    echo "Checking submodule remote URLs..."
+    for sub_dir in submodules/*/; do
+        [ -d "$sub_dir" ] || continue
+        if [ -d "$sub_dir/.git" ] || [ -f "$sub_dir/.git" ]; then
+            (
+                cd "$sub_dir" || exit 0
+                ensure_ssh_remote
+            )
+        fi
+    done
+
     echo "Updating all submodules to latest remote commits..."
     git submodule update --init --recursive --remote
-    
+
     # Re-link just in case structure updated
     echo "Verifying links..."
     link_all_addons
@@ -383,33 +423,55 @@ cmd_commit() {
     echo "Staging, committing, and pushing changes in submodule '$name'..."
     (
         cd "$sub_path" || exit 1
-        
-        # Check if there are any changes to commit
-        if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes detected in submodule '$name'. Nothing to commit."
-            exit 0
+
+        # Ensure remote is SSH before any network operation
+        ensure_ssh_remote
+
+        # Stage and commit any uncommitted local changes
+        if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+
+            git commit -m "$msg"
+            if [ $? -ne 0 ]; then
+                echo "Error: Failed to commit changes in submodule '$name'."
+                exit 1
+            fi
+            echo "Committed changes in submodule '$name'."
+        else
+            echo "No uncommitted changes in '$name' — checking for unpushed commits..."
         fi
-        
-        # Stage all changes
-        git add -A
-        
-        # Commit changes
-        git commit -m "$msg"
-        if [ $? -ne 0 ]; then
-            echo "Error: Failed to commit changes in submodule '$name'."
-            exit 1
+
+        # Always push if the branch is ahead of its remote tracking branch
+        local unpushed
+        unpushed=$(git log @{u}.. --oneline 2>/dev/null)
+        if [ -n "$unpushed" ]; then
+            echo "Pushing unpushed commits upstream..."
+            git push
+            if [ $? -ne 0 ]; then
+                echo "Error: Failed to push changes for submodule '$name'."
+                exit 1
+            fi
+            echo "Successfully pushed changes for submodule '$name'!"
+        else
+            echo "Nothing to push — submodule '$name' is up to date with remote."
         fi
-        
-        # Push changes to upstream
-        echo "Pushing changes upstream..."
-        git push
-        if [ $? -ne 0 ]; then
-            echo "Error: Failed to push changes for submodule '$name'."
-            exit 1
-        fi
-        
-        echo "Successfully committed and pushed changes for submodule '$name'!"
     )
+}
+
+cmd_fix_remotes() {
+    cd "$PROJECT_ROOT" || exit 1
+    echo "Converting all submodule remotes from HTTPS to SSH..."
+    local fixed=0
+    for sub_dir in submodules/*/; do
+        [ -d "$sub_dir" ] || continue
+        if [ -d "$sub_dir/.git" ] || [ -f "$sub_dir/.git" ]; then
+            (
+                cd "$sub_dir" || exit 0
+                ensure_ssh_remote
+            ) && fixed=$((fixed + 1))
+        fi
+    done
+    echo "Done. Checked $fixed submodule(s)."
 }
 
 cmd_setup() {
@@ -477,6 +539,9 @@ case "$1" in
         ;;
     update)
         cmd_update
+        ;;
+    fix-remotes)
+        cmd_fix_remotes
         ;;
     setup)
         cmd_setup

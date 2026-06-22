@@ -23,14 +23,16 @@ A bash script `manage_addons` is provided at the root of the project. To install
 
 Now you can run the `ap` command from anywhere inside the project!
 
+> **SSH Required** — All git operations use SSH authentication. Before using `ap`, make sure you have an SSH key configured for GitHub (or your git host). HTTPS URLs are not accepted. See [GitHub's SSH guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) if you need to set one up.
+
 ### CLI Commands
 
 * **Add an Addon**:
   ```bash
-  ap add <git_repo_url> <addon_name>
+  ap add <ssh_git_url> <addon_name>
   ```
-  Example: `ap add https://github.com/someuser/godot-logger-plugin.git logger`
-  *This downloads the addon to `submodules/logger`, detects its layout, and creates a directory junction/symlink at `addons/logger`.*
+  Example: `ap add git@github.com:someuser/godot-logger-plugin.git logger`
+  *This downloads the addon to `submodules/logger`, detects its layout, and creates a directory junction/symlink at `addons/logger`. Only SSH URLs are accepted — HTTPS will be rejected with an error showing the correct SSH equivalent.*
 
 * **Remove an Addon**:
   ```bash
@@ -44,6 +46,13 @@ Now you can run the `ap` command from anywhere inside the project!
   ap list
   ```
   *Lists all installed addon submodules along with their current git commit hashes.*
+
+* **Commit & Push Changes in a Submodule**:
+  ```bash
+  ap commit <addon_name> "<commit message>"
+  ```
+  Example: `ap commit logger "Add demo scene for previewing features"`
+  *Stages all changes inside `submodules/<addon_name>`, commits with the given message, and pushes to the addon's upstream remote. Use this to contribute changes back to the addon's own repository without manually `cd`-ing into it.*
 
 * **Update Addons**:
   ```bash
@@ -80,10 +89,11 @@ Because submodules are independent git repositories nested in this project under
 
 ## Project Structure
 
-* [submodules/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/submodules): Directory where actual addon git submodules are placed.
-* [addons/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addons): Directory containing dynamic junctions/links to the active submodules (used by Godot).
-* [project.godot](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/project.godot): Minimal Godot 4.7 project configurations.
-* [main.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/main.tscn) / [main.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/main.gd): Sleek Godot 4.7 dashboard UI that lists addons, handles live-filtering/search, and launches demos.
-* [addon_card.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addon_card.tscn) / [addon_card.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addon_card.gd): Addon list item visual card representation.
-* [addon_previewer_overlay.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addon_previewer_overlay.gd): Auto-loaded script creating a floating "← Back to Dashboard" button when playing addon demo scenes.
-* [manage_addons](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/manage_addons) (Bash CLI helper): Command interface to add/remove/list/update submodules.
+* [submodules/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/submodules): Directory where actual addon git submodules are placed. Contains a `.gdignore` so Godot skips indexing these source repos directly.
+* [addons/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addons): Directory containing dynamic junctions/symlinks to the active submodules (used by Godot).
+* [project.godot](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/project.godot): Minimal Godot 4.7 project configuration.
+* [Scenes/Main/main.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/Main/main.tscn) / [main.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/Main/main.gd): Dashboard UI that lists addons, handles live-filtering/search, and launches demo scenes.
+* [Scenes/AddonCard/addon_card.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/AddonCard/addon_card.tscn) / [addon_card.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/AddonCard/addon_card.gd): Visual card component representing each addon in the dashboard list.
+* [Scenes/DemoPreviewer/demo_previewer.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/DemoPreviewer/demo_previewer.tscn) / [demo_previewer.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/DemoPreviewer/demo_previewer.gd): Launches addon demo scenes as a full game process via `EditorInterface.play_custom_scene()` with a "← Back to Previewer" overlay button.
+* [addon_previewer_overlay.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addon_previewer_overlay.gd): Auto-loaded script that creates a floating "← Back to Previewer" button when a demo scene is running as a game process.
+* [manage_addons](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/manage_addons) (Bash CLI helper): Command interface to add, remove, commit, list, and update submodules. Install with `./manage_addons setup` to use the `ap` shorthand.

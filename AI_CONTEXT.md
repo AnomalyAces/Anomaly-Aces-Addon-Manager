@@ -14,12 +14,49 @@ Instead of copying addon folders into the project, addons are registered as **gi
 * **`submodules/`**: Contains the raw cloned git submodules of the addons.
   * Contains a `.gdignore` file to prevent Godot from scanning and importing files inside this folder, avoiding resource duplication conflicts.
 * **`addons/`**: Contains Windows directory junctions or Unix symlinks pointing to the active plugins inside `submodules/`. This is where Godot scans for addons.
+* **`addons/aceAddonPreviewer/`**: The native editor plugin integration directory.
+  * **`plugin.cfg`**: Declares the "Ace Addon Previewer" plugin.
+  * **`aceAddonPreviewer.gd`**: The plugin bootstrap script that adds the **Ace Previewer** main screen tab. Dynamically downscales the SVG icon (`AceAddonPreviewer.svg`) using Lanczos filtering to match native editor scales (`16 * scale`).
+* **`Scenes/`**: Dedicated subfolder containing the application visual components and layouts:
+  * **`Scenes/Main/`**: Main dashboard view (`main.tscn` / `main.gd`). It dynamically scans `res://addons/` for `plugin.cfg` files. It also references the unified SVG icon file `AceAddonPreviewer.svg`.
+  * **`Scenes/AddonCard/`**: Render card component (`addon_card.tscn` / `addon_card.gd`) showing details, run button, and live status toggle.
+  * **`Scenes/DemoPreviewer/`**: The standalone demo player container (`demo_previewer.tscn` / `demo_previewer.gd`).
 * **`project.godot`**: Godot 4.7 project settings.
-* **`main.tscn` / `main.gd`**: The dashboard scene. It dynamically scans `res://addons/` for `plugin.cfg` files and recursively searches for scenes containing `demo`, `test`, `example`, or `preview` in their names to render cards.
-* **`addon_card.tscn` / `addon_card.gd`**: Render card component for detected addons and their demos.
-* **`addon_previewer_overlay.gd`**: Autoloaded helper that overlays a floating **← Back to Dashboard** button on all scenes except the dashboard itself, allowing seamless demo testing.
+* **`addon_previewer_overlay.gd`**: Autoloaded helper that overlays a floating **← Back to Dashboard** button on all scenes except the dashboard itself when running in standalone mode.
 * **`manage_addons`**: A Bash CLI helper script.
-* **`.vscode/settings.json`**: Configures VS Code workspace settings to exclude `submodules/` from global searches and filesystem watching (`files.watcherExclude`), keeping the folder visible in the explorer sidebar while preventing duplicate class parsing diagnostics.
+* **`.vscode/settings.json`**: Configures VS Code workspace settings to exclude `submodules/` from global searches and filesystem watching.
+
+---
+
+## Editor Plugin & Dashboard Integration
+The dashboard and the addon manager are fully integrated inside the Godot Editor as native Main Screen tabs:
+* **Ace Previewer Tab**: Exposes the addon testing dashboard.
+  * **Instant Addon Toggling**: When running in the editor, toggling the status switch on an addon card calls `EditorInterface.set_plugin_enabled()` directly. This instantly activates or deactivates the addon in the editor workspace tree without needing an editor restart.
+  * **Standalone Fallback**: When the dashboard is run as a standalone game, toggling an addon card updates and saves the settings in `project.godot` and ProjectSettings memory directly.
+* **Ace Manager Tab**: Exposes the **Ace Addon Manager** layout inside the editor, replacing the legacy window popup. It dynamically fetches installed addons on tab click and supports complete viewport sizing.
+
+---
+
+## High-DPI Scaling & Theme Gotchas
+To support responsive UI scaling in the editor plugin at any display scale, the dashboard implements dynamic scaling via `EditorInterface.get_editor_scale()`:
+
+### 1. The Serialization Gotcha (Crucial!)
+Because dashboard scripts are marked with `@tool`, their `_ready()` functions run inside the Godot Editor workspace tree when editing them. If layout modifications are applied automatically on `_ready()`, they will modify the editor's tree and get **serialized back to the `.tscn` file** when saving the scene.
+* **Rule**: Only trigger layout and font scaling if `plugin_ref` is NOT `null`. When scenes are opened for editing in the editor, `plugin_ref` is `null`, ensuring properties remain at their clean, unscaled base values.
+* **Addon Cards**: Since addon cards are instantiated dynamically via code, they are scaled dynamically when `set_addon_details(..., scale)` is called by the parent main screen script.
+
+### 2. Differentiated Font Scaling
+Dynamically instantiated controls (like the demo run buttons) inherit standard editor theme settings which are already scaled by the Godot Editor.
+* **Rule**: To prevent double-scaling default fonts, `_apply_editor_scaling` must **only** scale font sizes that have an explicit override set in the scene (by checking `node.has_theme_font_size_override("font_size")`).
+
+---
+
+## Demo Running Process Flow
+Due to engine limitations, standard game scenes lack `@tool` execution and project-wide autoload singletons when instantiated directly in the editor tab (causing them to render statically or crash).
+To run demos correctly, the plugin uses a process-level execution flow:
+1. When clicking **"▶ Run"** in the editor plugin tab, `main.gd` writes the target path to a temporary file (`res://.preview_target.txt`) and launches the demo previewer as a separate process via `EditorInterface.play_custom_scene("res://Scenes/DemoPreviewer/demo_previewer.tscn")`.
+2. The spawned player process loads `demo_previewer.tscn`, reads the target path from the file, and runs the demo scene with all game scripts, inputs, physics, and autoloads active.
+3. Inside `demo_previewer.gd`, the **"← Back to Dashboard"** button checks if `AddonPreviewerOverlay.target_demo_scene == ""` (indicating it was launched in custom preview mode from the editor plugin). If so, it calls `get_tree().quit()`, closing the temporary window and returning focus cleanly back to the editor. In standalone mode (F5), it transitions back to the dashboard scene.
 
 ---
 
@@ -50,10 +87,10 @@ For each submodule under `submodules/NAME`:
 
 ### 2. Classification (Primary vs. Secondary)
 * **Primary / Main Addon**:
-  * Any candidate folder whose name matches the submodule repository name (normalizing casing, hyphens, and underscores).
-  * If a submodule only contains exactly one candidate folder, it is automatically treated as the Primary addon.
+  - Any candidate folder whose name matches the submodule repository name (normalizing casing, hyphens, and underscores).
+  - If a submodule only contains exactly one candidate folder, it is automatically treated as the Primary addon.
 * **Secondary / Snapshot Dependency**:
-  * All other candidate folders nested inside a submodule (e.g. `submodules/Anomaly-Aces-Addon-Manager/addons/anomalyAcesTable` where the folder name does not match the submodule name) are treated as Secondary.
+  - All other candidate folders nested inside a submodule (e.g. `submodules/Anomaly-Aces-Addon-Manager/addons/anomalyAcesTable` where the folder name does not match the submodule name) are treated as Secondary.
 
 ### 3. Global Link Resolution Flow (`link_all_addons`)
 Whenever addons are added, removed, or updated:
