@@ -1,17 +1,17 @@
 # AI Context & Developer Guide
 
-This file provides context for AI coding assistants (and developers) working on the **Anomaly Aces Addon Previewer** project. It outlines the project structure, design decisions, CLI commands, and rules for managing addon submodules and links.
+This file provides context for AI coding assistants (and developers) working on the **Anomaly Aces Addon Manager** project. It outlines the project structure, design decisions, CLI commands, and rules for managing addon submodules and links.
 
 ---
 
 ## Project Overview
-The Anomaly Aces Addon Previewer is a Godot 4.7 testing sandbox designed to preview, run, and develop Godot addons in isolation or in tandem.
+The Anomaly Aces Addon Manager is a Godot 4.7 testing sandbox designed to preview, run, and develop Godot addons in isolation or in tandem.
 Instead of copying addon folders into the project, addons are registered as **git submodules** under `submodules/` and linked dynamically into the standard `addons/` directory.
 
 The editor plugin exposes a **single unified tab** called **"Ace Addon Manager"** which contains three navigable sections:
 1. **Addon Previewer** (default landing page) — scan, toggle, and demo-run registered addons
 2. **Addon Updater** — fetch, check, and install updates for addons via GitHub
-3. **Addon Dependency Editor** — create/edit per-addon `addons.json` dependency files and invoke `manage_addons`
+3. **Addon Dependency Editor** — create/edit per-addon `addons.json` dependency files and invoke `manage_addons` (located at `addons/anomalyAcesAddonManager/manage_addons`)
 
 ---
 
@@ -19,9 +19,9 @@ The editor plugin exposes a **single unified tab** called **"Ace Addon Manager"*
 * **`submodules/`**: *(Currently empty — `anomalyAcesAddonManager` has been migrated into the main project.)* Contains raw cloned git submodules of addons.
   * Contains a `.gdignore` file to prevent Godot from scanning and importing files inside this folder, avoiding resource duplication conflicts.
 * **`addons/`**: Contains Windows directory junctions or Unix symlinks pointing to active plugins inside `submodules/`. This is where Godot scans for addons.
-* **`addons/aceAddonManager/`**: The unified native editor plugin integration directory.
+* **`addons/anomalyAcesAddonManager/`**: The unified native editor plugin integration directory.
   * **`plugin.cfg`**: Declares the "Ace Addon Manager" plugin (v2.0).
-  * **`aceAddonManager.gd`**: The plugin bootstrap script that registers the single **"Ace Addon Manager"** main screen tab. Exposes `switch_to_view(scene_path, extra_data)` to navigate between sub-sections. Preloads the SVG icon (`AceAddonManager.svg`).
+  * **`anomalyAcesAddonManager.gd`**: The plugin bootstrap script that registers the single **"Ace Addon Manager"** main screen tab. Exposes `switch_to_view(scene_path, extra_data)` to navigate between sub-sections. Preloads the SVG icon (`AceAddonManager.svg`).
   * **`AceAddonManager.svg`**: The plugin icon (original manager icon).
   * **`addon_previewer_overlay.gd`**: Autoloaded helper that overlays a floating **← Back to Dashboard** button on all scenes except the dashboard itself when running in standalone mode.
   * **`Fonts/`**: Migrated fonts (Chakra_Petch, Teko, TitleFont.tres).
@@ -32,23 +32,23 @@ The editor plugin exposes a **single unified tab** called **"Ace Addon Manager"*
     * `GitHubManager/GitHubManager.gd`
     * `RemoteRepoManager/RemoteRepoManager.gd`
   * **`Scenes/`**: Dedicated subfolder containing the application visual components and layouts:
-    * **`AddonPreviewer/`**: Addon Previewer dashboard (`main.tscn` / `main.gd`). Dynamically scans `res://addons/` for `plugin.cfg` files, excluding `aceAddonManager` itself. Contains the **"Addon Updater →"** nav button that calls `plugin_ref.switch_to_view()`.
+    * **`AddonPreviewer/`**: Addon Previewer dashboard (`main.tscn` / `main.gd`). Dynamically scans `res://addons/` for `plugin.cfg` files, excluding `anomalyAcesAddonManager` itself. Contains the **"Addon Updater →"** nav button that calls `plugin_ref.switch_to_view()`.
     * **`AddonCard/`**: Render card component (`addon_card.tscn` / `addon_card.gd`) showing details, status toggle, list of detected demos, and an **"⚙ Edit Dependencies"** button.
     * **`DemoPreviewer/`**: The standalone demo player container (`demo_previewer.tscn` / `demo_previewer.gd`).
     * **`AddonUpdater/`**: Host scene (`addon_updater.tscn` / `addon_updater.gd`) that wraps the migrated `AcePluginManager` at runtime. Provides matching dark-theme header with Back and Refresh buttons, and applies DPI scaling.
     * **`AddonDependencyEditor/`**: Dependency editor (`addon_dependency_editor.tscn` / `addon_dependency_editor.gd`) that reads/writes per-addon `addons.json` files and can invoke the `manage_addons` Bash script.
       * **`DependencyEntry/`**: Reusable form row (`dependency_entry.tscn` / `dependency_entry.gd`) for a single addon dependency, with nested sub-dependency support.
-* **`project.godot`**: Godot 4.7 project settings. The only enabled plugin entry is `res://addons/aceAddonManager/plugin.cfg`.
-* **`manage_addons`**: A Bash CLI helper script.
+* **`project.godot`**: Godot 4.7 project settings. The only enabled plugin entry is `res://addons/anomalyAcesAddonManager/plugin.cfg`.
+* **`addons/anomalyAcesAddonManager/manage_addons`**: A Bash CLI helper script.
 * **`.vscode/settings.json`**: Configures VS Code workspace settings to exclude `submodules/` from global searches and filesystem watching.
 
 ---
 
 ## Plugin Navigation Model
-All sub-sections are rendered inside a single `MarginContainer` wrapper in `aceAddonManager.gd`. Navigation works via:
+All sub-sections are rendered inside a single `MarginContainer` wrapper in `anomalyAcesAddonManager.gd`. Navigation works via:
 ```gdscript
-plugin_ref.switch_to_view("res://addons/aceAddonManager/Scenes/AddonUpdater/addon_updater.tscn")
-plugin_ref.switch_to_view("res://addons/aceAddonManager/Scenes/AddonDependencyEditor/addon_dependency_editor.tscn", { "folder_name": "myAddon", "addon_path": "res://addons/myAddon" })
+plugin_ref.switch_to_view("res://addons/anomalyAcesAddonManager/Scenes/AddonUpdater/addon_updater.tscn")
+plugin_ref.switch_to_view("res://addons/anomalyAcesAddonManager/Scenes/AddonDependencyEditor/addon_dependency_editor.tscn", { "folder_name": "myAddon", "addon_path": "res://addons/myAddon" })
 ```
 Every sub-scene implements `initialize_view(plugin_ref, extra_data)` to receive its context before `_ready()` fires.
 
@@ -58,7 +58,7 @@ Every sub-scene implements `initialize_view(plugin_ref, extra_data)` to receive 
 * **Ace Addon Manager Tab**: Single tab exposing all functionality.
   * **Addon Previewer** (default): Card grid with search, rescan, toggle, demo runner, and dependency editor entry points.
   * **Addon Updater**: Migrated `AcePluginManager` — GitHub-fetched addon list, update check, install flow, conflict detection, GitHub PAT management.
-  * **Addon Dependency Editor**: Per-addon `addons.json` editor. Writes to `res://addons/{folder}/addons.json`. Invokes `manage_addons update` via `OS.execute("bash", ...)` with a fallback copy-to-clipboard dialog.
+  * **Addon Dependency Editor**: Per-addon `addons.json` editor. Writes to `res://addons/{folder}/addons.json`. Invokes `manage_addons update` (at `addons/anomalyAcesAddonManager/manage_addons`) via `OS.execute("bash", ...)` with a fallback copy-to-clipboard dialog.
 
 ---
 
@@ -95,7 +95,7 @@ Each `addons.json` lives next to the addon's `plugin.cfg`. It defines remote dep
 
 ### Apply Changes Flow
 1. Save the `addons.json` file.
-2. Call `OS.execute("bash", [project_root + "manage_addons", "update"], output, true)`.
+2. Call `OS.execute("bash", [project_root + "addons/anomalyAcesAddonManager/manage_addons", "update"], output, true)`.
 3. Display a dialog with stdout/stderr output.
 4. On failure (bash not found or non-zero exit): show a fallback dialog with the command pre-filled in a copyable field.
 
@@ -104,30 +104,30 @@ Each `addons.json` lives next to the addon's `plugin.cfg`. It defines remote dep
 ## Demo Running Process Flow
 Due to engine limitations, standard game scenes lack `@tool` execution and project-wide autoload singletons when instantiated directly in the editor tab (causing them to render statically or crash).
 To run demos correctly, the plugin uses a process-level execution flow:
-1. When clicking **"▶ Run"** in the editor plugin tab, `main.gd` writes the target path to a temporary file (`res://.preview_target.txt`) and launches the demo previewer as a separate process via `EditorInterface.play_custom_scene("res://addons/aceAddonManager/Scenes/DemoPreviewer/demo_previewer.tscn")`.
+1. When clicking **"▶ Run"** in the editor plugin tab, `main.gd` writes the target path to a temporary file (`res://.preview_target.txt`) and launches the demo previewer as a separate process via `EditorInterface.play_custom_scene("res://addons/anomalyAcesAddonManager/Scenes/DemoPreviewer/demo_previewer.tscn")`.
 2. The spawned player process loads `demo_previewer.tscn`, reads the target path from the file, and runs the demo scene with all game scripts, inputs, physics, and autoloads active.
 3. Inside `demo_previewer.gd`, the **"← Back to Dashboard"** button checks if `AddonPreviewerOverlay.target_demo_scene == ""` (indicating it was launched in custom preview mode from the editor plugin). If so, it calls `get_tree().quit()`, closing the temporary window and returning focus cleanly back to the editor. In standalone mode (F5), it transitions back to the dashboard scene.
 
 ---
 
-## CLI Helper Command (`ap`)
-The `manage_addons` script is typically aliased globally as `ap` using:
+## CLI Helper Command (`ace-am`)
+The `manage_addons` script is typically aliased globally as `ace-am` using:
 ```bash
-./manage_addons setup
+./addons/anomalyAcesAddonManager/manage_addons setup
 source ~/.bashrc # or source ~/.zshrc
 ```
 
 ### Core CLI Commands:
-* **Add an Addon**: `ap add <git_repo_url> <addon_name>`
-* **Remove an Addon**: `ap remove <addon_name>`
-* **Commit Addon Changes**: `ap commit <addon_name> "<commit_message>"`
-* **List Addons**: `ap list`
-* **Update Addons**: `ap update`
+* **Add an Addon**: `ace-am add <git_repo_url> <addon_name>`
+* **Remove an Addon**: `ace-am remove <addon_name>`
+* **Commit Addon Changes**: `ace-am commit <addon_name> "<commit_message>"`
+* **List Addons**: `ace-am list`
+* **Update Addons**: `ace-am update`
 
 ---
 
 ## Linking Rules & Priority (Crucial for AI Agents)
-The project uses a global **two-pass link resolution** in `manage_addons` to handle naming collisions when a submodule contains nested snapshot dependencies.
+The project uses a global **two-pass link resolution** in `manage_addons` (located at `addons/anomalyAcesAddonManager/manage_addons`) to handle naming collisions when a submodule contains nested snapshot dependencies.
 
 ### 1. Candidate Detection
 For each submodule under `submodules/NAME`:

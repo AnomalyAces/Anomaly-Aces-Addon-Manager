@@ -14,7 +14,7 @@ The **Addon Manager** is a custom Godot editor interface that allows you to mana
 - Open the project in the **Godot Editor**.
 - Go to **Project -> Project Settings -> Plugins** and ensure the **Ace Addon Manager** plugin is checked/enabled.
 - Once enabled, a new **"Addon Manager"** main screen tab will appear at the top-center of the editor (alongside 2D, 3D, Script, and AssetLib).
-- *Alternatively*, you can run the standalone scene [main.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addons/aceAddonManager/Scenes/AddonPreviewer/main.tscn) directly to run the manager as a game window.
+- *Alternatively*, you can run the standalone scene [main.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/addons/anomalyAcesAddonManager/Scenes/AddonPreviewer/main.tscn) directly to run the manager as a game window.
 
 ### 2. Main Dashboard Features
 - **Search & Live Filtering**: Use the search bar at the top-right to instantly search through your active addons by name, developer, description, or folder.
@@ -31,14 +31,14 @@ Click the **Addon Updater** button in the top-right header to switch to the upda
 
 ---
 
-## Command Line Helper (`ap`)
+## Command Line Helper (`ace-am`)
 
-A bash script `manage_addons` is provided at the root of the project. To install it as a global command/alias (`ap`) on your PC:
+A bash script `manage_addons` is provided in the `addons/anomalyAcesAddonManager/` directory. To install it as a global command/alias (`ace-am`) on your PC:
 
 1. Open your Bash terminal (Git Bash, WSL, Linux, or macOS terminal).
 2. Run the setup command:
    ```bash
-   ./manage_addons setup
+   ./addons/anomalyAcesAddonManager/manage_addons setup
    ```
 3. Restart your terminal or reload your config:
    ```bash
@@ -46,42 +46,42 @@ A bash script `manage_addons` is provided at the root of the project. To install
    # Or source ~/.bash_profile depending on your OS/setup
    ```
 
-Now you can run the `ap` command from anywhere inside the project!
+Now you can run the `ace-am` command from anywhere inside the project!
 
-> **SSH Required** — All git operations use SSH authentication. Before using `ap`, make sure you have an SSH key configured for GitHub (or your git host). HTTPS URLs are not accepted. See [GitHub's SSH guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) if you need to set one up.
+> **SSH Required** — All git operations use SSH authentication. Before using `ace-am`, make sure you have an SSH key configured for GitHub (or your git host). HTTPS URLs are not accepted. See [GitHub's SSH guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) if you need to set one up.
 
 ### CLI Commands
 
 * **Add an Addon**:
   ```bash
-  ap add <ssh_git_url> <addon_name>
+  ace-am add <ssh_git_url> <addon_name>
   ```
-  Example: `ap add git@github.com:someuser/godot-logger-plugin.git logger`
+  Example: `ace-am add git@github.com:someuser/godot-logger-plugin.git logger`
   *This downloads the addon to `submodules/logger`, detects its layout, and creates a directory junction/symlink at `addons/logger`. Only SSH URLs are accepted — HTTPS will be rejected with an error showing the correct SSH equivalent.*
 
 * **Remove an Addon**:
   ```bash
-  ap remove <addon_name>
+  ace-am remove <addon_name>
   ```
-  Example: `ap remove logger`
+  Example: `ace-am remove logger`
   *This cleanly removes the junction/symlink under `addons/logger`, the submodule entries, and the git cache.*
 
 * **List Active Addons**:
   ```bash
-  ap list
+  ace-am list
   ```
   *Lists all installed addon submodules along with their current git commit hashes.*
 
 * **Commit & Push Changes in a Submodule**:
   ```bash
-  ap commit <addon_name> "<commit message>"
+  ace-am commit <addon_name> "<commit message>"
   ```
-  Example: `ap commit logger "Add demo scene for previewing features"`
+  Example: `ace-am commit logger "Add demo scene for previewing features"`
   *Stages all changes inside `submodules/<addon_name>`, commits with the given message, and pushes to the addon's upstream remote. Use this to contribute changes back to the addon's own repository without manually `cd`-ing into it.*
 
 * **Update Addons**:
   ```bash
-  ap update
+  ace-am update
   ```
   *Fetches and checks out the latest remote commits for all installed addon submodules, and verifies linking.*
 
@@ -114,11 +114,11 @@ Because submodules are independent git repositories nested in this project under
 
 ## Project Structure
 
-* [submodules/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/submodules): Directory where actual addon git submodules are placed. Contains a `.gdignore` so Godot skips indexing these source repos directly.
-* [addons/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addons): Directory containing dynamic junctions/symlinks to the active submodules (used by Godot).
-* [project.godot](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/project.godot): Minimal Godot 4.7 project configuration.
-* [Scenes/Main/main.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/Main/main.tscn) / [main.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/Main/main.gd): Dashboard UI that lists addons, handles live-filtering/search, and launches demo scenes.
-* [Scenes/AddonCard/addon_card.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/AddonCard/addon_card.tscn) / [addon_card.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/AddonCard/addon_card.gd): Visual card component representing each addon in the dashboard list.
-* [Scenes/DemoPreviewer/demo_previewer.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/DemoPreviewer/demo_previewer.tscn) / [demo_previewer.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/Scenes/DemoPreviewer/demo_previewer.gd): Launches addon demo scenes as a full game process via `EditorInterface.play_custom_scene()` with a "← Back to Manager" overlay button.
-* [addon_previewer_overlay.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/addon_previewer_overlay.gd): Auto-loaded script that creates a floating "← Back to Manager" button when a demo scene is running as a game process.
-* [manage_addons](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Previewer/manage_addons) (Bash CLI helper): Command interface to add, remove, commit, list, and update submodules. Install with `./manage_addons setup` to use the `ap` shorthand.
+* [submodules/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/submodules): Directory where actual addon git submodules are placed. Contains a `.gdignore` so Godot skips indexing these source repos directly.
+* [addons/](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/addons): Directory containing dynamic junctions/symlinks to the active submodules (used by Godot).
+* [project.godot](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/project.godot): Minimal Godot 4.7 project configuration.
+* [Scenes/Main/main.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/Scenes/Main/main.tscn) / [main.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/Scenes/Main/main.gd): Dashboard UI that lists addons, handles live-filtering/search, and launches demo scenes.
+* [Scenes/AddonCard/addon_card.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/Scenes/AddonCard/addon_card.tscn) / [addon_card.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/Scenes/AddonCard/addon_card.gd): Visual card component representing each addon in the dashboard list.
+* [Scenes/DemoPreviewer/demo_previewer.tscn](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/Scenes/DemoPreviewer/demo_previewer.tscn) / [demo_previewer.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/Scenes/DemoPreviewer/demo_previewer.gd): Launches addon demo scenes as a full game process via `EditorInterface.play_custom_scene()` with a "← Back to Manager" overlay button.
+* [addon_previewer_overlay.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/addon_previewer_overlay.gd): Auto-loaded script that creates a floating "← Back to Manager" button when a demo scene is running as a game process.
+* [manage_addons](file:///c:/Users/Jerek/Documents/Anomaly%20Aces/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/addons/anomalyAcesAddonManager/manage_addons) (Bash CLI helper): Command interface to add, remove, commit, list, and update submodules. Install with `./addons/anomalyAcesAddonManager/manage_addons setup` to use the `ace-am` shorthand.
