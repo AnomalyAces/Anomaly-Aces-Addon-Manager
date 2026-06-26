@@ -15,3 +15,5 @@ Thumbs.db
 addons/*
 !addons/.gitkeep
 !addons/aceAddonManager/
+addons/aceAddonManager/temp/*
+!addons/aceAddonManager/temp/.gdignore

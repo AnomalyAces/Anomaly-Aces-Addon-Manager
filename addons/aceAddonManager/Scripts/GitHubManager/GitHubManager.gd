@@ -76,6 +76,7 @@ func getAddonsFromRemoteRepo():
 	# return _addons
 
 func installAddonsFromRemoteRepo(addons: Array[RemoteRepoObject]):
+	_addons = addons
 	# Similar to getAddonsFromRemoteRepo but checks for updates based on version or branch commit date and emits a different signal for addons that have updates available
 	_initialize_counters()
 	_num_update_requests = _get_num_requests(addons)
@@ -126,6 +127,8 @@ func updateAddonsFromRemoteRepo():
 	
 	for addon in _addons:
 		_getAddonFromRemoteRepo(addon)
+
+	await addons_processed
 
 	addon_updates_processed.emit(_addons)
 	AceLog.printLog(["Updates Processed from Remote Repo "])
@@ -217,7 +220,7 @@ func _getAddonFromRemoteRepo(addon: RemoteRepoObject) -> void:
 	AceLog.printLog(["Requests Completed: %d / %d" % [_requests_completed, _num_requests]])
 
 	if _requests_completed >= _num_requests:
-		addons_processed.emit()
+		addons_processed.emit(_addons)
 
 
 func _setHTTPAddonInfoSignal(http: HTTPRequest, addon: RemoteRepoObject) -> void:
@@ -298,6 +301,12 @@ func _downloadAddonFromRemoteRepo(addon: RemoteRepoObject, isUpdate: bool = fals
 	# Create temp directory if it doesn't exist
 	if !DirAccess.dir_exists_absolute(GITHUB_TEMP_DOWNLOAD_PATH):
 		DirAccess.make_dir_recursive_absolute(GITHUB_TEMP_DOWNLOAD_PATH)
+		var gdignore_path = "res://addons/aceAddonManager/temp/.gdignore"
+		if !FileAccess.file_exists(gdignore_path):
+			var file = FileAccess.open(gdignore_path, FileAccess.WRITE)
+			if file:
+				file.store_line("# Tell Godot to ignore this directory and its children")
+				file.close()
 
 	#Set Download File Path
 	http.download_file = GITHUB_TEMP_DOWNLOAD_PATH + "/%s.zip" % addon.repo
@@ -387,7 +396,7 @@ func _getAddonUpdatesFromRemoteRepo(update: RemoteRepoObject) -> void:
 	AceLog.printLog(["Update Requests Completed: %d / %d" % [_requests_completed, _num_update_requests]])
 
 	if _requests_completed >= _num_update_requests:
-		addon_updates_processed.emit()
+		addon_updates_processed.emit(_addons)
 
 
 func _installAddons(addon: RemoteRepoObject) -> void:

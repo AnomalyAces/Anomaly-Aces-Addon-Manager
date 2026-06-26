@@ -28,4 +28,4 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/aceAddonManager/plugin.cfg")
+enabled=PackedStringArray("res://addons/aceAddonManager/plugin.cfg", "res://addons/anomalyAcesTable/plugin.cfg", "res://addons/log/plugin.cfg")

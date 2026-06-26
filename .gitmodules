@@ -1,1 +1,13 @@
 
+[submodule "submodules/anomalyAcesTable"]
+	path = submodules/anomalyAcesTable
+	url = git@github.com:AnomalyAces/Anomaly-Aces-Table.git
+[submodule "submodules/anomalyAcesUtil"]
+	path = submodules/anomalyAcesUtil
+	url = git@github.com:AnomalyAces/Anomaly-Aces-Util.git
+[submodule "submodules/anomalyAcesLog"]
+	path = submodules/anomalyAcesLog
+	url = git@github.com:AnomalyAces/Anomaly-Aces-Log.git
+[submodule "submodules/log"]
+	path = submodules/log
+	url = git@github.com:russmatney/log.gd.git

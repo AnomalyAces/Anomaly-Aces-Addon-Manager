@@ -16,8 +16,11 @@ var _addon_install_table: _AceTable
 var _addon_config: ConfigFile
 
 var _addons: Array[RemoteRepoObject] = []
+var _editor_scale: float = 1.0
 
 func _ready() -> void:
+	if _editor_scale != 1.0:
+		_scale_table_themes(installTablePlugin, _editor_scale)
 	rrm = GitHubManager.new(self, _editor_interface)
 
 	rrm.addons_installed.connect(_on_addons_installed)
@@ -60,7 +63,7 @@ func _createAddonInstallTable(addons: Array[RemoteRepoObject], configFile: Confi
 	addonColDef.columnType = AceTableConstants.ColumnType.LABEL
 	addonColDef.columnSort = true
 	addonColDef.columnAlign = AceTableConstants.Align.CENTER
-	addonColDef.columnImageSize = Vector2i(64,64)
+	addonColDef.columnImageSize = Vector2i(48 * _editor_scale, 48 * _editor_scale)
 	addonColDef.columnImage = "res://addons/aceAddonManager/Icons/Package.svg"
 	addonColDef.columnTextType = AceTableConstants.TextType.COMBO
 
@@ -104,6 +107,7 @@ func _createAddonInstallTable(addons: Array[RemoteRepoObject], configFile: Confi
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	installTablePlugin.printConfig()
 	_addon_install_table = AceTableManager.createTable(installTablePlugin, colDefs, tableData)
+	_apply_editor_scaling(installTablePlugin, _editor_scale)
 	# _addon_install_table.row_selected.connect(_on_addon_table_selection)
 	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
 
@@ -141,4 +145,60 @@ func _normalize_table_data(table_data: Array[Dictionary]) -> Array[Dictionary]:
 
 func _handle_update(link: String) -> void:
 	AceLog.printLog(["Update link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
+
+func initialize_scaling(scale: float) -> void:
+	_editor_scale = scale
+	_apply_editor_scaling(self, scale)
+
+func _scale_table_themes(table_plugin: Control, scale: float) -> void:
+	if scale == 1.0 or table_plugin == null:
+		return
+	if table_plugin.header_theme:
+		table_plugin.header_theme = _scale_theme(table_plugin.header_theme, scale)
+	if table_plugin.header_cell_theme:
+		table_plugin.header_cell_theme = _scale_theme(table_plugin.header_cell_theme, scale)
+	if table_plugin.row_theme:
+		table_plugin.row_theme = _scale_theme(table_plugin.row_theme, scale)
+	if table_plugin.row_cell_theme:
+		table_plugin.row_cell_theme = _scale_theme(table_plugin.row_cell_theme, scale)
+
+func _scale_theme(theme: Theme, scale: float) -> Theme:
+	var dup = theme.duplicate(true)
+	for type in dup.get_type_list():
+		for name in dup.get_font_size_list(type):
+			var val = dup.get_font_size(name, type)
+			dup.set_font_size(name, type, int(round(val * scale)))
+		for name in dup.get_constant_list(type):
+			var val = dup.get_constant(name, type)
+			dup.set_constant(name, type, int(round(val * scale)))
+	return dup
+
+func _apply_editor_scaling(node: Node, scale: float) -> void:
+	if scale == 1.0:
+		return
+	if node is Control:
+		if node.custom_minimum_size != Vector2.ZERO:
+			node.custom_minimum_size = node.custom_minimum_size * scale
+		
+		# Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
+		var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
+		for key in font_keys:
+			var override_font_size = node.get("theme_override_font_sizes/" + key)
+			if override_font_size != null and override_font_size is int and override_font_size > 0:
+				node.add_theme_font_size_override(key, int(round(override_font_size * scale)))
+		
+		# Scale margin overrides
+		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
+			var override_val = node.get("theme_override_constants/" + margin)
+			if override_val != null and override_val is int:
+				node.add_theme_constant_override(margin, int(round(override_val * scale)))
+		
+		# Scale separation overrides
+		for sep in ["separation", "h_separation", "v_separation"]:
+			var override_val = node.get("theme_override_constants/" + sep)
+			if override_val != null and override_val is int:
+				node.add_theme_constant_override(sep, int(round(override_val * scale)))
+	
+	for child in node.get_children():
+		_apply_editor_scaling(child, scale)
 

@@ -95,7 +95,7 @@ expand_mode = 2
 stretch_mode = 5
 
 [node name="Label" type="RichTextLabel" parent="." unique_id=1011437041]
-custom_minimum_size = Vector2(0, 128)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -104,7 +104,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/default_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/normal_font_size = 64
+theme_override_font_sizes/normal_font_size = 27
 text = "Loading..."
 horizontal_alignment = 1
 vertical_alignment = 1

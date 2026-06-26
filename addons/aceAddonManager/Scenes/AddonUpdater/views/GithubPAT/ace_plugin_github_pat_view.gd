@@ -15,10 +15,14 @@ const GITHUB_PAT_FILE_PATH: String = "user://github_pat.json"
 signal back_to_main_view()
 
 var personal_access_token: String = ""
+var _editor_interface: EditorInterface
+var _editor_scale: float = 1.0
 var expiration_date: String = "No expiration date found (Likely set to 'No Expiration')"
 
 
 func _ready() -> void:
+	if not http.request_completed.is_connected(_on_github_pat_check_completed):
+		http.request_completed.connect(_on_github_pat_check_completed)
 	initialize()
 
 
@@ -64,8 +68,6 @@ func _check_github_pat() -> void:
 		"User-Agent: GodotEngine" # GitHub API requires a User-Agent
 	]
 
-	http.request_completed.connect(_on_github_pat_check_completed)
-	
 	loadingView.show()
 	patContent.hide()
 	var result: int = http.request(url, headers)
@@ -157,3 +159,36 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 		# tokenNotesRTL.append_text("[*]Paste your PAT into the [b]Password[/b] field.")
 		# tokenNotesRTL.append_text("[*]Click [b]OK[/b] to apply changes.")
 		tokenNotesRTL.pop() # End the list.
+
+func initialize_scaling(scale: float) -> void:
+	_editor_scale = scale
+	_apply_editor_scaling(self, scale)
+
+func _apply_editor_scaling(node: Node, scale: float) -> void:
+	if scale == 1.0:
+		return
+	if node is Control:
+		if node.custom_minimum_size != Vector2.ZERO:
+			node.custom_minimum_size = node.custom_minimum_size * scale
+		
+		# Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
+		var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
+		for key in font_keys:
+			var override_font_size = node.get("theme_override_font_sizes/" + key)
+			if override_font_size != null and override_font_size is int and override_font_size > 0:
+				node.add_theme_font_size_override(key, int(round(override_font_size * scale)))
+		
+		# Scale margin overrides
+		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
+			var override_val = node.get("theme_override_constants/" + margin)
+			if override_val != null and override_val is int:
+				node.add_theme_constant_override(margin, int(round(override_val * scale)))
+		
+		# Scale separation overrides
+		for sep in ["separation", "h_separation", "v_separation"]:
+			var override_val = node.get("theme_override_constants/" + sep)
+			if override_val != null and override_val is int:
+				node.add_theme_constant_override(sep, int(round(override_val * scale)))
+	
+	for child in node.get_children():
+		_apply_editor_scaling(child, scale)

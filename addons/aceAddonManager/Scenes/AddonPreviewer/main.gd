@@ -7,7 +7,9 @@ const ADDON_CARD_SCENE = preload("res://addons/aceAddonManager/Scenes/AddonCard/
 @onready var search_input = $VBoxContainer/Header/HBox/Controls/SearchInput
 @onready var addon_count_label = $VBoxContainer/Header/HBox/Controls/AddonCountLabel
 @onready var refresh_button = $VBoxContainer/Header/HBox/Controls/RefreshButton
+@onready var ignore_button = $VBoxContainer/Header/HBox/Controls/IgnoreButton
 @onready var updater_button = $VBoxContainer/Header/HBox/Controls/UpdaterButton
+@onready var manager_deps_button = $VBoxContainer/Header/HBox/Controls/ManagerDepsButton
 @onready var scroll_container = $VBoxContainer/ContentMargins/ScrollContainer
 
 # Cache list of addon details: { name, version, author, description, demos, card_instance }
@@ -18,24 +20,29 @@ func initialize_view(p_ref, extra_data):
 	plugin_ref = p_ref
 
 func _ready():
+	var scale = 1.0
 	if Engine.is_editor_hint() and plugin_ref != null:
-		var scale = EditorInterface.get_editor_scale()
+		scale = EditorInterface.get_editor_scale()
 		_apply_editor_scaling(self, scale)
 		
 	# Style styling setup or connect signals
 	search_input.text_changed.connect(_on_search_changed)
 	refresh_button.pressed.connect(scan_addons)
+	ignore_button.pressed.connect(_on_ignore_button_pressed)
 	updater_button.pressed.connect(_on_updater_button_pressed)
+	manager_deps_button.pressed.connect(_on_manager_deps_pressed)
 	
 	scroll_container.resized.connect(_on_scroll_container_resized)
 	_on_scroll_container_resized()
+	
+	_setup_button_icons(scale)
 	
 	scan_addons()
 
 func _apply_editor_scaling(node: Node, scale: float):
 	if node is Control:
 		var size_scale = scale
-		if node == search_input or node == refresh_button or node == updater_button:
+		if node == search_input or node == refresh_button or node == ignore_button or node == updater_button or node == manager_deps_button:
 			size_scale = 1.0 + (scale - 1.0) * 0.4
 			node.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			
@@ -83,6 +90,7 @@ func scan_addons():
 	addons_list.clear()
 	
 	var enabled_plugins = get_enabled_plugins()
+	var ignored_folders = load_ignored_folders()
 	
 	var addons_path = "res://addons"
 	if not DirAccess.dir_exists_absolute(addons_path):
@@ -94,7 +102,7 @@ func scan_addons():
 		var folder_name = dir.get_next()
 		
 		while folder_name != "":
-			if dir.current_is_dir() and not folder_name.begins_with(".") and folder_name != "aceAddonManager":
+			if dir.current_is_dir() and not folder_name.begins_with(".") and folder_name != "aceAddonManager" and not folder_name in ignored_folders:
 				var addon_dir_path = addons_path + "/" + folder_name
 				var config_path = addon_dir_path + "/plugin.cfg"
 				
@@ -200,6 +208,9 @@ func _on_updater_button_pressed():
 	if plugin_ref:
 		plugin_ref.switch_to_view("res://addons/aceAddonManager/Scenes/AddonUpdater/addon_updater.tscn")
 
+func _on_manager_deps_pressed():
+	_on_open_dependency_editor("aceAddonManager")
+
 func _on_open_dependency_editor(folder_name: String):
 	if plugin_ref:
 		var addon_path = "res://addons/" + folder_name
@@ -273,3 +284,201 @@ func _on_search_changed(new_text: String):
 					item["folder"].to_lower().contains(filter)
 				)
 				card.visible = match_found
+
+func _setup_button_icons(scale: float) -> void:
+	var icon_size = int(round(16 * scale))
+	
+	# 1. Rescan button icon
+	var rescan_tex = load("res://addons/aceAddonManager/Icons/Rescan.svg")
+	if rescan_tex:
+		refresh_button.icon = _scale_svg_icon(rescan_tex, icon_size)
+		
+	# 2. Manager Dependencies button icon
+	var deps_tex = load("res://addons/aceAddonManager/Icons/ManagerDependencies.svg")
+	if deps_tex:
+		manager_deps_button.icon = _scale_svg_icon(deps_tex, icon_size)
+		if manager_deps_button.text.begins_with("⚙ "):
+			manager_deps_button.text = manager_deps_button.text.substr(2)
+		elif manager_deps_button.text.begins_with("⚙"):
+			manager_deps_button.text = manager_deps_button.text.substr(1)
+
+	# 3. Addon Updater button icon
+	var updater_tex = load("res://addons/aceAddonManager/Icons/AddonUpdater.svg")
+	if updater_tex:
+		updater_button.icon = _scale_svg_icon(updater_tex, icon_size)
+		if updater_button.text.ends_with("  →"):
+			updater_button.text = updater_button.text.substr(0, updater_button.text.length() - 3)
+		elif updater_button.text.ends_with(" →"):
+			updater_button.text = updater_button.text.substr(0, updater_button.text.length() - 2)
+
+	# 4. Ignore List button icon
+	if Engine.is_editor_hint():
+		var ignore_tex = EditorInterface.get_editor_theme().get_icon("VisibilityHidden", "EditorIcons")
+		if ignore_tex:
+			ignore_button.icon = ignore_tex
+
+func _scale_svg_icon(svg: Texture2D, target_size: int) -> Texture2D:
+	if svg:
+		var img = svg.get_image()
+		if img:
+			img.resize(target_size, target_size, Image.INTERPOLATE_LANCZOS)
+			return ImageTexture.create_from_image(img)
+	return svg
+
+func load_ignored_folders() -> Array[String]:
+	var ignored: Array[String] = []
+	var path = "res://addons/.addonignore"
+	if FileAccess.file_exists(path):
+		var file = FileAccess.open(path, FileAccess.READ)
+		if file:
+			while not file.eof_reached():
+				var line = file.get_line().strip_edges()
+				if line != "" and not line.begins_with("#"):
+					ignored.append(line)
+			file.close()
+	return ignored
+
+func save_ignored_folders(ignored: Array[String]) -> void:
+	var path = "res://addons/.addonignore"
+	var file = FileAccess.open(path, FileAccess.WRITE)
+	if file:
+		file.store_line("# Addon Previewer Ignore List")
+		file.store_line("# Edit this file manually or via the UI to hide subfolders from the addon previewer")
+		for folder in ignored:
+			file.store_line(folder)
+		file.close()
+
+func _on_ignore_button_pressed() -> void:
+	var dialog = ConfirmationDialog.new()
+	dialog.title = "Ignore List"
+	
+	# ScrollContainer for list
+	var scroll = ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	
+	var vbox = VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vbox)
+	
+	var label = Label.new()
+	label.text = "Select folders to ignore (hide from Previewer):"
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD
+	vbox.add_child(label)
+	
+	var spacer = Control.new()
+	spacer.custom_minimum_size = Vector2(0, 8)
+	vbox.add_child(spacer)
+	
+	var ignored_list = load_ignored_folders()
+	var checkboxes = {}
+	
+	var dir = DirAccess.open("res://addons")
+	if dir:
+		dir.list_dir_begin()
+		var name = dir.get_next()
+		while name != "":
+			if dir.current_is_dir() and not name.begins_with(".") and name != "aceAddonManager":
+				var checkbox = CheckBox.new()
+				checkbox.text = name
+				checkbox.button_pressed = name in ignored_list
+				vbox.add_child(checkbox)
+				checkboxes[name] = checkbox
+			name = dir.get_next()
+		dir.list_dir_end()
+	
+	var dialog_vbox = VBoxContainer.new()
+	dialog_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dialog_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	dialog_vbox.add_theme_constant_override("separation", 10)
+	dialog_vbox.add_child(scroll)
+	
+	var delete_checkbox = CheckBox.new()
+	delete_checkbox.text = "Also remove folder/symlink from addons folder"
+	delete_checkbox.button_pressed = false
+	dialog_vbox.add_child(delete_checkbox)
+	
+	var margins = MarginContainer.new()
+	margins.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margins.add_theme_constant_override("margin_left", 16)
+	margins.add_theme_constant_override("margin_top", 16)
+	margins.add_theme_constant_override("margin_right", 16)
+	margins.add_theme_constant_override("margin_bottom", 16)
+	margins.add_child(dialog_vbox)
+	dialog.add_child(margins)
+	
+	add_child(dialog)
+	
+	var scale = EditorInterface.get_editor_scale() if (Engine.is_editor_hint() and plugin_ref != null) else 1.0
+	dialog.min_size = Vector2(400, 360) * scale
+	scroll.custom_minimum_size = Vector2(360, 200) * scale
+	
+	# Connect confirm
+	dialog.confirmed.connect(func():
+		var new_ignored: Array[String] = []
+		var to_delete: Array[String] = []
+		for folder_name in checkboxes.keys():
+			if checkboxes[folder_name].button_pressed:
+				new_ignored.append(folder_name)
+				if delete_checkbox.button_pressed and DirAccess.dir_exists_absolute("res://addons/" + folder_name):
+					to_delete.append(folder_name)
+		
+		if to_delete.size() > 0:
+			var confirm_del = ConfirmationDialog.new()
+			confirm_del.title = "Warning: Permanent Deletion"
+			
+			var warn_label = Label.new()
+			warn_label.text = "Are you sure you want to permanently remove the folder/symlink for the following addon(s) from res://addons/? This action cannot be undone:\n\n" + ", ".join(to_delete)
+			warn_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+			
+			var warn_margins = MarginContainer.new()
+			warn_margins.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			warn_margins.add_theme_constant_override("margin_left", 16)
+			warn_margins.add_theme_constant_override("margin_top", 16)
+			warn_margins.add_theme_constant_override("margin_right", 16)
+			warn_margins.add_theme_constant_override("margin_bottom", 16)
+			warn_margins.add_child(warn_label)
+			confirm_del.add_child(warn_margins)
+			
+			add_child(confirm_del)
+			confirm_del.min_size = Vector2(450, 200) * scale
+			
+			confirm_del.confirmed.connect(func():
+				for folder_name in to_delete:
+					_remove_addon_folder(folder_name)
+				save_ignored_folders(new_ignored)
+				scan_addons()
+				confirm_del.queue_free()
+			)
+			confirm_del.canceled.connect(func():
+				confirm_del.queue_free()
+			)
+			confirm_del.popup_centered()
+		else:
+			save_ignored_folders(new_ignored)
+			scan_addons()
+			
+		dialog.queue_free()
+	)
+	
+	dialog.canceled.connect(func():
+		dialog.queue_free()
+	)
+	
+	dialog.popup_centered()
+
+func _remove_addon_folder(folder_name: String) -> void:
+	var path = "res://addons/" + folder_name
+	var global_path = ProjectSettings.globalize_path(path).replace("/", "\\")
+	
+	AceLog.printLog(["Removing addon folder/symlink: ", global_path], AceLog.LOG_LEVEL.INFO)
+	
+	var output = []
+	# On Windows, rmdir /s /q removes directory symlinks/junctions safely without deleting contents of target folder.
+	var exit_code = OS.execute("cmd.exe", ["/c", "rmdir", "/s", "/q", global_path], output)
+	if exit_code == 0:
+		AceLog.printLog(["Successfully removed folder/symlink: ", folder_name], AceLog.LOG_LEVEL.INFO)
+		if Engine.is_editor_hint():
+			EditorInterface.get_resource_filesystem().scan()
+	else:
+		AceLog.printLog(["Failed to remove folder/symlink: ", folder_name, " Exit code: ", exit_code, " Output: ", output], AceLog.LOG_LEVEL.ERROR)

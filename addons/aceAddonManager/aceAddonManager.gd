@@ -5,6 +5,9 @@ var main_screen_wrapper: MarginContainer
 var current_view: Control
 
 func _enter_tree() -> void:
+	# Enable all plugins in res://addons/
+	AddonManagerUtil.enable_addons()
+
 	main_screen_wrapper = MarginContainer.new()
 	main_screen_wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	main_screen_wrapper.size_flags_vertical = Control.SIZE_EXPAND_FILL

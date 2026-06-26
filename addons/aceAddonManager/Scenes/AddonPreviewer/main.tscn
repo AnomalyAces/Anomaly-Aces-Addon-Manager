@@ -87,6 +87,16 @@ custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 text = "Rescan"
 
+[node name="IgnoreButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633889]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "Ignore List"
+
+[node name="ManagerDepsButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633888]
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 2
+text = "⚙ Manager Dependencies"
+
 [node name="UpdaterButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633887]
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2

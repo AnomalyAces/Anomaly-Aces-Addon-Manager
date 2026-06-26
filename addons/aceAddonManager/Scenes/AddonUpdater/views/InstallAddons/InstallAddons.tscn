@@ -43,10 +43,10 @@ theme = SubResource("Theme_oxym2")
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1694393823]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 32
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 32
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
 [node name="PageContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=998148114]
 layout_mode = 2
@@ -62,8 +62,8 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
 theme = ExtResource("7_t7svs")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 64
-theme_override_font_sizes/font_size = 32
+theme_override_constants/icon_max_width = 30
+theme_override_font_sizes/font_size = 27
 text = "Back"
 icon = ExtResource("2_1erv5")
 flat = true
@@ -76,7 +76,7 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_uu8fy")
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 30
 text = "Install Addons"
 horizontal_alignment = 1
 
@@ -126,9 +126,9 @@ size_flags_stretch_ratio = 2.5
 theme = ExtResource("7_t7svs")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
-theme_override_constants/icon_max_width = 64
+theme_override_constants/icon_max_width = 30
 theme_override_constants/align_to_largest_stylebox = 0
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 27
 text = "Install"
 icon = ExtResource("10_t7svs")
 flat = true

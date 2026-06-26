@@ -35,9 +35,6 @@ func _ready() -> void:
 			
 			manager_container.add_child(plugin_manager)
 			
-			# Apply scaling to the inner manager scenes as well
-			_apply_editor_scaling(plugin_manager, scale)
-			
 			# Trigger the initial addon load
 			_on_refresh_pressed()
 
@@ -56,22 +53,24 @@ func _apply_editor_scaling(node: Node, scale: float) -> void:
 			if node.custom_minimum_size != Vector2.ZERO:
 				node.custom_minimum_size = node.custom_minimum_size * scale
 		
-		# Scale explicit font size overrides only (avoids double-scaling default fonts)
-		if node.has_theme_font_size_override("font_size"):
-			var current_size = node.get_theme_font_size("font_size")
-			node.add_theme_font_size_override("font_size", int(round(current_size * scale)))
+		# Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
+		var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
+		for key in font_keys:
+			var override_font_size = node.get("theme_override_font_sizes/" + key)
+			if override_font_size != null and override_font_size is int and override_font_size > 0:
+				node.add_theme_font_size_override(key, int(round(override_font_size * scale)))
 		
 		# Scale margin overrides
 		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
-			if node.has_theme_constant_override(margin):
-				var val = node.get_theme_constant(margin)
-				node.add_theme_constant_override(margin, int(round(val * scale)))
+			var override_val = node.get("theme_override_constants/" + margin)
+			if override_val != null and override_val is int:
+				node.add_theme_constant_override(margin, int(round(override_val * scale)))
 		
 		# Scale separation overrides
 		for sep in ["separation", "h_separation", "v_separation"]:
-			if node.has_theme_constant_override(sep):
-				var val = node.get_theme_constant(sep)
-				node.add_theme_constant_override(sep, int(round(val * scale)))
+			var override_val = node.get("theme_override_constants/" + sep)
+			if override_val != null and override_val is int:
+				node.add_theme_constant_override(sep, int(round(override_val * scale)))
 	
 	for child in node.get_children():
 		_apply_editor_scaling(child, scale)
