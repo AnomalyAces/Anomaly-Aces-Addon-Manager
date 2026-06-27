@@ -25,9 +25,6 @@ var _selected_conflicts: Array[RemoteRepoConflict] = []
 var _editor_scale: float = 1.0
 
 func _ready() -> void:
-	if _editor_scale != 1.0:
-		_scale_table_themes(addonTablePlugin, _editor_scale)
-		_scale_table_themes(conflictTablePlugin, _editor_scale)
 	rrm = GitHubManager.new(self, _editor_interface)
 	# _createTable()
 	# for i in randi_range(1,3):
@@ -411,54 +408,7 @@ func initialize_scaling(scale: float) -> void:
 	_editor_scale = scale
 	_apply_editor_scaling(self, scale)
 
-func _scale_table_themes(table_plugin: Control, scale: float) -> void:
-	if scale == 1.0 or table_plugin == null:
-		return
-	if table_plugin.header_theme:
-		table_plugin.header_theme = _scale_theme(table_plugin.header_theme, scale)
-	if table_plugin.header_cell_theme:
-		table_plugin.header_cell_theme = _scale_theme(table_plugin.header_cell_theme, scale)
-	if table_plugin.row_theme:
-		table_plugin.row_theme = _scale_theme(table_plugin.row_theme, scale)
-	if table_plugin.row_cell_theme:
-		table_plugin.row_cell_theme = _scale_theme(table_plugin.row_cell_theme, scale)
 
-func _scale_theme(theme: Theme, scale: float) -> Theme:
-	var dup = theme.duplicate(true)
-	for type in dup.get_type_list():
-		for name in dup.get_font_size_list(type):
-			var val = dup.get_font_size(name, type)
-			dup.set_font_size(name, type, int(round(val * scale)))
-		for name in dup.get_constant_list(type):
-			var val = dup.get_constant(name, type)
-			dup.set_constant(name, type, int(round(val * scale)))
-	return dup
 
 func _apply_editor_scaling(node: Node, scale: float) -> void:
-	if scale == 1.0:
-		return
-	if node is Control:
-		if node.custom_minimum_size != Vector2.ZERO:
-			node.custom_minimum_size = node.custom_minimum_size * scale
-		
-		# Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
-		var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
-		for key in font_keys:
-			var override_font_size = node.get("theme_override_font_sizes/" + key)
-			if override_font_size != null and override_font_size is int and override_font_size > 0:
-				node.add_theme_font_size_override(key, int(round(override_font_size * scale)))
-		
-		# Scale margin overrides
-		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
-			var override_val = node.get("theme_override_constants/" + margin)
-			if override_val != null and override_val is int:
-				node.add_theme_constant_override(margin, int(round(override_val * scale)))
-		
-		# Scale separation overrides
-		for sep in ["separation", "h_separation", "v_separation"]:
-			var override_val = node.get("theme_override_constants/" + sep)
-			if override_val != null and override_val is int:
-				node.add_theme_constant_override(sep, int(round(override_val * scale)))
-	
-	for child in node.get_children():
-		_apply_editor_scaling(child, scale)
+	AddonManagerUtil.apply_editor_scaling(node, scale)

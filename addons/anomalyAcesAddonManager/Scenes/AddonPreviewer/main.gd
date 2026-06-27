@@ -20,10 +20,13 @@ func initialize_view(p_ref, extra_data):
 	plugin_ref = p_ref
 
 func _ready():
-	var scale = 1.0
+	var scale = AddonManagerUtil.get_applied_scale()
 	if Engine.is_editor_hint() and plugin_ref != null:
-		scale = EditorInterface.get_editor_scale()
 		_apply_editor_scaling(self, scale)
+		
+		# Add manual scaling control UI to header controls
+		var controls = $VBoxContainer/Header/HBox/Controls
+		AddonManagerUtil.add_scale_ui_to_header(controls, self)
 		
 	# Style styling setup or connect signals
 	search_input.text_changed.connect(_on_search_changed)
@@ -71,7 +74,7 @@ func _apply_editor_scaling(node: Node, scale: float):
 		_apply_editor_scaling(child, scale)
 
 func _on_scroll_container_resized():
-	var scale = EditorInterface.get_editor_scale() if Engine.is_editor_hint() else 1.0
+	var scale = AddonManagerUtil.get_applied_scale()
 	var card_min_width = 350.0 * scale
 	var h_sep = 20.0 * scale
 	var available_width = scroll_container.size.x
@@ -173,7 +176,7 @@ func find_demo_scenes(path: String) -> Array:
 	return list
 
 func render_addon_cards():
-	var scale = EditorInterface.get_editor_scale() if (Engine.is_editor_hint() and plugin_ref != null) else 1.0
+	var scale = AddonManagerUtil.get_applied_scale()
 	for item in addons_list:
 		var card = ADDON_CARD_SCENE.instantiate()
 		grid_container.add_child(card)
@@ -409,7 +412,7 @@ func _on_ignore_button_pressed() -> void:
 	
 	add_child(dialog)
 	
-	var scale = EditorInterface.get_editor_scale() if (Engine.is_editor_hint() and plugin_ref != null) else 1.0
+	var scale = AddonManagerUtil.get_applied_scale()
 	dialog.min_size = Vector2(400, 360) * scale
 	scroll.custom_minimum_size = Vector2(360, 200) * scale
 	

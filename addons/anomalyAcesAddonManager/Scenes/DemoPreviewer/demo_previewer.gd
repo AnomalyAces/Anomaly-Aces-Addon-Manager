@@ -18,7 +18,7 @@ func _ready() -> void:
 		back_button.pressed.connect(_on_back_pressed)
 	
 	if Engine.is_editor_hint() and plugin_ref != null:
-		var scale = EditorInterface.get_editor_scale()
+		var scale = AddonManagerUtil.get_applied_scale()
 		_apply_editor_scaling(self, scale)
 	
 	# Determine target scene

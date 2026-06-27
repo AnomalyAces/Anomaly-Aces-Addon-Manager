@@ -19,18 +19,22 @@ func _ready() -> void:
 		github_pat.back_to_main_view.connect(_on_close_github_pat)
 
 func assignEditorInterface(editorInterface: EditorInterface) -> void:
-	var scale = editorInterface.get_editor_scale()
-	if main_view != null:
-		main_view._editor_interface = editorInterface
-		main_view.initialize_scaling(scale)
+	var scale = AddonManagerUtil.get_applied_scale()
+	
+	var mv = main_view if main_view != null else get_node_or_null("Main")
+	if mv != null:
+		mv._editor_interface = editorInterface
+		mv.initialize_scaling(scale)
 
-	if install_addons != null:
-		install_addons._editor_interface = editorInterface
-		install_addons.initialize_scaling(scale)
+	var ia = install_addons if install_addons != null else get_node_or_null("InstallAddons")
+	if ia != null:
+		ia._editor_interface = editorInterface
+		ia.initialize_scaling(scale)
 
-	if github_pat != null:
-		github_pat._editor_interface = editorInterface
-		github_pat.initialize_scaling(scale)
+	var gp = github_pat if github_pat != null else get_node_or_null("GithubPat")
+	if gp != null:
+		gp._editor_interface = editorInterface
+		gp.initialize_scaling(scale)
 
 
 func _on_open_install_addons(addons: Array[RemoteRepoObject], config_file: ConfigFile) -> void:

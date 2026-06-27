@@ -56,15 +56,15 @@ layout_mode = 2
 alignment = 1
 
 [node name="Back" type="Button" parent="PanelContainer/MarginContainer/PageContainer/HeaderContainer" unique_id=1998712538]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 50)
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
 theme = ExtResource("7_t7svs")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 48
-theme_override_font_sizes/font_size = 42
+theme_override_constants/icon_max_width = 30
+theme_override_font_sizes/font_size = 25
 text = "Back"
 icon = ExtResource("2_1erv5")
 flat = true
@@ -77,7 +77,7 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_uu8fy")
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 28
 text = "Install Addons"
 horizontal_alignment = 1
 
@@ -121,16 +121,16 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 5.0
 
 [node name="InstallButton" type="Button" parent="PanelContainer/MarginContainer/PageContainer/ButtonContainer" unique_id=897545897]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.5
 theme = ExtResource("7_t7svs")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
-theme_override_constants/icon_max_width = 48
+theme_override_constants/icon_max_width = 30
 theme_override_constants/align_to_largest_stylebox = 0
-theme_override_font_sizes/font_size = 42
+theme_override_font_sizes/font_size = 25
 text = "Install"
 icon = ExtResource("10_t7svs")
 flat = true

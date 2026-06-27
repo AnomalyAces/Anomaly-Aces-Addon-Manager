@@ -62,17 +62,29 @@ Every sub-scene implements `initialize_view(plugin_ref, extra_data)` to receive 
 
 ---
 
-## High-DPI Scaling & Theme Gotchas
-To support responsive UI scaling in the editor plugin at any display scale, the dashboard implements dynamic scaling via `EditorInterface.get_editor_scale()`:
+## High-DPI Scaling & Layout Adjustments
+To support responsive UI scaling in the editor plugin at any display scale, the dashboard implements dynamic scaling via `AddonManagerUtil.apply_editor_scaling(node, scale)`:
 
 ### 1. The Serialization Gotcha (Crucial!)
 Because dashboard scripts are marked with `@tool`, their `_ready()` functions run inside the Godot Editor workspace tree when editing them. If layout modifications are applied automatically on `_ready()`, they will modify the editor's tree and get **serialized back to the `.tscn` file** when saving the scene.
 * **Rule**: Only trigger layout and font scaling if `plugin_ref` is NOT `null`. When scenes are opened for editing in the editor, `plugin_ref` is `null`, ensuring properties remain at their clean, unscaled base values.
 * **Addon Cards**: Since addon cards are instantiated dynamically via code, they are scaled dynamically when `set_addon_details(..., scale)` is called by the parent main screen script.
 
-### 2. Differentiated Font Scaling
-Dynamically instantiated controls (like the demo run buttons) inherit standard editor theme settings which are already scaled by the Godot Editor.
-* **Rule**: To prevent double-scaling default fonts, `_apply_editor_scaling` must **only** scale font sizes that have an explicit override set in the scene (by checking `node.has_theme_font_size_override("font_size")`).
+### 2. Manual Custom Scaling Control
+- The manual scale selector in the Addon Updater header uses an editable text field (`LineEdit`). 
+- It parses input strings robustly (e.g. `120%`, `120`, `1.2`, `1.2x`). Values `>= 10.0` are interpreted as percentages, while values `< 10.0` are treated as direct multipliers. 
+- Custom scale is clamped between `0.5` (50%) and `4.0` (400%), default applied scale is `1.0` (100%).
+- Changing the scale saves it to settings and reloads the current view dynamically.
+
+### 3. Baseline Proportions (1080p Layout)
+The baseline layout properties in the `.tscn` and `.tres` view files are set to comfortable 1920x1080 resolution defaults:
+- **Table text baseline**: Row cell font size is set to **`18px`**.
+- **Table header text baseline**: Header cell font size is set to **`23px`** (~25% larger than table text).
+- **Action buttons**: Height is **`50px`**, font size is **`25px`** (~40% larger than table text), and icon max width is **`30px`**.
+- **Header buttons**: "Refresh" and "Addon Previewer" are flat buttons (`flat = true`) with a compact height of **`28px`**. The manual scale LineEdit also matches this height constraint (`80x28px`).
+
+### 4. Table Theme Duplication & Scaling
+* `AceTablePlugin` tables rely on shared `Theme` resources. If you duplicate the theme via `theme.duplicate(true)`, scaling the values inside the duplicate and assigning it back scales font sizes and margins correctly in-memory without mutating or saving modified resources back to disk.
 
 ---
 

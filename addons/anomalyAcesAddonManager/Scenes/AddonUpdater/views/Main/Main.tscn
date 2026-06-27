@@ -49,14 +49,14 @@ theme = SubResource("Theme_l7mma")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1745202067]
 layout_mode = 2
-theme_override_constants/separation = 21
+theme_override_constants/separation = 12
 
 [node name="Title" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1623449591]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_q1a5h")
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 32
 text = "Ace Add-On Manager"
 horizontal_alignment = 1
 
@@ -73,15 +73,15 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 
 [node name="Reload" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1311066716]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_y0qvv")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
-theme_override_constants/icon_max_width = 48
+theme_override_constants/icon_max_width = 30
 theme_override_constants/align_to_largest_stylebox = 0
-theme_override_font_sizes/font_size = 42
+theme_override_font_sizes/font_size = 25
 text = "Check For Updates"
 icon = ExtResource("3_uimyb")
 flat = true
@@ -89,14 +89,14 @@ autowrap_mode = 2
 autowrap_trim_flags = 0
 
 [node name="Select" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=910910059]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.1
 theme = ExtResource("5_y0qvv")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 48
-theme_override_font_sizes/font_size = 42
+theme_override_constants/icon_max_width = 30
+theme_override_font_sizes/font_size = 25
 text = "Select Available Updates"
 icon = ExtResource("7_yb3ld")
 flat = true
@@ -104,14 +104,14 @@ autowrap_mode = 2
 autowrap_trim_flags = 0
 
 [node name="Install" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=1549816277]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.1
 theme = ExtResource("5_y0qvv")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 48
-theme_override_font_sizes/font_size = 42
+theme_override_constants/icon_max_width = 30
+theme_override_font_sizes/font_size = 25
 text = "Install Selected Add-ons"
 icon = ExtResource("3_sg5kk")
 flat = true
@@ -133,14 +133,14 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.1
 
 [node name="GithubPAT" type="Button" parent="PanelContainer/VBoxContainer/ActionButtons" unique_id=257857659]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("5_y0qvv")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_constants/icon_max_width = 48
+theme_override_constants/icon_max_width = 30
 theme_override_constants/align_to_largest_stylebox = 0
-theme_override_font_sizes/font_size = 42
+theme_override_font_sizes/font_size = 25
 text = "Github Personal Access Token"
 icon = ExtResource("4_sg5kk")
 flat = true
@@ -167,7 +167,7 @@ layout_mode = 2
 [node name="LoadingView" parent="PanelContainer/VBoxContainer" unique_id=1213959645 instance=ExtResource("8_n0oye")]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(85, 85)
+custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
@@ -178,7 +178,7 @@ visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_q1a5h")
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
 
 [node name="AddonTablePlugin" type="Control" parent="PanelContainer/VBoxContainer" unique_id=1510064024]

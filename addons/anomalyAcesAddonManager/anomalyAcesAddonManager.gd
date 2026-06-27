@@ -3,6 +3,8 @@ extends EditorPlugin
 
 var main_screen_wrapper: MarginContainer
 var current_view: Control
+var current_view_path: String = ""
+var current_extra_data = null
 
 func _enter_tree() -> void:
 	# Enable all plugins in res://addons/
@@ -39,13 +41,16 @@ func _get_plugin_icon() -> Texture2D:
 	if base_tex:
 		var img = base_tex.get_image()
 		if img:
-			var scale = EditorInterface.get_editor_scale()
+			var scale = AddonManagerUtil.get_applied_scale()
 			var target_size = int(round(16 * scale))
 			img.resize(target_size, target_size, Image.INTERPOLATE_LANCZOS)
 			return ImageTexture.create_from_image(img)
 	return base_tex
 
 func switch_to_view(scene_path: String, extra_data = null) -> void:
+	current_view_path = scene_path
+	current_extra_data = extra_data
+	
 	# Clear current view
 	if current_view:
 		main_screen_wrapper.remove_child(current_view)
@@ -63,3 +68,7 @@ func switch_to_view(scene_path: String, extra_data = null) -> void:
 			current_view.initialize_view(self, extra_data)
 			
 		main_screen_wrapper.add_child(current_view)
+
+func reload_current_view() -> void:
+	if current_view_path != "":
+		switch_to_view(current_view_path, current_extra_data)

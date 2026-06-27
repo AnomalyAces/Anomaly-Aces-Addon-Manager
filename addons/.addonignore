@@ -1,0 +1,5 @@
+# Addon Previewer Ignore List
+# Edit this file manually or via the UI to hide subfolders from the addon previewer
+gd-plug
+gdUnit4
+reload_current_scene

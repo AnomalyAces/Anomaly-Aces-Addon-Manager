@@ -14,6 +14,7 @@ Thumbs.db
 # Ignore dynamically generated links inside addons/
 addons/*
 !addons/.gitkeep
+!addons/.addonignore
 !addons/anomalyAcesAddonManager/
 addons/anomalyAcesAddonManager/temp/*
 !addons/anomalyAcesAddonManager/temp/.gdignore

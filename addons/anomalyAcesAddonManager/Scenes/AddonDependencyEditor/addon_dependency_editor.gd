@@ -31,8 +31,12 @@ func _ready() -> void:
 	add_entry_button.pressed.connect(_on_add_entry_pressed)
 	
 	if Engine.is_editor_hint() and plugin_ref != null:
-		var scale = EditorInterface.get_editor_scale()
+		var scale = AddonManagerUtil.get_applied_scale()
 		_apply_editor_scaling($VBoxContainer/Header, scale)
+		
+		# Add manual scaling control UI to header controls
+		var controls = $VBoxContainer/Header/HBox/Controls
+		AddonManagerUtil.add_scale_ui_to_header(controls, self)
 	
 	# Update subtitle with addon folder name
 	subtitle_label.text = "Editing: " + (folder_name if folder_name != "" else "Unknown Addon")
