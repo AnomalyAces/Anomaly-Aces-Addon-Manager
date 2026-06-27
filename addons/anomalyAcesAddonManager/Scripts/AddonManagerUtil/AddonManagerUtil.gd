@@ -207,10 +207,7 @@ static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = t
     if skip_tables and is_table:
         return
     if node is Control:
-        if node.custom_minimum_size != Vector2.ZERO:
-            node.custom_minimum_size = node.custom_minimum_size * scale
-        
-        # If the control is a Button and is inside a "Header" hierarchy
+        # Check if the control is inside a "Header" hierarchy
         var is_in_header = false
         var parent = node
         while parent != null:
@@ -219,15 +216,37 @@ static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = t
                 break
             parent = parent.get_parent()
             
-        if node is Button and is_in_header:
-            node.flat = true
-        
-        # Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
-        var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
-        for key in font_keys:
-            if node.has_theme_font_size_override(key):
-                var current_size = node.get_theme_font_size(key)
-                node.add_theme_font_size_override(key, int(round(current_size * scale)))
+        var custom_scaled = false
+        if is_in_header and (node is Button or node is LineEdit or node.name == "AddonCountLabel"):
+            if node is LineEdit:
+                node.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+                
+            if node is Button:
+                node.flat = true
+                
+            var base_min = node.custom_minimum_size
+            if base_min != Vector2.ZERO:
+                var new_h = base_min.y + 12
+                var new_w = base_min.x
+                if abs(base_min.x - base_min.y) < 2:
+                    new_w = base_min.x + 12
+                else:
+                    new_w = base_min.x + 50 # Add extra width for larger text
+                node.custom_minimum_size = Vector2(new_w, new_h) * scale
+                
+            node.add_theme_font_size_override("font_size", int(round(26 * scale)))
+            custom_scaled = true
+            
+        if not custom_scaled:
+            if node.custom_minimum_size != Vector2.ZERO:
+                node.custom_minimum_size = node.custom_minimum_size * scale
+                
+            # Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
+            var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
+            for key in font_keys:
+                if node.has_theme_font_size_override(key):
+                    var current_size = node.get_theme_font_size(key)
+                    node.add_theme_font_size_override(key, int(round(current_size * scale)))
         
         # Scale margin, separation, and other constant overrides
         var constant_keys = [

@@ -282,17 +282,17 @@ func _on_search_changed(new_text: String):
 				card.visible = match_found
 
 func _setup_button_icons(scale: float) -> void:
-	var icon_size = int(round(16 * scale))
+	var icon_size = int(round((16 + 12) * scale))
 	
 	# 1. Rescan button icon
 	var rescan_tex = load("res://addons/anomalyAcesAddonManager/Icons/Rescan.svg")
 	if rescan_tex:
-		refresh_button.icon = _scale_svg_icon(rescan_tex, icon_size)
+		refresh_button.icon = AddonManagerUtil.scale_svg_icon(rescan_tex, icon_size)
 		
 	# 2. Manager Dependencies button icon
 	var deps_tex = load("res://addons/anomalyAcesAddonManager/Icons/ManagerDependencies.svg")
 	if deps_tex:
-		manager_deps_button.icon = _scale_svg_icon(deps_tex, icon_size)
+		manager_deps_button.icon = AddonManagerUtil.scale_svg_icon(deps_tex, icon_size)
 		if manager_deps_button.text.begins_with("⚙ "):
 			manager_deps_button.text = manager_deps_button.text.substr(2)
 		elif manager_deps_button.text.begins_with("⚙"):
@@ -301,7 +301,7 @@ func _setup_button_icons(scale: float) -> void:
 	# 3. Addon Updater button icon
 	var updater_tex = load("res://addons/anomalyAcesAddonManager/Icons/AddonUpdater.svg")
 	if updater_tex:
-		updater_button.icon = _scale_svg_icon(updater_tex, icon_size)
+		updater_button.icon = AddonManagerUtil.scale_svg_icon(updater_tex, icon_size)
 		if updater_button.text.ends_with("  →"):
 			updater_button.text = updater_button.text.substr(0, updater_button.text.length() - 3)
 		elif updater_button.text.ends_with(" →"):
@@ -311,15 +311,7 @@ func _setup_button_icons(scale: float) -> void:
 	if Engine.is_editor_hint():
 		var ignore_tex = EditorInterface.get_editor_theme().get_icon("VisibilityHidden", "EditorIcons")
 		if ignore_tex:
-			ignore_button.icon = ignore_tex
-
-func _scale_svg_icon(svg: Texture2D, target_size: int) -> Texture2D:
-	if svg:
-		var img = svg.get_image()
-		if img:
-			img.resize(target_size, target_size, Image.INTERPOLATE_LANCZOS)
-			return ImageTexture.create_from_image(img)
-	return svg
+			ignore_button.icon = AddonManagerUtil.scale_svg_icon(ignore_tex, icon_size)
 
 func load_ignored_folders() -> Array[String]:
 	var ignored: Array[String] = []
