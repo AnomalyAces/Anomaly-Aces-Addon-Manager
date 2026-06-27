@@ -32,7 +32,7 @@ func _ready() -> void:
 	
 	if Engine.is_editor_hint() and plugin_ref != null:
 		var scale = AddonManagerUtil.get_applied_scale()
-		_apply_editor_scaling($VBoxContainer/Header, scale)
+		AddonManagerUtil.apply_editor_scaling($VBoxContainer, scale)
 		
 		# Add manual scaling control UI to header controls
 		var controls = $VBoxContainer/Header/HBox/Controls
@@ -145,32 +145,4 @@ func _on_back_pressed() -> void:
 	if plugin_ref:
 		plugin_ref.switch_to_view("res://addons/anomalyAcesAddonManager/Scenes/AddonPreviewer/main.tscn")
 
-func _apply_editor_scaling(node: Node, scale: float) -> void:
-	if scale == 1.0:
-		return
-	if node is Control:
-		if node == back_button or node == save_button or node == run_script_button:
-			var soft_scale = 1.0 + (scale - 1.0) * 0.4
-			node.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			if node.custom_minimum_size != Vector2.ZERO:
-				node.custom_minimum_size = node.custom_minimum_size * soft_scale
-		else:
-			if node.custom_minimum_size != Vector2.ZERO:
-				node.custom_minimum_size = node.custom_minimum_size * scale
-		
-		if node.has_theme_font_size_override("font_size"):
-			var current_size = node.get_theme_font_size("font_size")
-			node.add_theme_font_size_override("font_size", int(round(current_size * scale)))
-		
-		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
-			if node.has_theme_constant_override(margin):
-				var val = node.get_theme_constant(margin)
-				node.add_theme_constant_override(margin, int(round(val * scale)))
-		
-		for sep in ["separation", "h_separation", "v_separation"]:
-			if node.has_theme_constant_override(sep):
-				var val = node.get_theme_constant(sep)
-				node.add_theme_constant_override(sep, int(round(val * scale)))
-	
-	for child in node.get_children():
-		_apply_editor_scaling(child, scale)
+

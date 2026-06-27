@@ -19,7 +19,7 @@ func _ready() -> void:
 	
 	if Engine.is_editor_hint() and plugin_ref != null:
 		var scale = AddonManagerUtil.get_applied_scale()
-		_apply_editor_scaling(self, scale)
+		AddonManagerUtil.apply_editor_scaling(self, scale)
 	
 	# Determine target scene
 	var target_scene = ""
@@ -71,29 +71,4 @@ func _go_back() -> void:
 func _on_back_pressed() -> void:
 	_go_back()
 
-func _apply_editor_scaling(node: Node, scale: float):
-	if scale == 1.0:
-		return
-	if node is Control:
-		if node.custom_minimum_size != Vector2.ZERO:
-			node.custom_minimum_size = node.custom_minimum_size * scale
-		
-		# Scale font size overrides
-		var font_size_key = "font_size"
-		if node.has_theme_font_size_override(font_size_key):
-			var current_size = node.get_theme_font_size(font_size_key)
-			node.add_theme_font_size_override(font_size_key, int(round(current_size * scale)))
-			
-		# Scale margin theme overrides
-		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
-			if node.has_theme_constant_override(margin):
-				var val = node.get_theme_constant(margin)
-				node.add_theme_constant_override(margin, int(round(val * scale)))
-				
-		# Scale separation theme overrides
-		if node.has_theme_constant_override("separation"):
-			var val = node.get_theme_constant("separation")
-			node.add_theme_constant_override("separation", int(round(val * scale)))
-			
-	for child in node.get_children():
-		_apply_editor_scaling(child, scale)
+

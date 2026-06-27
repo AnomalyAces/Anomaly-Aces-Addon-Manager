@@ -83,25 +83,16 @@ static func save_settings(settings: Dictionary) -> void:
         file.close()
 
 static func get_estimated_scale() -> float:
-    var screen = DisplayServer.window_get_current_screen()
-    var screen_size = DisplayServer.screen_get_size(screen)
-    
-    # Determine the active scale factor (prioritizing Godot editor scale inside editor, then OS display scale)
-    var active_scale = 1.0
-    if Engine.is_editor_hint() and ClassDB.class_exists("EditorInterface"):
-        active_scale = EditorInterface.get_editor_scale()
-    else:
-        var screen_scale = DisplayServer.screen_get_scale(screen)
-        if screen_scale > 0:
-            active_scale = screen_scale
-            
-    var logical_width = float(screen_size.x)
-    if active_scale > 0:
-        logical_width = float(screen_size.x) / active_scale
+    var screen_size = DisplayServer.screen_get_size()
+    var os_scale = DisplayServer.screen_get_scale()
+    if os_scale <= 0:
+        os_scale = 1.0
         
+    var logical_width = float(screen_size.x) / os_scale
     var ratio = logical_width / 1920.0
     var est = max(1.0, round(ratio * 4.0) / 4.0)
-    AceLog.printLog(["[Scaling Debug] Screen index: ", screen, " | Active Scale: ", active_scale, " | Physical Size: ", screen_size, " | Logical Width: ", logical_width, " | Estimated Scale: ", est], AceLog.LOG_LEVEL.DEBUG)
+    
+    AceLog.printLog(["[Scaling Debug] OS Scale: ", os_scale, " | Physical Size: ", screen_size, " | Logical Width: ", logical_width, " | Estimated Scale: ", est], AceLog.LOG_LEVEL.DEBUG)
     return est
 
 static func get_applied_scale() -> float:
@@ -143,11 +134,8 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     line_edit.text = "%d%%" % int(current_scale * 100)
     line_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
     
-    line_edit.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-    
-    # Scale elements inside the header to match the current scale factor
-    var font_size = int(round(13 * current_scale))
-    var min_size = Vector2(80 * current_scale, 28 * current_scale)
+    var font_size = int(round(14 * current_scale))
+    var min_size = Vector2(60, 30) * current_scale
     
     line_edit.add_theme_font_size_override("font_size", font_size)
     line_edit.custom_minimum_size = min_size
@@ -201,6 +189,8 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     )
     
     line_edit.focus_exited.connect(func():
+        if line_edit.is_queued_for_deletion() or not line_edit.is_inside_tree():
+            return
         apply_scale.call(line_edit.text)
     )
 

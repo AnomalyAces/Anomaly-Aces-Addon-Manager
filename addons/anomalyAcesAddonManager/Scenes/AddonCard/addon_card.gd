@@ -17,32 +17,7 @@ signal open_dependency_editor_requested(folder_name: String)
 var plugin_path: String = ""
 var folder_name: String = ""
 
-func _apply_editor_scaling(node: Node, scale: float):
-	if scale == 1.0:
-		return
-	if node is Control:
-		if node.custom_minimum_size != Vector2.ZERO:
-			node.custom_minimum_size = node.custom_minimum_size * scale
-		
-		# Scale font size overrides
-		var font_size_key = "font_size"
-		if node.has_theme_font_size_override(font_size_key):
-			var current_size = node.get_theme_font_size(font_size_key)
-			node.add_theme_font_size_override(font_size_key, int(round(current_size * scale)))
-			
-		# Scale margin theme overrides
-		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
-			if node.has_theme_constant_override(margin):
-				var val = node.get_theme_constant(margin)
-				node.add_theme_constant_override(margin, int(round(val * scale)))
-				
-		# Scale separation theme overrides
-		if node.has_theme_constant_override("separation"):
-			var val = node.get_theme_constant("separation")
-			node.add_theme_constant_override("separation", int(round(val * scale)))
-			
-	for child in node.get_children():
-		_apply_editor_scaling(child, scale)
+
 
 func set_addon_details(addon_name: String, version: String, author: String, description: String, demos: Array, is_enabled: bool, p_path: String, scale: float = 1.0, p_folder: String = ""):
 	title_label.text = addon_name
@@ -93,7 +68,8 @@ func set_addon_details(addon_name: String, version: String, author: String, desc
 		no_demos_label.visible = true
 		
 	if scale != 1.0:
-		_apply_editor_scaling(self, scale)
+		AceLog.printLog(["[Card Scale Debug] Card: ", addon_name, " | Applying scale: ", scale], AceLog.LOG_LEVEL.DEBUG)
+		AddonManagerUtil.apply_editor_scaling(self, scale)
 
 func _update_status_text(enabled: bool):
 	var color = Color(0.3, 0.8, 0.3) if enabled else Color(0.6, 0.6, 0.6)
