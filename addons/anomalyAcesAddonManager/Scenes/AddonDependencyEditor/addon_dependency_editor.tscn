@@ -72,6 +72,7 @@ custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.55, 0.58, 1)
 text = "\u2190 Addon Previewer"
+flat = true
 
 [node name="TitleSection" type="VBoxContainer" parent="VBoxContainer/Header/HBox"]
 layout_mode = 2
@@ -104,12 +105,14 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 text = "\U0001f4be Save addons.json"
+flat = true
 
 [node name="RunScriptButton" type="Button" parent="VBoxContainer/Header/HBox/Controls"]
 custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
 text = "\u2699 Apply Changes"
+flat = true
 
 [node name="DependencyListScroll" type="ScrollContainer" parent="VBoxContainer"]
 layout_mode = 2

@@ -210,12 +210,24 @@ static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = t
         if node.custom_minimum_size != Vector2.ZERO:
             node.custom_minimum_size = node.custom_minimum_size * scale
         
+        # If the control is a Button and is inside a "Header" hierarchy
+        var is_in_header = false
+        var parent = node
+        while parent != null:
+            if parent.name == "Header":
+                is_in_header = true
+                break
+            parent = parent.get_parent()
+            
+        if node is Button and is_in_header:
+            node.flat = true
+        
         # Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
         var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
         for key in font_keys:
-            var override_font_size = node.get("theme_override_font_sizes/" + key)
-            if override_font_size != null and override_font_size is int and override_font_size > 0:
-                node.add_theme_font_size_override(key, int(round(override_font_size * scale)))
+            if node.has_theme_font_size_override(key):
+                var current_size = node.get_theme_font_size(key)
+                node.add_theme_font_size_override(key, int(round(current_size * scale)))
         
         # Scale margin, separation, and other constant overrides
         var constant_keys = [
@@ -224,9 +236,9 @@ static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = t
             "icon_max_width"
         ]
         for key in constant_keys:
-            var override_val = node.get("theme_override_constants/" + key)
-            if override_val != null and override_val is int:
-                node.add_theme_constant_override(key, int(round(override_val * scale)))
+            if node.has_theme_constant_override(key):
+                var val = node.get_theme_constant(key)
+                node.add_theme_constant_override(key, int(round(val * scale)))
         
         # Scale table themes if the node is an AceTablePlugin
         if is_table:

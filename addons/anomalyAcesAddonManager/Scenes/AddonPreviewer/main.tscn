@@ -86,22 +86,25 @@ clear_button_enabled = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 text = "Rescan"
+flat = true
 
 [node name="IgnoreButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633889]
 custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
 text = "Ignore List"
+flat = true
 
 [node name="ManagerDepsButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633888]
 custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 text = "⚙ Manager Dependencies"
+flat = true
 
 [node name="UpdaterButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633887]
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.7, 1.0, 1)
-text = "Addon Updater  ->"
+text = "Addon Updater"
+flat = true
 
 [node name="ContentMargins" type="MarginContainer" parent="VBoxContainer" unique_id=596153689]
 layout_mode = 2
