@@ -24,6 +24,12 @@ func _ready() -> void:
 	var estimated_scale = _last_detected_est_scale
 	var applied_scale = AddonManagerUtil.get_applied_scale()
 	
+	# Load and scale the back button icon
+	var back_tex = load("res://addons/anomalyAcesAddonManager/Icons/AceAddonBack.svg")
+	if back_tex:
+		var icon_size = int(round(16 * estimated_scale))
+		back_button.icon = AddonManagerUtil.scale_svg_icon(back_tex, icon_size)
+	
 	# Scale the header region by the estimated resolution scale factor
 	AddonManagerUtil.apply_editor_scaling($VBoxContainer/Header, estimated_scale)
 	

@@ -52,10 +52,8 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="BackButton" type="Button" parent="VBoxContainer/Header/HBox"]
-custom_minimum_size = Vector2(140, 28)
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.55, 0.58, 1)
-text = "\u2190 Addon Previewer"
 flat = true
 
 [node name="TitleSection" type="VBoxContainer" parent="VBoxContainer/Header/HBox"]

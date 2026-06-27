@@ -280,3 +280,12 @@ static func _scale_theme(theme: Theme, scale: float) -> Theme:
             var val = dup.get_constant(name, type)
             dup.set_constant(name, type, int(round(val * scale)))
     return dup
+
+static func scale_svg_icon(svg: Texture2D, target_size: int) -> Texture2D:
+    if svg:
+        var img = svg.get_image()
+        if img:
+            img.resize(target_size, target_size, Image.INTERPOLATE_LANCZOS)
+            return ImageTexture.create_from_image(img)
+    return svg
+
