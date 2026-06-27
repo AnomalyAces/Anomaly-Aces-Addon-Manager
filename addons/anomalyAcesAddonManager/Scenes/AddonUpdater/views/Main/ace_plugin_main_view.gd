@@ -23,6 +23,7 @@ var _selected_addons: Array[RemoteRepoObject] = []
 var _conflicts: Array[RemoteRepoConflict] = []
 var _selected_conflicts: Array[RemoteRepoConflict] = []
 var _editor_scale: float = 1.0
+var _table_scale: float = 1.0
 
 func _ready() -> void:
 	rrm = GitHubManager.new(self, _editor_interface)
@@ -255,7 +256,7 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 	AceLog.printLog(["Loading Conflict Table data via AceTableManager"])
 	conflictTablePlugin.printConfig()
 	_conflict_table = AceTableManager.createTable(conflictTablePlugin, colDefs, tableData)
-	_apply_editor_scaling(conflictTablePlugin, _editor_scale)
+	_apply_editor_scaling(conflictTablePlugin, _table_scale)
 	_conflict_table.row_selected.connect(_on_conflict_table_selection)
 	AceLog.printLog(["Done Loading Conflict Table data via AceTableManager"])
 
@@ -286,7 +287,7 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	selectColDef.columnName = ""
 	selectColDef.columnType = AceTableConstants.ColumnType.SELECTION
 	selectColDef.columnAlign = AceTableConstants.Align.CENTER
-	selectColDef.columnImageSize = Vector2i(48 * _editor_scale, 48 * _editor_scale)
+	selectColDef.columnImageSize = Vector2i(48 * _table_scale, 48 * _table_scale)
 	selectColDef.columnHasSelectAll = true
 
 	var addonColDef: AceTableColumnDef = AceTableColumnDef.new()
@@ -341,7 +342,7 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	addonTablePlugin.printConfig()
 	_addon_table = AceTableManager.createTable(addonTablePlugin, colDefs, tableData)
-	_apply_editor_scaling(addonTablePlugin, _editor_scale)
+	_apply_editor_scaling(addonTablePlugin, _table_scale)
 	_addon_table.row_selected.connect(_on_addon_table_selection)
 	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
 
@@ -405,8 +406,23 @@ func _merge_updated_addons(addons: Array[RemoteRepoObject]) -> void:
 			_addons.append(updated_addon)
 
 func initialize_scaling(scale: float) -> void:
-	_editor_scale = scale
-	_apply_editor_scaling(self, scale)
+	_editor_scale = scale * 0.8
+	_table_scale = scale * 0.7
+	
+	# Scale action buttons, table titles, and loading views by _editor_scale
+	var action_buttons = get_node_or_null("PanelContainer/VBoxContainer/ActionButtons")
+	if action_buttons:
+		_apply_editor_scaling(action_buttons, _editor_scale)
+	if tableTtile:
+		_apply_editor_scaling(tableTtile, _editor_scale)
+	if loadingView:
+		_apply_editor_scaling(loadingView, _editor_scale)
+		
+	# Scale tables by _table_scale
+	if addonTablePlugin:
+		_apply_editor_scaling(addonTablePlugin, _table_scale)
+	if conflictTablePlugin:
+		_apply_editor_scaling(conflictTablePlugin, _table_scale)
 
 
 

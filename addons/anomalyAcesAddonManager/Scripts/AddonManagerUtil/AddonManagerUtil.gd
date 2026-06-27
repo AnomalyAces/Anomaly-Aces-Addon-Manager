@@ -83,20 +83,11 @@ static func save_settings(settings: Dictionary) -> void:
         file.close()
 
 static func get_estimated_scale() -> float:
-    if Engine.is_editor_hint():
-        return EditorInterface.get_editor_scale()
-    
     var screen = DisplayServer.window_get_current_screen()
-    var screen_scale = DisplayServer.screen_get_scale(screen)
-    if screen_scale > 1.0:
-        return screen_scale
-        
-    var dpi = DisplayServer.screen_get_dpi(screen)
-    if dpi > 0:
-        var raw_scale = dpi / 96.0
-        if raw_scale > 1.1:
-            return max(1.0, round(raw_scale * 4.0) / 4.0)
-            
+    var screen_size = DisplayServer.screen_get_size(screen)
+    if screen_size.x > 0:
+        var ratio = float(screen_size.x) / 1920.0
+        return max(1.0, round(ratio * 4.0) / 4.0)
     return 1.0
 
 static func get_applied_scale() -> float:
@@ -105,7 +96,7 @@ static func get_applied_scale() -> float:
         var custom_scale = settings.get("scale")
         if custom_scale is float or custom_scale is int:
             return float(custom_scale)
-    return 1.0
+    return max(1.0, AddonManagerUtil.get_estimated_scale())
 
 static func set_applied_scale(scale: float) -> void:
     var settings = AddonManagerUtil.get_settings()
@@ -119,10 +110,12 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     if controls_container.has_node("ScaleContainer"):
         return
         
+    var header_scale = AddonManagerUtil.get_estimated_scale()
+    
     var container = HBoxContainer.new()
     container.name = "ScaleContainer"
     container.alignment = BoxContainer.ALIGNMENT_CENTER
-    container.add_theme_constant_override("separation", 6)
+    container.add_theme_constant_override("separation", int(round(6 * header_scale)))
     
     var label = Label.new()
     label.name = "ScaleLabel"
@@ -137,10 +130,13 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     
     line_edit.size_flags_vertical = Control.SIZE_SHRINK_CENTER
     
-    # Do not scale elements inside the header, but make LineEdit custom_minimum_size match RefreshButton height
-    line_edit.add_theme_font_size_override("font_size", 13)
-    line_edit.custom_minimum_size = Vector2(80, 28)
-    label.add_theme_font_size_override("font_size", 13)
+    # Scale elements inside the header to match the header resolution scale factor
+    var font_size = int(round(13 * header_scale))
+    var min_size = Vector2(80 * header_scale, 28 * header_scale)
+    
+    line_edit.add_theme_font_size_override("font_size", font_size)
+    line_edit.custom_minimum_size = min_size
+    label.add_theme_font_size_override("font_size", font_size)
     label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.75, 1))
     
     container.add_child(label)

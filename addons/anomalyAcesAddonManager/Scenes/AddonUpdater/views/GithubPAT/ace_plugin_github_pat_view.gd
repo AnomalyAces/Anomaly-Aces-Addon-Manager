@@ -162,7 +162,7 @@ func _on_github_pat_check_completed(result: int, response_code: int, headers: Ar
 
 func initialize_scaling(scale: float) -> void:
 	_editor_scale = scale
-	_apply_editor_scaling(self, scale)
+	_apply_editor_scaling(self, scale * 0.8)
 
 func _apply_editor_scaling(node: Node, scale: float) -> void:
 	AddonManagerUtil.apply_editor_scaling(node, scale)

@@ -20,10 +20,16 @@ func initialize_view(p_ref, extra_data):
 	plugin_ref = p_ref
 
 func _ready():
-	var scale = AddonManagerUtil.get_applied_scale()
+	var estimated_scale = AddonManagerUtil.get_estimated_scale()
+	var applied_scale = AddonManagerUtil.get_applied_scale()
+	
+	# Scale the header region by the estimated resolution scale factor
+	_apply_editor_scaling($VBoxContainer/Header, estimated_scale)
+	
+	# Scale the content margins by the applied custom scale factor
+	_apply_editor_scaling($VBoxContainer/ContentMargins, applied_scale)
+	
 	if Engine.is_editor_hint() and plugin_ref != null:
-		_apply_editor_scaling(self, scale)
-		
 		# Add manual scaling control UI to header controls
 		var controls = $VBoxContainer/Header/HBox/Controls
 		AddonManagerUtil.add_scale_ui_to_header(controls, self)
@@ -38,7 +44,7 @@ func _ready():
 	scroll_container.resized.connect(_on_scroll_container_resized)
 	_on_scroll_container_resized()
 	
-	_setup_button_icons(scale)
+	_setup_button_icons(applied_scale)
 	
 	scan_addons()
 
@@ -58,17 +64,18 @@ func _apply_editor_scaling(node: Node, scale: float):
 			var current_size = node.get_theme_font_size(font_size_key)
 			node.add_theme_font_size_override(font_size_key, int(round(current_size * scale)))
 			
-		# Scale margin theme overrides
+		# Scale margin theme overrides with dampening to prevent vertical bloat
+		var spacing_scale = 1.0 + (scale - 1.0) * 0.5
 		for margin in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
 			if node.has_theme_constant_override(margin):
 				var val = node.get_theme_constant(margin)
-				node.add_theme_constant_override(margin, int(round(val * scale)))
+				node.add_theme_constant_override(margin, int(round(val * spacing_scale)))
 				
-		# Scale separation theme overrides
+		# Scale separation theme overrides with dampening
 		for sep in ["separation", "h_separation", "v_separation"]:
 			if node.has_theme_constant_override(sep):
 				var val = node.get_theme_constant(sep)
-				node.add_theme_constant_override(sep, int(round(val * scale)))
+				node.add_theme_constant_override(sep, int(round(val * spacing_scale)))
 			
 	for child in node.get_children():
 		_apply_editor_scaling(child, scale)

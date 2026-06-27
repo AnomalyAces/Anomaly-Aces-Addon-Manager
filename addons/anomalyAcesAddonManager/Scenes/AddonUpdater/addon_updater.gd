@@ -17,12 +17,18 @@ func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	refresh_button.pressed.connect(_on_refresh_pressed)
 	
+	var estimated_scale = AddonManagerUtil.get_estimated_scale()
+	var applied_scale = AddonManagerUtil.get_applied_scale()
+	
+	# Scale the header region by the estimated resolution scale factor
+	AddonManagerUtil.apply_editor_scaling($VBoxContainer/Header, estimated_scale)
+	
 	if Engine.is_editor_hint() and plugin_ref != null:
 		# Add manual scaling control UI to header controls
 		var controls = $VBoxContainer/Header/HBox/Controls
 		AddonManagerUtil.add_scale_ui_to_header(controls, self)
 		
-		# Instantiate the migrated AcePluginManager at runtime
+		# Instantiate the migrated AcePluginManager at runtime directly
 		var scene_res = load(ACE_PLUGIN_MANAGER_SCENE)
 		if scene_res:
 			plugin_manager = scene_res.instantiate()
@@ -31,7 +37,7 @@ func _ready() -> void:
 			
 			manager_container.add_child(plugin_manager)
 			
-			# Pass editor interface and apply scale after adding to tree (so @onready child nodes are initialized)
+			# Pass editor interface
 			if plugin_manager.has_method("assignEditorInterface"):
 				plugin_manager.assignEditorInterface(EditorInterface)
 			

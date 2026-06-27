@@ -19,6 +19,7 @@ func _ready() -> void:
 		github_pat.back_to_main_view.connect(_on_close_github_pat)
 
 func assignEditorInterface(editorInterface: EditorInterface) -> void:
+	# Scale updater subviews dynamically using the user's custom scale setting
 	var scale = AddonManagerUtil.get_applied_scale()
 	
 	var mv = main_view if main_view != null else get_node_or_null("Main")
