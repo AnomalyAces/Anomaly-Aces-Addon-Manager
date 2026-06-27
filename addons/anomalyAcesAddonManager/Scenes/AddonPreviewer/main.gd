@@ -15,12 +15,16 @@ const ADDON_CARD_SCENE = preload("res://addons/anomalyAcesAddonManager/Scenes/Ad
 # Cache list of addon details: { name, version, author, description, demos, card_instance }
 var addons_list: Array = []
 var plugin_ref = null
+var _last_detected_est_scale: float = 1.0
 
 func initialize_view(p_ref, extra_data):
 	plugin_ref = p_ref
 
 func _ready():
-	var estimated_scale = AddonManagerUtil.get_estimated_scale()
+	_last_detected_est_scale = AddonManagerUtil.get_estimated_scale()
+	get_tree().root.size_changed.connect(_on_dpi_or_resolution_changed)
+	
+	var estimated_scale = _last_detected_est_scale
 	var applied_scale = AddonManagerUtil.get_applied_scale()
 	
 	# Scale the header region by the estimated resolution scale factor
@@ -47,6 +51,18 @@ func _ready():
 	_setup_button_icons(applied_scale)
 	
 	scan_addons()
+
+func _exit_tree() -> void:
+	var root = get_tree().root if get_tree() else null
+	if root and root.size_changed.is_connected(_on_dpi_or_resolution_changed):
+		root.size_changed.disconnect(_on_dpi_or_resolution_changed)
+
+func _on_dpi_or_resolution_changed() -> void:
+	var new_est = AddonManagerUtil.get_estimated_scale()
+	if new_est != _last_detected_est_scale:
+		_last_detected_est_scale = new_est
+		if plugin_ref and plugin_ref.has_method("reload_current_view"):
+			plugin_ref.reload_current_view()
 
 func _apply_editor_scaling(node: Node, scale: float):
 	if node is Control:

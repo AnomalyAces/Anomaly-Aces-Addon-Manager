@@ -10,6 +10,10 @@ func _enter_tree() -> void:
 	# Enable all plugins in res://addons/
 	AddonManagerUtil.enable_addons()
 
+	#Intialize the AceLog settings
+	AceLog.initialize_settings()
+
+	#Initialize the main screen wrapper
 	main_screen_wrapper = MarginContainer.new()
 	main_screen_wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	main_screen_wrapper.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -41,7 +45,9 @@ func _get_plugin_icon() -> Texture2D:
 	if base_tex:
 		var img = base_tex.get_image()
 		if img:
-			var scale = AddonManagerUtil.get_applied_scale()
+			var scale = 1.0
+			if Engine.is_editor_hint():
+				scale = EditorInterface.get_editor_scale()
 			var target_size = int(round(16 * scale))
 			img.resize(target_size, target_size, Image.INTERPOLATE_LANCZOS)
 			return ImageTexture.create_from_image(img)

@@ -105,8 +105,9 @@ func _createAddonInstallTable(addons: Array[RemoteRepoObject], configFile: Confi
 
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	installTablePlugin.printConfig()
+	AddonManagerUtil.scale_table_themes(installTablePlugin, _table_scale)
 	_addon_install_table = AceTableManager.createTable(installTablePlugin, colDefs, tableData)
-	_apply_editor_scaling(installTablePlugin, _table_scale)
+	AddonManagerUtil.apply_editor_scaling(_addon_install_table, _table_scale, false)
 	# _addon_install_table.row_selected.connect(_on_addon_table_selection)
 	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
 
@@ -146,25 +147,12 @@ func _handle_update(link: String) -> void:
 	AceLog.printLog(["Update link pressed: %s" % link], AceLog.LOG_LEVEL.INFO)
 
 func initialize_scaling(scale: float) -> void:
-	_editor_scale = scale * 0.8
-	_table_scale = scale * 0.7
-	
-	# Scale action buttons, back buttons, and titles by _editor_scale
-	var header_container = get_node_or_null("PanelContainer/MarginContainer/PageContainer/HeaderContainer")
-	if header_container:
-		_apply_editor_scaling(header_container, _editor_scale)
-	var button_container = get_node_or_null("PanelContainer/MarginContainer/PageContainer/ButtonContainer")
-	if button_container:
-		_apply_editor_scaling(button_container, _editor_scale)
-	if loadingView:
-		_apply_editor_scaling(loadingView, _editor_scale)
-		
-	# Scale install table by _table_scale
-	if installTablePlugin:
-		_apply_editor_scaling(installTablePlugin, _table_scale)
+	_editor_scale = scale
+	_table_scale = scale
+	_apply_editor_scaling(self, scale)
 
 
 
 func _apply_editor_scaling(node: Node, scale: float) -> void:
-	AddonManagerUtil.apply_editor_scaling(node, scale)
+	AddonManagerUtil.apply_editor_scaling(node, scale, true)
 

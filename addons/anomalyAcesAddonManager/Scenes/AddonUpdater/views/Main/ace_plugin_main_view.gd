@@ -35,12 +35,11 @@ func _ready() -> void:
 	rrm.addons_install_ready.connect(_on_addons_install_ready)
 	rrm.addon_updates_processed.connect(_on_addon_updates_processed)
 
-	AceLog.printLog(["Current Animation: %s" % loadingView.animationPlayer.current_animation], AceLog.LOG_LEVEL.INFO)
-
 	if loadingView.animationPlayer.current_animation != "Loading":
 		loadingView.playAnimation()
 	
-	getAddons()
+	if not Engine.is_editor_hint():
+		getAddons()
 
 
 	
@@ -255,8 +254,9 @@ func _createConflictTable(conflics: Array[RemoteRepoConflict]) -> void:
 
 	AceLog.printLog(["Loading Conflict Table data via AceTableManager"])
 	conflictTablePlugin.printConfig()
+	AddonManagerUtil.scale_table_themes(conflictTablePlugin, _table_scale)
 	_conflict_table = AceTableManager.createTable(conflictTablePlugin, colDefs, tableData)
-	_apply_editor_scaling(conflictTablePlugin, _table_scale)
+	AddonManagerUtil.apply_editor_scaling(_conflict_table, _table_scale, false)
 	_conflict_table.row_selected.connect(_on_conflict_table_selection)
 	AceLog.printLog(["Done Loading Conflict Table data via AceTableManager"])
 
@@ -341,8 +341,9 @@ func _createAddonTable(addons: Array[RemoteRepoObject]) -> void:
 
 	AceLog.printLog(["Loading Add-on Table data via AceTableManager"])
 	addonTablePlugin.printConfig()
+	AddonManagerUtil.scale_table_themes(addonTablePlugin, _table_scale)
 	_addon_table = AceTableManager.createTable(addonTablePlugin, colDefs, tableData)
-	_apply_editor_scaling(addonTablePlugin, _table_scale)
+	AddonManagerUtil.apply_editor_scaling(_addon_table, _table_scale, false)
 	_addon_table.row_selected.connect(_on_addon_table_selection)
 	AceLog.printLog(["Done Loading Add-on Table data via AceTableManager"])
 
@@ -406,25 +407,11 @@ func _merge_updated_addons(addons: Array[RemoteRepoObject]) -> void:
 			_addons.append(updated_addon)
 
 func initialize_scaling(scale: float) -> void:
-	_editor_scale = scale * 0.8
-	_table_scale = scale * 0.7
-	
-	# Scale action buttons, table titles, and loading views by _editor_scale
-	var action_buttons = get_node_or_null("PanelContainer/VBoxContainer/ActionButtons")
-	if action_buttons:
-		_apply_editor_scaling(action_buttons, _editor_scale)
-	if tableTtile:
-		_apply_editor_scaling(tableTtile, _editor_scale)
-	if loadingView:
-		_apply_editor_scaling(loadingView, _editor_scale)
-		
-	# Scale tables by _table_scale
-	if addonTablePlugin:
-		_apply_editor_scaling(addonTablePlugin, _table_scale)
-	if conflictTablePlugin:
-		_apply_editor_scaling(conflictTablePlugin, _table_scale)
+	_editor_scale = scale
+	_table_scale = scale
+	_apply_editor_scaling(self, scale)
 
 
 
 func _apply_editor_scaling(node: Node, scale: float) -> void:
-	AddonManagerUtil.apply_editor_scaling(node, scale)
+	AddonManagerUtil.apply_editor_scaling(node, scale, true)

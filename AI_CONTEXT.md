@@ -71,10 +71,10 @@ Because dashboard scripts are marked with `@tool`, their `_ready()` functions ru
 * **Addon Cards**: Since addon cards are instantiated dynamically via code, they are scaled dynamically when `set_addon_details(..., scale)` is called by the parent main screen script.
 
 ### 2. Resolution-Based Scale Estimation
-- When the plugin loads, the default estimated scale is calculated using a resolution width formula:
+- When the plugin loads, the default estimated scale is calculated based on the **logical (DPI-scaled) screen resolution width**:
   $$\text{scale} = \max\left(1.0, \frac{\text{round}(\text{ratio} \times 4.0)}{4.0}\right)$$
-  where $\text{ratio} = \frac{\text{current\_screen\_width}}{1920.0}$
-- This rounds screen resolutions automatically to their closest `0.25` increment (e.g. `1920px` estimates `1.0`, `2560px` estimates `1.25`, `3456px` estimates `1.75`, and `3840px` estimates `2.0`).
+  where $\text{ratio} = \frac{\text{logical\_screen\_width}}{1920.0}$ and $\text{logical\_screen\_width} = \frac{\text{physical\_screen\_width}}{\text{DisplayServer.screen\_get\_scale()}}$
+- This ensures that if OS scaling is active (e.g., `200%` on a `3456x2160` screen, resulting in a logical width of `1728px`), the estimated scale will be computed using the logical space (yielding `1.0` scale) instead of the raw physical space, avoiding double-scaling since Godot already scales the canvas by the OS scale automatically.
 
 ### 3. Decoupled Scaling & Layout Dampening
 - **Decoupled Headers**: The top navigation header is scaled by `estimated_scale` so its buttons and labels match the scale of the Godot editor itself. The main content (cards scroll area and tables) scales by the user's custom scale setting (`applied_scale`), which defaults to `estimated_scale`.

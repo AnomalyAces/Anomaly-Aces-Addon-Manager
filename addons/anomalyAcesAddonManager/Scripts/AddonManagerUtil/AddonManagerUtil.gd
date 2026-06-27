@@ -85,22 +85,38 @@ static func save_settings(settings: Dictionary) -> void:
 static func get_estimated_scale() -> float:
     var screen = DisplayServer.window_get_current_screen()
     var screen_size = DisplayServer.screen_get_size(screen)
-    if screen_size.x > 0:
-        var ratio = float(screen_size.x) / 1920.0
-        return max(1.0, round(ratio * 4.0) / 4.0)
-    return 1.0
+    
+    # Determine the active scale factor (prioritizing Godot editor scale inside editor, then OS display scale)
+    var active_scale = 1.0
+    if Engine.is_editor_hint() and ClassDB.class_exists("EditorInterface"):
+        active_scale = EditorInterface.get_editor_scale()
+    else:
+        var screen_scale = DisplayServer.screen_get_scale(screen)
+        if screen_scale > 0:
+            active_scale = screen_scale
+            
+    var logical_width = float(screen_size.x)
+    if active_scale > 0:
+        logical_width = float(screen_size.x) / active_scale
+        
+    var ratio = logical_width / 1920.0
+    var est = max(1.0, round(ratio * 4.0) / 4.0)
+    AceLog.printLog(["[Scaling Debug] Screen index: ", screen, " | Active Scale: ", active_scale, " | Physical Size: ", screen_size, " | Logical Width: ", logical_width, " | Estimated Scale: ", est], AceLog.LOG_LEVEL.DEBUG)
+    return est
 
 static func get_applied_scale() -> float:
     var settings = AddonManagerUtil.get_settings()
-    if settings.has("scale"):
-        var custom_scale = settings.get("scale")
-        if custom_scale is float or custom_scale is int:
-            return float(custom_scale)
+    if settings.get("is_custom_scale", false) == true:
+        if settings.has("scale"):
+            var custom_scale = settings.get("scale")
+            if custom_scale is float or custom_scale is int:
+                return float(custom_scale)
     return max(1.0, AddonManagerUtil.get_estimated_scale())
 
 static func set_applied_scale(scale: float) -> void:
     var settings = AddonManagerUtil.get_settings()
     settings["scale"] = scale
+    settings["is_custom_scale"] = true
     AddonManagerUtil.save_settings(settings)
 
 static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_instance: Control) -> void:
@@ -110,12 +126,12 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     if controls_container.has_node("ScaleContainer"):
         return
         
-    var header_scale = AddonManagerUtil.get_estimated_scale()
+    var current_scale = AddonManagerUtil.get_applied_scale()
     
     var container = HBoxContainer.new()
     container.name = "ScaleContainer"
     container.alignment = BoxContainer.ALIGNMENT_CENTER
-    container.add_theme_constant_override("separation", int(round(6 * header_scale)))
+    container.add_theme_constant_override("separation", int(round(6 * current_scale)))
     
     var label = Label.new()
     label.name = "ScaleLabel"
@@ -124,15 +140,14 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     var line_edit = LineEdit.new()
     line_edit.name = "ScaleLineEdit"
     
-    var current_scale = AddonManagerUtil.get_applied_scale()
     line_edit.text = "%d%%" % int(current_scale * 100)
     line_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
     
     line_edit.size_flags_vertical = Control.SIZE_SHRINK_CENTER
     
-    # Scale elements inside the header to match the header resolution scale factor
-    var font_size = int(round(13 * header_scale))
-    var min_size = Vector2(80 * header_scale, 28 * header_scale)
+    # Scale elements inside the header to match the current scale factor
+    var font_size = int(round(13 * current_scale))
+    var min_size = Vector2(80 * current_scale, 28 * current_scale)
     
     line_edit.add_theme_font_size_override("font_size", font_size)
     line_edit.custom_minimum_size = min_size
@@ -190,8 +205,16 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     )
 
 
-static func apply_editor_scaling(node: Node, scale: float) -> void:
+static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = true) -> void:
     if scale == 1.0 or node == null:
+        return
+        
+    var is_table = false
+    var scr = node.get_script()
+    if scr and (scr.resource_path.ends_with("ace_table_properties.gd") or node.has_method("printConfig")):
+        is_table = true
+        
+    if skip_tables and is_table:
         return
     if node is Control:
         if node.custom_minimum_size != Vector2.ZERO:
@@ -216,24 +239,33 @@ static func apply_editor_scaling(node: Node, scale: float) -> void:
                 node.add_theme_constant_override(key, int(round(override_val * scale)))
         
         # Scale table themes if the node is an AceTablePlugin
-        if node is AceTablePlugin:
-            _scale_table_themes(node, scale)
+        if is_table:
+            scale_table_themes(node, scale)
     
     for child in node.get_children():
-        apply_editor_scaling(child, scale)
+        apply_editor_scaling(child, scale, skip_tables)
 
 
-static func _scale_table_themes(table_plugin: Control, scale: float) -> void:
+static func scale_table_themes(table_plugin: Control, scale: float) -> void:
     if scale == 1.0 or table_plugin == null:
         return
-    if table_plugin.header_theme:
-        table_plugin.header_theme = _scale_theme(table_plugin.header_theme, scale)
-    if table_plugin.header_cell_theme:
-        table_plugin.header_cell_theme = _scale_theme(table_plugin.header_cell_theme, scale)
-    if table_plugin.row_theme:
-        table_plugin.row_theme = _scale_theme(table_plugin.row_theme, scale)
-    if table_plugin.row_cell_theme:
-        table_plugin.row_cell_theme = _scale_theme(table_plugin.row_cell_theme, scale)
+        
+    var theme_keys = ["header_theme", "header_cell_theme", "row_theme", "row_cell_theme"]
+    for key in theme_keys:
+        var meta_key = "original_" + key
+        var orig = null
+        if table_plugin.has_meta(meta_key):
+            orig = table_plugin.get_meta(meta_key)
+        if orig == null:
+            orig = table_plugin.get(key)
+            if orig != null:
+                table_plugin.set_meta(meta_key, orig)
+        else:
+            table_plugin.set(key, orig)
+            
+        var current = table_plugin.get(key)
+        if current != null and current is Theme:
+            table_plugin.set(key, _scale_theme(current, scale))
 
 
 static func _scale_theme(theme: Theme, scale: float) -> Theme:

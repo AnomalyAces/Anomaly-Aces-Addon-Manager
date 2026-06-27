@@ -8,6 +8,10 @@
 
 config_version=5
 
+[aceLog]
+
+settings/logLevel="DEBUG"
+
 [application]
 
 config/name="Anomaly Aces Addon Manager"
