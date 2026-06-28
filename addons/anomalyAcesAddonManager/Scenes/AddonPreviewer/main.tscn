@@ -68,7 +68,7 @@ text = "Preview and test your registered addons"
 
 [node name="Controls" type="HBoxContainer" parent="VBoxContainer/Header/HBox" unique_id=1732833946]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 10
 
 [node name="AddonCountLabel" type="Label" parent="VBoxContainer/Header/HBox/Controls" unique_id=1230635310]
 layout_mode = 2
@@ -77,31 +77,31 @@ theme_override_font_sizes/font_size = 14
 text = "4 Addon(s) Detected"
 
 [node name="SearchInput" type="LineEdit" parent="VBoxContainer/Header/HBox/Controls" unique_id=835086713]
-custom_minimum_size = Vector2(250, 36)
+custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 placeholder_text = "Search addons..."
 clear_button_enabled = true
 
 [node name="RefreshButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=132544225]
-custom_minimum_size = Vector2(100, 36)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "Rescan"
 flat = true
 
 [node name="IgnoreButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633889]
-custom_minimum_size = Vector2(120, 36)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "Ignore List"
 flat = true
 
 [node name="ManagerDepsButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633888]
-custom_minimum_size = Vector2(160, 36)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "⚙ Manager Dependencies"
 flat = true
 
 [node name="UpdaterButton" type="Button" parent="VBoxContainer/Header/HBox/Controls" unique_id=241633887]
-custom_minimum_size = Vector2(100, 36)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "Addon Updater"
 flat = true

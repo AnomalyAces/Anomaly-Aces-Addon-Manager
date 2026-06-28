@@ -83,16 +83,27 @@ static func save_settings(settings: Dictionary) -> void:
         file.close()
 
 static func get_estimated_scale() -> float:
-    var screen_size = DisplayServer.screen_get_size()
-    var os_scale = DisplayServer.screen_get_scale()
+    var current_screen = DisplayServer.window_get_current_screen()
+    var screen_size = DisplayServer.screen_get_size(current_screen)
+    var os_scale = DisplayServer.screen_get_scale(current_screen)
     if os_scale <= 0:
         os_scale = 1.0
         
-    var logical_width = float(screen_size.x) / os_scale
+    var physical_width = float(screen_size.x)
+    if os_scale > 1.0:
+        if physical_width < 1920.0:
+            # Godot returned logical size. Multiply to get physical.
+            physical_width = physical_width * os_scale
+        elif physical_width > 3840.0:
+            # Godot returned double-scaled size. Divide to get physical.
+            physical_width = physical_width / os_scale
+        
+    var logical_width = physical_width / os_scale
     var ratio = logical_width / 1920.0
     var est = max(1.0, round(ratio * 4.0) / 4.0)
     
-    AceLog.printLog(["[Scaling Debug] OS Scale: ", os_scale, " | Physical Size: ", screen_size, " | Logical Width: ", logical_width, " | Estimated Scale: ", est], AceLog.LOG_LEVEL.DEBUG)
+    print("[Scaling Debug] Current Screen: ", current_screen, " | OS Scale: ", os_scale, " | Physical Size: ", screen_size, " | Normalized Physical Width: ", physical_width, " | Logical Width: ", logical_width, " | Estimated Scale: ", est)
+    AceLog.printLog(["[Scaling Debug] OS Scale: ", os_scale, " | Physical Size: ", screen_size, " | Physical Width: ", physical_width, " | Estimated Scale: ", est], AceLog.LOG_LEVEL.DEBUG)
     return est
 
 static func get_applied_scale() -> float:
@@ -108,6 +119,13 @@ static func set_applied_scale(scale: float) -> void:
     var settings = AddonManagerUtil.get_settings()
     settings["scale"] = scale
     settings["is_custom_scale"] = true
+    AddonManagerUtil.save_settings(settings)
+
+static func clear_applied_scale() -> void:
+    var settings = AddonManagerUtil.get_settings()
+    settings["is_custom_scale"] = false
+    if settings.has("scale"):
+        settings.erase("scale")
     AddonManagerUtil.save_settings(settings)
 
 static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_instance: Control) -> void:
@@ -160,7 +178,10 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
                 has_dot = true
                 
         if clean_text.is_empty():
-            line_edit.text = "%d%%" % int(AddonManagerUtil.get_applied_scale() * 100)
+            AddonManagerUtil.clear_applied_scale()
+            var main_plugin = plugin_instance.get("plugin_ref")
+            if main_plugin and main_plugin.has_method("reload_current_view"):
+                main_plugin.call("reload_current_view")
             return
             
         var val = float(clean_text)
@@ -226,15 +247,18 @@ static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = t
                 
             var base_min = node.custom_minimum_size
             if base_min != Vector2.ZERO:
-                var new_h = base_min.y + 12
-                var new_w = base_min.x
-                if abs(base_min.x - base_min.y) < 2:
-                    new_w = base_min.x + 12
+                var new_h = base_min.y + 12 # +12px height increase
+                if base_min.x > 0:
+                    var new_w = base_min.x
+                    if abs(base_min.x - base_min.y) < 2:
+                        new_w = base_min.x + 12 # +12px width for square buttons
+                    else:
+                        new_w = base_min.x + 12 # +12px width for regular buttons
+                    node.custom_minimum_size = Vector2(new_w, new_h) * scale
                 else:
-                    new_w = base_min.x + 50 # Add extra width for larger text
-                node.custom_minimum_size = Vector2(new_w, new_h) * scale
+                    node.custom_minimum_size = Vector2(0, new_h * scale)
                 
-            node.add_theme_font_size_override("font_size", int(round(26 * scale)))
+            node.add_theme_font_size_override("font_size", int(round(18 * scale))) # Base 18px font (14 + 4)
             custom_scaled = true
             
         if not custom_scaled:

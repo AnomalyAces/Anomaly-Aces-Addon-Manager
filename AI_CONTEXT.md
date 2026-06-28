@@ -63,42 +63,51 @@ Every sub-scene implements `initialize_view(plugin_ref, extra_data)` to receive 
 ---
 
 ## High-DPI Scaling & Layout Adjustments
-To support responsive UI scaling in the editor plugin at any display scale, the dashboard implements dynamic scaling via `AddonManagerUtil.apply_editor_scaling(node, scale)`:
+To support responsive UI scaling in the editor plugin at any display scale and resolution, the project implements a robust dynamic scaling utility defined in [AddonManagerUtil.gd](file:///c:/Users/Jerek/Documents/Anomaly%20Aces%20Plugins/Anomaly-Aces-Addon-Manager/addons/anomalyAcesAddonManager/Scripts/AddonManagerUtil/AddonManagerUtil.gd):
 
 ### 1. The Serialization Gotcha (Crucial!)
-Because dashboard scripts are marked with `@tool`, their `_ready()` functions run inside the Godot Editor workspace tree when editing them. If layout modifications are applied automatically on `_ready()`, they will modify the editor's tree and get **serialized back to the `.tscn` file** when saving the scene.
+Because dashboard scripts are marked with `@tool`, their `_ready()` functions run inside the Godot Editor workspace tree when editing them. If layout modifications are applied automatically on `_ready()`, they will modify the editor's active scene and get **serialized back to the `.tscn` file** when saving the scene.
 * **Rule**: Only trigger layout and font scaling if `plugin_ref` is NOT `null`. When scenes are opened for editing in the editor, `plugin_ref` is `null`, ensuring properties remain at their clean, unscaled base values.
 * **Addon Cards**: Since addon cards are instantiated dynamically via code, they are scaled dynamically when `set_addon_details(..., scale)` is called by the parent main screen script.
 
 ### 2. Resolution-Based Scale Estimation
-- When the plugin loads, the default estimated scale is calculated based on the **logical (DPI-scaled) screen resolution width**:
-  $$\text{scale} = \max\left(1.0, \frac{\text{round}(\text{ratio} \times 4.0)}{4.0}\right)$$
-  where $\text{ratio} = \frac{\text{logical\_screen\_width}}{1920.0}$ and $\text{logical\_screen\_width} = \frac{\text{physical\_screen\_width}}{\text{DisplayServer.screen\_get\_scale()}}$
-- This ensures that if OS scaling is active (e.g., `200%` on a `3456x2160` screen, resulting in a logical width of `1728px`), the estimated scale will be computed using the logical space (yielding `1.0` scale) instead of the raw physical space, avoiding double-scaling since Godot already scales the canvas by the OS scale automatically.
+- The default estimated scale is calculated strictly based on the physical screen resolution width and the OS display scale factor:
+  * If the reported physical width is greater than standard 4K (`3840px`), we know it is a double-scaled layout size returned by Godot and divide it by the OS scale factor (`DisplayServer.screen_get_scale()`) to get the true physical width.
+  * If the reported width is less than or equal to `3840px`, we use it directly as the true physical width.
+- This ensures that a `3456px` display width always calculates to `1.75` (175%) estimated scale factor, regardless of scaling quirks or monitor setups.
+- Multi-monitor queries should call `DisplayServer.screen_get_size()` and `DisplayServer.screen_get_scale()` with no arguments (defaulting to `-1`) to dynamically target the active display.
 
-### 3. Decoupled Scaling & Layout Dampening
-- **Decoupled Headers**: The top navigation header is scaled by `estimated_scale` so its buttons and labels match the scale of the Godot editor itself. The main content (cards scroll area and tables) scales by the user's custom scale setting (`applied_scale`), which defaults to `estimated_scale`.
-- **Layout Dampening**: To prevent large margins, paddings, and control separations from taking up too much vertical screen space and collapsing scroll containers on high-res displays, margin adjustments use a dampened scaling factor:
-  $$\text{dampened\_scale} = 1.0 + (\text{applied\_scale} - 1.0) \times 0.5$$
+### 3. Destruction Auto-Save Guard (LineEdit focus_exited)
+- When a text-input box (like the custom scale `LineEdit` in the header) has focus, it triggers a `focus_exited` signal when the view is destroyed or reloaded.
+- To prevent destruction-induced `focus_exited` signals from saving stale text values back to `addon_manager_settings.json` (locking the scale factor to an old value), the callback must check `is_queued_for_deletion()` and `is_inside_tree()`:
+  ```gdscript
+  line_edit.focus_exited.connect(func():
+      if line_edit.is_queued_for_deletion() or not line_edit.is_inside_tree():
+          return
+      apply_scale.call(line_edit.text)
+  )
+  ```
 
-### 4. Manual Custom Scaling Control
-- The manual scale selector in the Addon Updater header uses an editable text field (`LineEdit`). 
+### 4. Official Godot Theme Overrides API
+- In Godot 4, you **MUST** use the official Control theme override methods to scale layout attributes at runtime. Querying using raw property paths like `node.get("theme_override_font_sizes/font_size")` returns `null` because theme overrides are managed internally by the Control class.
+- Use the following APIs to safely get and scale properties:
+  * **Fonts**: `node.has_theme_font_size_override(key)` and `node.get_theme_font_size(key)`
+  * **Constants**: `node.has_theme_constant_override(key)` and `node.get_theme_constant(key)`
+  * Apply scaled values using `node.add_theme_font_size_override(key, value)` and `node.add_theme_constant_override(key, value)`.
+
+### 5. Header Sizing and Form Element Constraining (+12px Expansion)
+- **Flat Header Style**: All header buttons (Rescan, Ignore List, Manager Dependencies, Updater, Back) are flat buttons (`flat = true` in their `.tscn` files).
+- **Dimension Expansion (+12px)**: During `apply_editor_scaling()`, if a control is inside a `"Header"` node hierarchy and is a form element (e.g. `Button` or `LineEdit`), its base `custom_minimum_size` width/height and its base font size (`font_size = 26px`) are increased by `12px` before applying the scaling factor.
+- **Icon Sizing (+12px)**: Header SVG icons (Rescan, Gear, Back) are scaled to a base size of `28px` (original `16px` + `12px`) before scale multiplier is applied.
+- **LineEdit Constraint**: To prevent search input fields and other text entries from expanding vertically inside headers when the container grows, they must be constrained to the vertical center:
+  ```gdscript
+  node.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+  ```
+
+### 6. Custom Scaling Control Settings
+- The manual scale selector in the Addon Updater header uses an editable text field (`LineEdit`) that reads/writes to `user://addon_manager_settings.json`. 
 - It parses input strings robustly (e.g. `120%`, `120`, `1.2`, `1.2x`). Values `>= 10.0` are interpreted as percentages, while values `< 10.0` are treated as direct multipliers. 
-- Custom scale is clamped between `0.5` (50%) and `4.0` (400%), default applied scale is `1.0` (100%).
-- Changing the scale saves it to settings and reloads the current view dynamically.
-
-### 5. Granular Subview Scaling & Dynamic Table Rows
-Because the updater's subviews have very large baseline text and button sizes (e.g. `25px`-`32px` fonts) compared to the previewer cards (`12px`-`18px` fonts), the subviews apply granular multipliers to map them to matching visual proportions:
-- The main view manager passes the raw `applied_scale` directly to the subviews.
-- The subviews cache these inside `_editor_scale = scale * 0.8` (for buttons, back buttons, labels) and `_table_scale = scale * 0.7` (for tables and cell contents).
-- Since table rows/cells are populated dynamically *after* initialization, `_createAddonTable()` and `_createInstallAddonsTable()` explicitly call `_apply_editor_scaling(table_node, _table_scale)` when cells are composed, preventing scale loss and ensuring rows match headers.
-
-### 6. Baseline Proportions (1080p Layout)
-The baseline layout properties in the `.tscn` and `.tres` view files are set to comfortable 1920x1080 resolution defaults:
-- **Table text baseline**: Row cell font size is set to **`18px`**.
-- **Table header text baseline**: Header cell font size is set to **`23px`** (~25% larger than table text).
-- **Action buttons**: Height is **`50px`**, font size is **`25px`** (~40% larger than table text), and icon max width is **`30px`**.
-- **Header buttons**: "Refresh" and "Addon Previewer" are flat buttons (`flat = true`) with a compact height of **`28px`**. The manual scale LineEdit also matches this height constraint (`80x28px`).
+- Custom scale is clamped between `0.5` (50%) and `4.0` (400%). Changing the scale saves it to settings and reloads the current view dynamically.
 
 ### 7. Table Theme Duplication & Scaling
 * `AceTablePlugin` tables rely on shared `Theme` resources. If you duplicate the theme via `theme.duplicate(true)`, scaling the values inside the duplicate and assigning it back scales font sizes and margins correctly in-memory without mutating or saving modified resources back to disk.
