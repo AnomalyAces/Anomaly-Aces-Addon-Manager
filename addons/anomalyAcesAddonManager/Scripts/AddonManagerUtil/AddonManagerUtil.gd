@@ -1,7 +1,6 @@
 @tool
 class_name AddonManagerUtil extends Object
 
-const AceScale = preload("res://addons/anomalyAcesUtil/Scripts/AceScale/AceScale.gd")
 
 static func get_github_pat() -> GithubPATInfo:
     var pat_info: GithubPATInfo = GithubPATInfo.new()
