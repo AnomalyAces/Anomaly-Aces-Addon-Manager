@@ -1,6 +1,7 @@
 @tool
 class_name AddonManagerUtil extends Object
 
+
 static func get_github_pat() -> GithubPATInfo:
     var pat_info: GithubPATInfo = GithubPATInfo.new()
     if AceFileUtil.File.file_exists(AcePluginGithubPATView.GITHUB_PAT_FILE_PATH):
@@ -82,38 +83,42 @@ static func save_settings(settings: Dictionary) -> void:
         file.store_string(JSON.stringify(settings, "\t"))
         file.close()
 
+const ADDON_MANAGER_SCALING_RULES := {
+    "Header/Button": {
+        "flat": true,
+        "font_size": 18,
+        "height_offset": 12,
+        "width_offset": 12,
+        "square_width_offset": 12
+    },
+    "Header/LineEdit": {
+        "size_flags_vertical": Control.SIZE_SHRINK_CENTER,
+        "font_size": 18,
+        "height_offset": 6,
+        "width_offset": 12
+    },
+    "Header/ScaleLineEdit": {
+        "size_flags_vertical": Control.SIZE_SHRINK_CENTER,
+        "font_size": 18,
+        "height_offset": 6,
+        "width_offset": 0
+    },
+    "Header/AddonCountLabel": {
+        "font_size": 18,
+        "height_offset": 12,
+        "width_offset": 12
+    },
+    "AceTablePlugin": {
+        "skip_scaling": true,
+        "theme_properties": ["header_theme", "header_cell_theme", "row_theme", "row_cell_theme"]
+    }
+}
+
 static func get_estimated_scale() -> float:
-    var current_screen = DisplayServer.window_get_current_screen()
-    var screen_size = DisplayServer.screen_get_size(current_screen)
-    var os_scale = DisplayServer.screen_get_scale(current_screen)
-    if os_scale <= 0:
-        os_scale = 1.0
-        
-    var physical_width = float(screen_size.x)
-    if os_scale > 1.0:
-        if physical_width < 1920.0:
-            # Godot returned logical size. Multiply to get physical.
-            physical_width = physical_width * os_scale
-        elif physical_width > 3840.0:
-            # Godot returned double-scaled size. Divide to get physical.
-            physical_width = physical_width / os_scale
-        
-    var logical_width = physical_width / os_scale
-    var ratio = logical_width / 1920.0
-    var est = max(1.0, round(ratio * 4.0) / 4.0)
-    
-    print("[Scaling Debug] Current Screen: ", current_screen, " | OS Scale: ", os_scale, " | Physical Size: ", screen_size, " | Normalized Physical Width: ", physical_width, " | Logical Width: ", logical_width, " | Estimated Scale: ", est)
-    AceLog.printLog(["[Scaling Debug] OS Scale: ", os_scale, " | Physical Size: ", screen_size, " | Physical Width: ", physical_width, " | Estimated Scale: ", est], AceLog.LOG_LEVEL.DEBUG)
-    return est
+    return AceScale.get_estimated_scale()
 
 static func get_applied_scale() -> float:
-    var settings = AddonManagerUtil.get_settings()
-    if settings.get("is_custom_scale", false) == true:
-        if settings.has("scale"):
-            var custom_scale = settings.get("scale")
-            if custom_scale is float or custom_scale is int:
-                return float(custom_scale)
-    return max(1.0, AddonManagerUtil.get_estimated_scale())
+    return AceScale.get_scale_from_settings(get_settings())
 
 static func set_applied_scale(scale: float) -> void:
     var settings = AddonManagerUtil.get_settings()
@@ -140,7 +145,7 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     var container = HBoxContainer.new()
     container.name = "ScaleContainer"
     container.alignment = BoxContainer.ALIGNMENT_CENTER
-    container.add_theme_constant_override("separation", int(round(6 * current_scale)))
+    container.add_theme_constant_override("separation", 6)
     
     var label = Label.new()
     label.name = "ScaleLabel"
@@ -152,19 +157,20 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
     line_edit.text = "%d%%" % int(current_scale * 100)
     line_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
     
-    var font_size = int(round(14 * current_scale))
-    var min_size = Vector2(60, 30) * current_scale
-    
-    line_edit.add_theme_font_size_override("font_size", font_size)
-    line_edit.custom_minimum_size = min_size
-    label.add_theme_font_size_override("font_size", font_size)
+    line_edit.custom_minimum_size = Vector2(60, 30)
     label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.75, 1))
+    
+    label.add_theme_font_size_override("font_size", 14)
+    line_edit.add_theme_font_size_override("font_size", 14)
     
     container.add_child(label)
     container.add_child(line_edit)
     
     controls_container.add_child(container)
     controls_container.move_child(container, 0)
+    
+    # Scale the newly added container recursively using the rules
+    AceScale.apply_editor_scaling(container, current_scale, true, ADDON_MANAGER_SCALING_RULES)
     
     var apply_scale = func(new_text: String):
         var clean_text = ""
@@ -215,120 +221,11 @@ static func add_scale_ui_to_header(controls_container: HBoxContainer, plugin_ins
         apply_scale.call(line_edit.text)
     )
 
-
 static func apply_editor_scaling(node: Node, scale: float, skip_tables: bool = true) -> void:
-    if scale == 1.0 or node == null:
-        return
-        
-    var is_table = false
-    var scr = node.get_script()
-    if scr and (scr.resource_path.ends_with("ace_table_properties.gd") or node.has_method("printConfig")):
-        is_table = true
-        
-    if skip_tables and is_table:
-        return
-    if node is Control:
-        # Check if the control is inside a "Header" hierarchy
-        var is_in_header = false
-        var parent = node
-        while parent != null:
-            if parent.name == "Header":
-                is_in_header = true
-                break
-            parent = parent.get_parent()
-            
-        var custom_scaled = false
-        if is_in_header and (node is Button or node is LineEdit or node.name == "AddonCountLabel"):
-            if node is LineEdit:
-                node.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-                
-            if node is Button:
-                node.flat = true
-                
-            var base_min = node.custom_minimum_size
-            if base_min != Vector2.ZERO:
-                var new_h = base_min.y + 12 # +12px height increase
-                if base_min.x > 0:
-                    var new_w = base_min.x
-                    if abs(base_min.x - base_min.y) < 2:
-                        new_w = base_min.x + 12 # +12px width for square buttons
-                    else:
-                        new_w = base_min.x + 12 # +12px width for regular buttons
-                    node.custom_minimum_size = Vector2(new_w, new_h) * scale
-                else:
-                    node.custom_minimum_size = Vector2(0, new_h * scale)
-                
-            node.add_theme_font_size_override("font_size", int(round(18 * scale))) # Base 18px font (14 + 4)
-            custom_scaled = true
-            
-        if not custom_scaled:
-            if node.custom_minimum_size != Vector2.ZERO:
-                node.custom_minimum_size = node.custom_minimum_size * scale
-                
-            # Scale explicit font size overrides directly from properties to bypass scene tree lookup gotchas
-            var font_keys = ["font_size", "normal_font_size", "bold_font_size", "bold_italics_font_size", "italics_font_size", "mono_font_size"]
-            for key in font_keys:
-                if node.has_theme_font_size_override(key):
-                    var current_size = node.get_theme_font_size(key)
-                    node.add_theme_font_size_override(key, int(round(current_size * scale)))
-        
-        # Scale margin, separation, and other constant overrides
-        var constant_keys = [
-            "margin_left", "margin_top", "margin_right", "margin_bottom",
-            "separation", "h_separation", "v_separation",
-            "icon_max_width"
-        ]
-        for key in constant_keys:
-            if node.has_theme_constant_override(key):
-                var val = node.get_theme_constant(key)
-                node.add_theme_constant_override(key, int(round(val * scale)))
-        
-        # Scale table themes if the node is an AceTablePlugin
-        if is_table:
-            scale_table_themes(node, scale)
-    
-    for child in node.get_children():
-        apply_editor_scaling(child, scale, skip_tables)
-
+    AceScale.apply_editor_scaling(node, scale, skip_tables, ADDON_MANAGER_SCALING_RULES)
 
 static func scale_table_themes(table_plugin: Control, scale: float) -> void:
-    if scale == 1.0 or table_plugin == null:
-        return
-        
-    var theme_keys = ["header_theme", "header_cell_theme", "row_theme", "row_cell_theme"]
-    for key in theme_keys:
-        var meta_key = "original_" + key
-        var orig = null
-        if table_plugin.has_meta(meta_key):
-            orig = table_plugin.get_meta(meta_key)
-        if orig == null:
-            orig = table_plugin.get(key)
-            if orig != null:
-                table_plugin.set_meta(meta_key, orig)
-        else:
-            table_plugin.set(key, orig)
-            
-        var current = table_plugin.get(key)
-        if current != null and current is Theme:
-            table_plugin.set(key, _scale_theme(current, scale))
-
-
-static func _scale_theme(theme: Theme, scale: float) -> Theme:
-    var dup = theme.duplicate(true)
-    for type in dup.get_type_list():
-        for name in dup.get_font_size_list(type):
-            var val = dup.get_font_size(name, type)
-            dup.set_font_size(name, type, int(round(val * scale)))
-        for name in dup.get_constant_list(type):
-            var val = dup.get_constant(name, type)
-            dup.set_constant(name, type, int(round(val * scale)))
-    return dup
+    AceScale.scale_custom_themes(table_plugin, scale, ["header_theme", "header_cell_theme", "row_theme", "row_cell_theme"])
 
 static func scale_svg_icon(svg: Texture2D, target_size: int) -> Texture2D:
-    if svg:
-        var img = svg.get_image()
-        if img:
-            img.resize(target_size, target_size, Image.INTERPOLATE_LANCZOS)
-            return ImageTexture.create_from_image(img)
-    return svg
-
+    return AceScale.scale_svg_icon(svg, target_size)
