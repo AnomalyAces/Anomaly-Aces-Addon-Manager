@@ -119,6 +119,20 @@ ensure_ssh_remote() {
     fi
 }
 
+remove_gdignore_safely() {
+    local target_file="$PROJECT_ROOT/addons/anomalyAcesAddonManager/.gdignore"
+    if [ -f "$target_file" ]; then
+        echo "Removing temporary .gdignore from anomalyAcesAddonManager..."
+        if [ -d "$PROJECT_ROOT/.git" ]; then
+            (
+                cd "$PROJECT_ROOT" || exit 1
+                git update-index --assume-unchanged addons/anomalyAcesAddonManager/.gdignore 2>/dev/null
+            )
+        fi
+        rm -f "$target_file"
+    fi
+}
+
 clear_submodule_links() {
     if [ -d addons ]; then
         for link in addons/*; do
@@ -144,6 +158,7 @@ clear_submodule_links() {
 }
 
 link_all_addons() {
+    remove_gdignore_safely
     clear_submodule_links
     
     if [ ! -d submodules ]; then
@@ -480,6 +495,7 @@ cmd_fix_remotes() {
 
 cmd_bootstrap() {
     cd "$PROJECT_ROOT" || exit 1
+    remove_gdignore_safely
     
     echo "=== Ace Addon Manager Bootstrapper ==="
     echo "This command will download the required addon dependencies directly from GitHub"

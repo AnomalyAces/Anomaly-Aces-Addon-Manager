@@ -1,13 +1,15 @@
 # Ace Addon Manager Standalone Installation Guide
 
-If you only have the `anomalyAcesAddonManager` folder, you must run the bootstrapper command *before* enabling the plugin in your Godot Project Settings. 
+If you copy only the `anomalyAcesAddonManager` folder directly into an existing Godot project:
 
-Because this manager depends on its companion plugins (`anomalyAcesLog`, `anomalyAcesTable`, `anomalyAcesUtil`, and `log`), enabling it prematurely will lead to Godot script compilation and resource load errors.
+1. **Automatic Error Suppression**: The folder ships with a temporary `.gdignore` file. This tells Godot to ignore the directory on startup, preventing script compilation or class-not-found errors before your dependencies are ready.
+2. **Recursive Resolution**: The bootstrapper parses the manager's `addons.json` and recursively downloads and resolves the entire dependency tree (including `anomalyAcesLog`, `anomalyAcesTable`, `anomalyAcesUtil`, and sub-dependencies like `log`) directly from GitHub.
+3. **Activation**: Running the bootstrap command automatically deletes the `.gdignore` file so Godot can safely scan, compile, and register the plugin.
 
 ---
 
 ### Step 1: Copy the Addon Folder
-Ensure the `anomalyAcesAddonManager` folder is placed inside your Godot project's `addons/` directory:
+Place the `anomalyAcesAddonManager` folder inside your Godot project's `addons/` directory:
 ```
 your-godot-project/
 ├── addons/
@@ -21,10 +23,10 @@ your-godot-project/
    ```bash
    ./addons/anomalyAcesAddonManager/manage_addons bootstrap
    ```
-   *This command will download the ZIP archives for the 4 dependencies directly from GitHub, extract the required addon folders, and install them into your `addons/` directory.*
+   *This command will dynamically download and resolve all dependencies listed in the addons.json files directly from GitHub, install them under `addons/`, and remove the `.gdignore` file.*
 
 ### Step 3: Enable the Plugin in Godot
 1. Open your project in the **Godot Editor**.
 2. Go to **Project -> Project Settings -> Plugins**.
-3. Locate **Ace Addon Manager** and check the **Enable** checkbox.
+3. Locate **Ace Addon Manager** (which is now visible and compiled cleanly) and check the **Enable** checkbox.
 4. The **"Addon Manager"** main screen tab will now appear at the top-center of your editor.

@@ -10,8 +10,12 @@ func _enter_tree() -> void:
 	# Enable all plugins in res://addons/
 	AddonManagerUtil.enable_addons()
 
-	#Intialize the AceLog settings
-	AceLog.initialize_settings()
+	# Initialize the AceLog settings if the dependency is present
+	var ace_log_path = "res://addons/anomalyAcesLog/scripts/AceLog.gd"
+	if ResourceLoader.exists(ace_log_path):
+		var ace_log = load(ace_log_path)
+		if ace_log:
+			ace_log.initialize_settings()
 
 	#Initialize the main screen wrapper
 	main_screen_wrapper = MarginContainer.new()

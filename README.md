@@ -12,14 +12,13 @@ The **Addon Manager** is a custom Godot editor interface that allows you to mana
 
 ### Standalone Installation (Without cloning this sandbox repository)
 If you are copying only the `anomalyAcesAddonManager` folder directly into an existing Godot project:
-1. Copy the `anomalyAcesAddonManager` directory into your project's `addons/` directory.
-2. **DO NOT enable the plugin yet** (doing so will throw compile errors because its companion plugins are missing).
-3. Open a terminal at your project's root and run the bootstrapper command:
+1. Copy the `anomalyAcesAddonManager` directory into your project's `addons/` directory. (A temporary `.gdignore` file inside prevents initial Godot compilation/load errors).
+2. Open a terminal at your project's root and run the bootstrapper command:
    ```bash
    ./addons/anomalyAcesAddonManager/manage_addons bootstrap
    ```
-   *(This downloads and extracts the 4 required dependencies (`anomalyAcesLog`, `anomalyAcesTable`, `anomalyAcesUtil`, and `log`) to your `addons/` folder).*
-4. Once completed, open the Godot Editor, go to **Project -> Project Settings -> Plugins** and enable **Ace Addon Manager**.
+   *(This dynamically resolves and downloads the required dependencies directly from GitHub using `addons.json` files and deletes the `.gdignore` file).*
+3. Once completed, open the Godot Editor, go to **Project -> Project Settings -> Plugins** and enable **Ace Addon Manager**.
 
 ### 1. Opening the UI
 - Open the project in the **Godot Editor**.
@@ -68,7 +67,7 @@ Now you can run the `ace-am` command from anywhere inside the project!
   ace-am bootstrap
   # Or run directly without alias: ./addons/anomalyAcesAddonManager/manage_addons bootstrap
   ```
-  *Downloads, extracts, and installs the 4 required dependency addon folders (anomalyAcesLog, anomalyAcesTable, anomalyAcesUtil, and log) directly from GitHub to the `addons/` directory.*
+  *Dynamically resolves, downloads, and extracts all required dependency addon folders recursively using the `addons.json` files directly from GitHub to the `addons/` directory, removing the temporary `.gdignore` file.*
 
 * **Add an Addon**:
   ```bash
