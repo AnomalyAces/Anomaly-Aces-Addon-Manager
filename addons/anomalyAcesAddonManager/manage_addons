@@ -120,17 +120,24 @@ ensure_ssh_remote() {
 }
 
 remove_gdignore_safely() {
-    local target_file="$PROJECT_ROOT/addons/anomalyAcesAddonManager/.gdignore"
-    if [ -f "$target_file" ]; then
-        echo "Removing temporary .gdignore from anomalyAcesAddonManager..."
-        if [ -d "$PROJECT_ROOT/.git" ]; then
-            (
-                cd "$PROJECT_ROOT" || exit 1
-                git update-index --assume-unchanged addons/anomalyAcesAddonManager/.gdignore 2>/dev/null
-            )
+    # Files to remove and assume-unchanged
+    local files=(
+        "addons/anomalyAcesAddonManager/Scripts/.gdignore"
+        "addons/anomalyAcesAddonManager/Scenes/.gdignore"
+    )
+    for file in "${files[@]}"; do
+        local target_file="$PROJECT_ROOT/$file"
+        if [ -f "$target_file" ]; then
+            echo "Removing temporary .gdignore from $(dirname "$file")..."
+            if [ -d "$PROJECT_ROOT/.git" ]; then
+                (
+                    cd "$PROJECT_ROOT" || exit 1
+                    git update-index --assume-unchanged "$file" 2>/dev/null
+                )
+            fi
+            rm -f "$target_file"
         fi
-        rm -f "$target_file"
-    fi
+    done
 }
 
 clear_submodule_links() {

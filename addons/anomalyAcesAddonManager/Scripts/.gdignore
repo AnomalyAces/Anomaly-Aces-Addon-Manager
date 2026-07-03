@@ -1,0 +1,2 @@
+# Temporarily ignore this directory to prevent Godot compile/load errors before bootstrapping dependencies.
+# This file will be deleted automatically when running any ace-am setup, link, or bootstrap CLI commands.

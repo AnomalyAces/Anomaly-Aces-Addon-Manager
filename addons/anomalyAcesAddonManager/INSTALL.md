@@ -2,9 +2,9 @@
 
 If you copy only the `anomalyAcesAddonManager` folder directly into an existing Godot project:
 
-1. **Automatic Error Suppression**: The folder ships with a temporary `.gdignore` file. This tells Godot to ignore the directory on startup, preventing script compilation or class-not-found errors before your dependencies are ready.
+1. **Automatic Error Suppression**: The folder ships with temporary `.gdignore` files inside the `Scripts/` and `Scenes/` subdirectories. This tells Godot to ignore those script/scene directories on startup, suppressing compilation or class-not-found errors before your dependencies are ready, while keeping `INSTALL.md` and basic metadata visible.
 2. **Recursive Resolution**: The bootstrapper parses the manager's `addons.json` and recursively downloads and resolves the entire dependency tree (including `anomalyAcesLog`, `anomalyAcesTable`, `anomalyAcesUtil`, and sub-dependencies like `log`) directly from GitHub.
-3. **Activation**: Running the bootstrap command automatically deletes the `.gdignore` file so Godot can safely scan, compile, and register the plugin.
+3. **Activation**: Running the bootstrap command automatically deletes the `.gdignore` files so Godot can safely scan, compile, and register the plugin.
 
 ---
 
@@ -23,7 +23,7 @@ your-godot-project/
    ```bash
    ./addons/anomalyAcesAddonManager/manage_addons bootstrap
    ```
-   *This command will dynamically download and resolve all dependencies listed in the addons.json files directly from GitHub, install them under `addons/`, and remove the `.gdignore` file.*
+   *This command will dynamically download and resolve all dependencies listed in the addons.json files directly from GitHub, install them under `addons/`, and remove the temporary `.gdignore` files.*
 
 ### Step 3: Enable the Plugin in Godot
 1. Open your project in the **Godot Editor**.

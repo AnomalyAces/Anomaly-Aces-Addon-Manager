@@ -6,6 +6,21 @@ This project integrates addons as **git submodules** inside the `submodules/` di
 
 ---
 
+## Workflows: Quick Usage vs. Full Development
+
+This repository supports two distinct workflows depending on whether you want to simply *use* the Addon Manager or *develop/contribute* to the addons themselves:
+
+1. **Quick Addon Usage (Bootstrapping / Standalone Installation)**
+   - **Target Audience**: Users who want to integrate the Addon Manager into their own game projects to preview, download, and manage third-party addons.
+   - **How it works**: You copy only the `anomalyAcesAddonManager` directory into your project's `addons/` folder. Running the `bootstrap` CLI command pulls down the required helper dependency folders directly from GitHub as plain directories.
+   - **Instructions**: See the [INSTALL.md](file:///c:/Users/Jerek/Documents/Anomaly Aces/Anomaly Aces Plugins/Anomaly-Aces-Addon-Manager/addons/anomalyAcesAddonManager/INSTALL.md) guide inside the addon directory for detailed steps.
+
+2. **Full Developer Experience (Submodules + Symlinks)**
+   - **Target Audience**: Developers who want to write, edit, test, and contribute changes back to the individual addon repositories themselves.
+   - **How it works**: Addons are registered as Git submodules inside `submodules/` and linked via junctions/symlinks under `addons/`. This keeps the Git workspace clean, isolates addon changes, and allows you to use commands like `ace-am commit <addon_name> "<msg>"` to stage, commit, and push modifications directly back upstream to their original repositories.
+
+---
+
 ## How to Use the UI
 
 The **Addon Manager** is a custom Godot editor interface that allows you to manage and test addons directly inside the Godot Editor.
