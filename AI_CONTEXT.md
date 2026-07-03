@@ -156,6 +156,7 @@ source ~/.bashrc # or source ~/.zshrc
 ```
 
 ### Core CLI Commands:
+* **Bootstrap Dependencies**: `ace-am bootstrap`
 * **Add an Addon**: `ace-am add <git_repo_url> <addon_name>`
 * **Remove an Addon**: `ace-am remove <addon_name>`
 * **Commit Addon Changes**: `ace-am commit <addon_name> "<commit_message>"`

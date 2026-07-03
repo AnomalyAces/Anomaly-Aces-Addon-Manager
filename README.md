@@ -10,6 +10,17 @@ This project integrates addons as **git submodules** inside the `submodules/` di
 
 The **Addon Manager** is a custom Godot editor interface that allows you to manage and test addons directly inside the Godot Editor.
 
+### Standalone Installation (Without cloning this sandbox repository)
+If you are copying only the `anomalyAcesAddonManager` folder directly into an existing Godot project:
+1. Copy the `anomalyAcesAddonManager` directory into your project's `addons/` directory.
+2. **DO NOT enable the plugin yet** (doing so will throw compile errors because its companion plugins are missing).
+3. Open a terminal at your project's root and run the bootstrapper command:
+   ```bash
+   ./addons/anomalyAcesAddonManager/manage_addons bootstrap
+   ```
+   *(This downloads and extracts the 4 required dependencies (`anomalyAcesLog`, `anomalyAcesTable`, `anomalyAcesUtil`, and `log`) to your `addons/` folder).*
+4. Once completed, open the Godot Editor, go to **Project -> Project Settings -> Plugins** and enable **Ace Addon Manager**.
+
 ### 1. Opening the UI
 - Open the project in the **Godot Editor**.
 - Go to **Project -> Project Settings -> Plugins** and ensure the **Ace Addon Manager** plugin is checked/enabled.
@@ -51,6 +62,13 @@ Now you can run the `ace-am` command from anywhere inside the project!
 > **SSH Required** — All git operations use SSH authentication. Before using `ace-am`, make sure you have an SSH key configured for GitHub (or your git host). HTTPS URLs are not accepted. See [GitHub's SSH guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) if you need to set one up.
 
 ### CLI Commands
+
+* **Bootstrap Dependencies (Standalone/Non-Git)**:
+  ```bash
+  ace-am bootstrap
+  # Or run directly without alias: ./addons/anomalyAcesAddonManager/manage_addons bootstrap
+  ```
+  *Downloads, extracts, and installs the 4 required dependency addon folders (anomalyAcesLog, anomalyAcesTable, anomalyAcesUtil, and log) directly from GitHub to the `addons/` directory.*
 
 * **Add an Addon**:
   ```bash
