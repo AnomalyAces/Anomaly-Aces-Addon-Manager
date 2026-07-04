@@ -52,7 +52,7 @@ theme_override_constants/separation = 16
 [node name="BackButton" type="Button" parent="VBoxContainer/Header/HBox"]
 custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
-text = "← Back to Dashboard"
+text = "< Back to Dashboard"
 flat = true
 
 [node name="PathLabel" type="Label" parent="VBoxContainer/Header/HBox"]

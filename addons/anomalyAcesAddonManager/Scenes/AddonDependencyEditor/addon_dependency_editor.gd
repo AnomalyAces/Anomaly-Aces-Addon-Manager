@@ -58,7 +58,7 @@ func _load_addons_json() -> void:
 					_add_entry_from_data(entry_data)
 				return
 	
-	# No file found — show blank form status
+	# No file found - show blank form status
 	file_status_label.text = "\u26A0 No addons.json found"
 	file_status_label.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2, 1))
 
@@ -115,10 +115,10 @@ func _on_run_script_pressed() -> void:
 	if exit_code == 0:
 		_show_output_dialog("\u2713 manage_addons update completed successfully", output_text, true)
 	else:
-		# Fallback: bash not found or script error — show copyable command
+		# Fallback: bash not found or script error - show copyable command
 		var fallback_msg = "Could not run script automatically (exit code %d).\n\nRun this command manually from the project root:\n" % exit_code
 		var cmd = "bash ./addons/anomalyAcesAddonManager/manage_addons update"
-		_show_output_dialog("\u26A0 Script execution failed \u2014 copy command below", fallback_msg + output_text, false, cmd)
+		_show_output_dialog("\u26A0 Script execution failed - copy command below", fallback_msg + output_text, false, cmd)
 
 func _show_output_dialog(title: String, body: String, success: bool, copy_cmd: String = "") -> void:
 	output_dialog.title = title

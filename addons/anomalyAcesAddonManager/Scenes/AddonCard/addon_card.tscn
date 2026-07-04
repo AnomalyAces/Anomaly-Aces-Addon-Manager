@@ -74,7 +74,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.75, 1.0, 1)
 theme_override_font_sizes/font_size = 12
 flat = true
-text = "\u2699 Edit Dependencies"
+text = "Edit Dependencies"
 alignment = 0
 
 [node name="Description" type="Label" parent="VBox" unique_id=1124455566]
