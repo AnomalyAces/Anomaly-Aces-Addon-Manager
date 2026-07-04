@@ -7,8 +7,30 @@ var current_view_path: String = ""
 var current_extra_data = null
 
 func _enter_tree() -> void:
-	# Enable all plugins in res://addons/
-	AddonManagerUtil.enable_addons()
+	# Check for missing dependencies first
+	var missing_deps = []
+	if not ResourceLoader.exists("res://addons/anomalyAcesLog/scripts/AceLog.gd"):
+		missing_deps.append("anomalyAcesLog")
+	if not ResourceLoader.exists("res://addons/anomalyAcesUtil/Scripts/AceFileUtil/AceFileUtil.gd"):
+		missing_deps.append("anomalyAcesUtil")
+	if not ResourceLoader.exists("res://addons/anomalyAcesTable/Scripts/Table/AceTableManager.gd"):
+		missing_deps.append("anomalyAcesTable")
+
+	if missing_deps.size() > 0:
+		var err_msg = "Ace Addon Manager: Missing required companion plugins: %s. " % [missing_deps]
+		err_msg += "Please run the bootstrap script (manage_addons bootstrap) before enabling the plugin."
+		printerr(err_msg)
+		push_error(err_msg)
+		if Engine.is_editor_hint():
+			EditorInterface.call_deferred("set_plugin_enabled", "anomalyAcesAddonManager", false)
+		return
+
+	# Enable all plugins in res://addons/ if the utility class is available
+	var util_path = "res://addons/anomalyAcesAddonManager/Scripts/AddonManagerUtil/AddonManagerUtil.gd"
+	if ResourceLoader.exists(util_path):
+		var util = load(util_path)
+		if util:
+			util.enable_addons()
 
 	# Initialize the AceLog settings if the dependency is present
 	var ace_log_path = "res://addons/anomalyAcesLog/scripts/AceLog.gd"
