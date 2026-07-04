@@ -54,7 +54,7 @@ func set_addon_details(addon_name: String, version: String, author: String, desc
 			var btn = Button.new()
 			# Extract filename from path
 			var filename = demo_path.get_file()
-			btn.text = "▶ Run " + filename
+			btn.text = "\u25B6 Run " + filename
 			btn.tooltip_text = demo_path
 			
 			# Store demo_path in a local variable for the lambda closure

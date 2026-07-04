@@ -293,18 +293,18 @@ func _setup_button_icons(scale: float) -> void:
 	var deps_tex = load("res://addons/anomalyAcesAddonManager/Icons/ManagerDependencies.svg")
 	if deps_tex:
 		manager_deps_button.icon = AddonManagerUtil.scale_svg_icon(deps_tex, icon_size)
-		if manager_deps_button.text.begins_with("⚙ "):
+		if manager_deps_button.text.begins_with("\u2699 "):
 			manager_deps_button.text = manager_deps_button.text.substr(2)
-		elif manager_deps_button.text.begins_with("⚙"):
+		elif manager_deps_button.text.begins_with("\u2699"):
 			manager_deps_button.text = manager_deps_button.text.substr(1)
 
 	# 3. Addon Updater button icon
 	var updater_tex = load("res://addons/anomalyAcesAddonManager/Icons/AddonUpdater.svg")
 	if updater_tex:
 		updater_button.icon = AddonManagerUtil.scale_svg_icon(updater_tex, icon_size)
-		if updater_button.text.ends_with("  →"):
+		if updater_button.text.ends_with("  \u2192"):
 			updater_button.text = updater_button.text.substr(0, updater_button.text.length() - 3)
-		elif updater_button.text.ends_with(" →"):
+		elif updater_button.text.ends_with(" \u2192"):
 			updater_button.text = updater_button.text.substr(0, updater_button.text.length() - 2)
 
 	# 4. Ignore List button icon

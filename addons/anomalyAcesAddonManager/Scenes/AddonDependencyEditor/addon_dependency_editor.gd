@@ -52,14 +52,14 @@ func _load_addons_json() -> void:
 			file.close()
 			var parsed = JSON.parse_string(json_text)
 			if parsed is Array:
-				file_status_label.text = "✓ Loaded addons.json"
+				file_status_label.text = "\u2713 Loaded addons.json"
 				file_status_label.add_theme_color_override("font_color", Color(0.3, 0.8, 0.3, 1))
 				for entry_data in parsed:
 					_add_entry_from_data(entry_data)
 				return
 	
 	# No file found — show blank form status
-	file_status_label.text = "⚠ No addons.json found"
+	file_status_label.text = "\u26A0 No addons.json found"
 	file_status_label.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2, 1))
 
 func _add_entry_from_data(data: Dictionary) -> void:
@@ -93,10 +93,10 @@ func _on_save_pressed() -> void:
 	if file:
 		file.store_string(json_text)
 		file.close()
-		file_status_label.text = "✓ Saved addons.json"
+		file_status_label.text = "\u2713 Saved addons.json"
 		file_status_label.add_theme_color_override("font_color", Color(0.3, 0.8, 0.3, 1))
 	else:
-		file_status_label.text = "✗ Save failed!"
+		file_status_label.text = "\u2717 Save failed!"
 		file_status_label.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3, 1))
 
 func _on_run_script_pressed() -> void:
@@ -113,12 +113,12 @@ func _on_run_script_pressed() -> void:
 	var output_text = "\n".join(output)
 	
 	if exit_code == 0:
-		_show_output_dialog("✓ manage_addons update completed successfully", output_text, true)
+		_show_output_dialog("\u2713 manage_addons update completed successfully", output_text, true)
 	else:
 		# Fallback: bash not found or script error — show copyable command
 		var fallback_msg = "Could not run script automatically (exit code %d).\n\nRun this command manually from the project root:\n" % exit_code
 		var cmd = "bash ./addons/anomalyAcesAddonManager/manage_addons update"
-		_show_output_dialog("⚠ Script execution failed — copy command below", fallback_msg + output_text, false, cmd)
+		_show_output_dialog("\u26A0 Script execution failed \u2014 copy command below", fallback_msg + output_text, false, cmd)
 
 func _show_output_dialog(title: String, body: String, success: bool, copy_cmd: String = "") -> void:
 	output_dialog.title = title
