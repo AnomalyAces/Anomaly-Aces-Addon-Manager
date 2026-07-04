@@ -1,3 +1,3 @@
-extends Node
+class_name AddonPreviewerOverlay extends Node
 
-var target_demo_scene: String = ""
+static var target_demo_scene: String = ""
