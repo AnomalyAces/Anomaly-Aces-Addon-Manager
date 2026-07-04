@@ -42,11 +42,15 @@ static func enable_addons() -> void:
         dir.list_dir_begin()
         var folder_name = dir.get_next()
         
-        while folder_name != "":
-            # 1. Ensure it is a directory and not a hidden file system path
-            if dir.current_is_dir() and not folder_name.begins_with("."):
-                # 2. Check if the directory actually contains a 'plugin.cfg' file
-                var cfg_path = folder_name.path_join("plugin.cfg")
+		while folder_name != "":
+			# 1. Ensure it is a directory and not a hidden file system path
+			if dir.current_is_dir() and not folder_name.begins_with("."):
+				# Skip enabling the Addon Manager itself to avoid recursive enabling conflicts
+				if folder_name == "anomalyAcesAddonManager":
+					folder_name = dir.get_next()
+					continue
+				# 2. Check if the directory actually contains a 'plugin.cfg' file
+				var cfg_path = folder_name.path_join("plugin.cfg")
                 if dir.file_exists(cfg_path):
                     # 3. Only enable it if it isn't active already
                     if not EditorInterface.is_plugin_enabled(folder_name):

@@ -13,7 +13,6 @@ signal remove_requested
 @onready var add_sub_dep_button: Button = $VBox/SubDepsSection/AddSubDepButton
 @onready var sub_deps_container: VBoxContainer = $VBox/SubDepsSection/SubDepsContainer
 
-const DEPENDENCY_ENTRY_SCENE = preload("res://addons/anomalyAcesAddonManager/Scenes/AddonDependencyEditor/DependencyEntry/dependency_entry.tscn")
 
 func _ready() -> void:
 	remove_button.pressed.connect(func(): remove_requested.emit())
@@ -26,7 +25,8 @@ func _on_release_toggled(pressed: bool) -> void:
 	version_branch_field.placeholder_text = "e.g. 1.0.0" if pressed else "e.g. master"
 
 func _on_add_sub_dep() -> void:
-	var entry = DEPENDENCY_ENTRY_SCENE.instantiate()
+	var scene = load("res://addons/anomalyAcesAddonManager/Scenes/AddonDependencyEditor/DependencyEntry/dependency_entry.tscn")
+	var entry = scene.instantiate()
 	sub_deps_container.add_child(entry)
 	entry.remove_requested.connect(func(): entry.queue_free())
 

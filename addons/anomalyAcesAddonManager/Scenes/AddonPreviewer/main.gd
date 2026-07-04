@@ -309,7 +309,7 @@ func _setup_button_icons(scale: float) -> void:
 
 	# 4. Ignore List button icon
 	if Engine.is_editor_hint():
-		var ignore_tex = EditorInterface.get_editor_theme().get_icon("VisibilityHidden", "EditorIcons")
+		var ignore_tex = EditorInterface.get_editor_theme().get_icon("GuiVisibilityHidden", "EditorIcons")
 		if ignore_tex:
 			ignore_button.icon = AddonManagerUtil.scale_svg_icon(ignore_tex, icon_size)
 
