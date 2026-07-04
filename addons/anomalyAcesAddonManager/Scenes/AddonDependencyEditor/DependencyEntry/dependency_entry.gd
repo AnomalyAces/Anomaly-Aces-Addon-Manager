@@ -62,7 +62,8 @@ func set_data(data: Dictionary) -> void:
 	
 	# Load nested dependencies
 	for sub_dep in data.get("dependencies", []):
-		var entry = DEPENDENCY_ENTRY_SCENE.instantiate()
+		var scene = load("res://addons/anomalyAcesAddonManager/Scenes/AddonDependencyEditor/DependencyEntry/dependency_entry.tscn")
+		var entry = scene.instantiate()
 		sub_deps_container.add_child(entry)
 		entry.set_data(sub_dep)
 		entry.remove_requested.connect(func(): entry.queue_free())
