@@ -652,7 +652,11 @@ cmd_bootstrap() {
             echo "Downloading dependency: $repo ($ref)..."
             
             if [ "$downloader" = "curl" ]; then
-                curl -L -s -o "$zip_file" "$zip_url"
+                if [ "$IS_WINDOWS" -eq 1 ]; then
+                    curl -L --ssl-no-revoke -s -o "$zip_file" "$zip_url"
+                else
+                    curl -L -s -o "$zip_file" "$zip_url"
+                fi
             else
                 wget -q -O "$zip_file" "$zip_url"
             fi

@@ -108,7 +108,13 @@ func _on_run_script_pressed() -> void:
 	var output: Array = []
 	
 	# Try to run via bash (Git Bash / WSL on Windows, native bash on Linux/Mac)
-	var exit_code = OS.execute("bash", [script_path, "update"], output, true)
+	var bash_cmd = "bash"
+	if OS.get_name() == "Windows":
+		var git_bash = _find_git_bash_windows()
+		if git_bash != "":
+			bash_cmd = git_bash
+	
+	var exit_code = OS.execute(bash_cmd, [script_path, "update"], output, true)
 	
 	var output_text = "\n".join(output)
 	
@@ -119,6 +125,39 @@ func _on_run_script_pressed() -> void:
 		var fallback_msg = "Could not run script automatically (exit code %d).\n\nRun this command manually from the project root:\n" % exit_code
 		var cmd = "bash ./addons/anomalyAcesAddonManager/manage_addons update"
 		_show_output_dialog("\u26A0 Script execution failed - copy command below", fallback_msg + output_text, false, cmd)
+
+func _find_git_bash_windows() -> String:
+	# 1. Try to find git in PATH and locate bash relative to it
+	var where_output: Array = []
+	var where_exit = OS.execute("where.exe", ["git"], where_output, true)
+	if where_exit == 0 and where_output.size() > 0:
+		var git_path = where_output[0].strip_edges()
+		if "\n" in git_path:
+			git_path = git_path.split("\n")[0].strip_edges()
+		
+		# Typically, git is in "Git/cmd/git.exe" and bash is in "Git/bin/bash.exe"
+		var git_dir = git_path.get_base_dir()
+		var git_root = git_dir.get_base_dir()
+		var possible_bash = git_root.path_join("bin/bash.exe")
+		if FileAccess.file_exists(possible_bash):
+			return possible_bash
+		
+		var possible_sh = git_root.path_join("bin/sh.exe")
+		if FileAccess.file_exists(possible_sh):
+			return possible_sh
+
+	# 2. Try common default Git installation paths on Windows
+	var common_paths = [
+		"C:/Program Files/Git/bin/bash.exe",
+		"C:/Program Files (x86)/Git/bin/bash.exe",
+		"D:/Program Files/Git/bin/bash.exe",
+		"D:/Program Files (x86)/Git/bin/bash.exe"
+	]
+	for path in common_paths:
+		if FileAccess.file_exists(path):
+			return path
+
+	return ""
 
 func _show_output_dialog(title: String, body: String, success: bool, copy_cmd: String = "") -> void:
 	output_dialog.title = title
