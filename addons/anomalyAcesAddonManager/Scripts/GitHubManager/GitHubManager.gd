@@ -420,6 +420,10 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			#Move the downloaded addon to the addons folder
 			AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()], [".zip"])
 
+			# If updating the AddonManager, remove temporary .gdignore files from its subfolders
+			if addon.repo.to_lower().contains("addon-manager") or addon.subfolder.to_lower().contains("addonmanager"):
+				_remove_gdignores_recursively("res://" + addon.subfolder)
+
 			#Delete Files and Folders that didn't get moved
 			AceFileUtil.File.delete_matching_items("%s" % GITHUB_TEMP_DOWNLOAD_PATH, ".zip")
 			
@@ -545,3 +549,21 @@ func _get_config_file() -> ConfigFile:
 
 func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
 	return AceDateTimeUtil.DateTime.utc_string_to_local_datetime_string(utc_datetime_string)
+
+func _remove_gdignores_recursively(path: String) -> void:
+	var dir = DirAccess.open(path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if file_name != "." and file_name != "..":
+				var full_path = path.path_join(file_name)
+				if dir.current_is_dir():
+					_remove_gdignores_recursively(full_path)
+				elif file_name == ".gdignore":
+					var err = DirAccess.remove_absolute(full_path)
+					if err == OK:
+						AceLog.printLog(["Removed temporary .gdignore file at: %s" % full_path], AceLog.LOG_LEVEL.INFO)
+					else:
+						AceLog.printLog(["Failed to remove temporary .gdignore file at: %s. Error: %d" % [full_path, err]], AceLog.LOG_LEVEL.WARN)
+			file_name = dir.get_next()

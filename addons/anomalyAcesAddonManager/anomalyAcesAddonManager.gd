@@ -39,13 +39,23 @@ func _enter_tree() -> void:
 		if ace_log:
 			ace_log.initialize_settings()
 
+	# Clean up any orphaned wrappers from previous hot-reloads
+	var main_screen = EditorInterface.get_editor_main_screen()
+	if main_screen:
+		for child in main_screen.get_children():
+			if child.name == "AceAddonManagerWrapper":
+				main_screen.remove_child(child)
+				child.queue_free()
+
 	#Initialize the main screen wrapper
 	main_screen_wrapper = MarginContainer.new()
+	main_screen_wrapper.name = "AceAddonManagerWrapper"
 	main_screen_wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	main_screen_wrapper.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main_screen_wrapper.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	
 	# Add the wrapper to the editor's main viewport
-	EditorInterface.get_editor_main_screen().add_child(main_screen_wrapper)
+	main_screen.add_child(main_screen_wrapper)
 	
 	# Load the initial dashboard view (Addon Previewer)
 	switch_to_view("res://addons/anomalyAcesAddonManager/Scenes/AddonPreviewer/main.tscn")
