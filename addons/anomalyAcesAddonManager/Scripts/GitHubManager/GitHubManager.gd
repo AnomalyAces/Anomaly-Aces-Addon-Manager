@@ -421,7 +421,7 @@ func _installAddons(addon: RemoteRepoObject) -> void:
 			AceFileUtil.File.move_folder(_editor_interface, "%s/%s" % [GITHUB_TEMP_DOWNLOAD_PATH, addon.repo.get_base_dir()], "%s/%s" % [ADDON_DIR, addon.repo.get_base_dir()], [".zip"])
 
 			# If updating the AddonManager, remove temporary .gdignore files from its subfolders
-			if addon.repo.to_lower().contains("addon-manager") or addon.subfolder.to_lower().contains("addonmanager"):
+			if addon.subfolder.contains("anomalyAcesAddonManager") or addon.repo == "Anomaly-Aces-Addon-Manager":
 				_remove_gdignores_recursively("res://" + addon.subfolder)
 
 			#Delete Files and Folders that didn't get moved
@@ -551,6 +551,8 @@ func _convert_utc_string_to_local_string(utc_datetime_string: String) -> String:
 	return AceDateTimeUtil.DateTime.utc_string_to_local_datetime_string(utc_datetime_string)
 
 func _remove_gdignores_recursively(path: String) -> void:
+	if not path.contains("anomalyAcesAddonManager"):
+		return
 	var dir = DirAccess.open(path)
 	if dir:
 		dir.list_dir_begin()
