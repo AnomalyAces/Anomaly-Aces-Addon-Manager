@@ -30,3 +30,27 @@ your-godot-project/
 2. Go to **Project -> Project Settings -> Plugins**.
 3. Locate **Ace Addon Manager** (which is now visible and compiled cleanly) and check the **Enable** checkbox.
 4. The **"Addon Manager"** main screen tab will now appear at the top-center of your editor.
+
+---
+
+### Tracking and Managing Custom Dependencies
+
+If you have custom addons or asset libraries inside your project, you can add an `addons.json` file to their folder so that their dependencies are automatically tracked and installed by the bootstrapper:
+
+1. **Via the Editor UI**: Open the Addon Manager dashboard, click **"Edit Dependencies"** on the addon card, configure your dependency list, and click **"Save addons.json"**.
+2. **Via Manual File Creation**: Create a file named `addons.json` in the root of the addon folder (e.g., `res://addons/my_custom_addon/addons.json`) and configure its dependencies in standard JSON format:
+   ```json
+   [
+     {
+       "repo": "Anomaly-Aces-Util",
+       "subfolder": "addons/anomalyAcesUtil",
+       "owner": "anomalyaces",
+       "branch": "master",
+       "isRelease": false,
+       "version": "1.0",
+       "dependencies": []
+     }
+   ]
+   ```
+
+The CLI bootstrapper (`manage_addons bootstrap`) scans all folders under `addons/` recursively for `addons.json` files, meaning any dependencies defined this way will be automatically resolved and installed during a bootstrap or update.

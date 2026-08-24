@@ -56,6 +56,51 @@ Click the **Addon Updater** button in the top-right header to switch to the upda
 
 ---
 
+## Managing Addon Dependencies (addons.json)
+
+The Addon Manager automatically tracks and resolves dependencies for any addon that has an `addons.json` file in its root directory.
+
+### How to Add `addons.json` to an Addon Folder:
+
+1. **For Addons Displayed on the Dashboard** (folders containing a `plugin.cfg`):
+   - Open the **Addon Manager** in the Godot Editor.
+   - Click the **⚙ Edit Dependencies** button on the addon's card.
+   - If the addon doesn't have an `addons.json` file yet, the editor will display `⚠ No addons.json found`.
+   - Click **+ Add Top-Level Dependency** to define dependencies, or leave it blank.
+   - Click **Save addons.json** in the header. The manager will automatically generate and save the file in your addon's subfolder (e.g. `res://addons/my_addon/addons.json`).
+
+2. **For Non-UI folders / Asset Libraries** (folders without a `plugin.cfg`):
+   - You can create a file named `addons.json` directly inside your addon's directory using Godot's FileSystem dock or an external editor.
+   - Alternatively, you can add a minimal `plugin.cfg` file to the folder first, so it appears in the editor UI:
+     ```ini
+     [plugin]
+     name="My Library Name"
+     description="Description of my library"
+     author="Author Name"
+     version="1.0"
+     script=""
+     ```
+     Once created, you can manage its dependencies via the editor UI.
+
+### `addons.json` Structure
+Each `addons.json` file contains a JSON array of dependency objects:
+```json
+[
+	{
+		"repo": "Anomaly-Aces-Log",
+		"subfolder": "addons/anomalyAcesLog",
+		"owner": "anomalyaces",
+		"branch": "master",
+		"isRelease": false,
+		"version": "1.0",
+		"dependencies": []
+	}
+]
+```
+The CLI command `ace-am bootstrap` and `ace-am update` recursively scan all subdirectories under `res://addons/` for these files and download any missing dependencies from GitHub automatically.
+
+---
+
 ## Command Line Helper (`ace-am`)
 
 A bash script `manage_addons` is provided in the `addons/anomalyAcesAddonManager/` directory. To install it as a global command/alias (`ace-am`) on your PC:
